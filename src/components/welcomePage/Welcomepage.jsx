@@ -138,7 +138,7 @@ const Welcomepage = () => {
                 >
                   
 
-                  <div className="relative flex items-center justify-center w-12 h-12">
+                  <div className="relative flex items-center justify-center w-12 h-12" onClick={()=>navigate("/dashboard")}>
                     <motion.div
                       className="absolute w-12 h-12 rounded-full border border-white/30"
                       animate={{

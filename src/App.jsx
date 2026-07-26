@@ -2,6 +2,7 @@
 import './App.css'
 import Signin from './components/authentication/signin/Signin'
 import Signup from './components/authentication/signup/Signup'
+import Maindashboard from './components/dashboard/maindashboard/Maindashboard'
 import Welcomepage from './components/welcomePage/Welcomepage'
 import {BrowserRouter, Route, Routes} from "react-router-dom"
 function App() {
@@ -15,6 +16,8 @@ function App() {
       <Route path='/' element={<Welcomepage/>}/>
       <Route path='/signup' element={<Signup/>} />
       <Route path='/signin' element={<Signin/>} />
+      <Route path='/dashboard' element={<Maindashboard/>} />
+      
      </Routes>
      </BrowserRouter>
     </>
