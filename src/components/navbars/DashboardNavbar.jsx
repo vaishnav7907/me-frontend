@@ -4,18 +4,18 @@ import { IoReorderTwoOutline } from "react-icons/io5";
 const DashboardNavbar = () => {
   const navbarItems = [
     { name: "New" },
-    { name: "Women" },
-    { name: "Men" },
+    // { name: "Women" },
+    // { name: "Men" },
     { name: "Collections" },
     { name: "Sales" },
     { name: "Cart" },
   ];
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pt-7 pl-7 pr-7">
         <div className=" flex items-center gap-20">
           <div>
-            <motion.h1 className="text-4xl text-black  cursor-pointer">
+            <motion.h1 className="text-4xl text-white  cursor-pointer">
               <span className="font-thin">M</span>
               <span className="font-bold">E</span>
             </motion.h1>
