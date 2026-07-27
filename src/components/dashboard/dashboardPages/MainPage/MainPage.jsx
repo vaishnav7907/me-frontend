@@ -1,17 +1,20 @@
 import React from "react";
 import DashboadrNavbar from "../../../navbars/DashboardNavbar";
 import NewCollections from "../NewCollections";
-import MenCollection from "../MenCollection";
+
+import Brands from "../Brands";
+import Sales from "../Sales";
 const MainPage = () => {
   return (
-    <div className="h-screen w-full bg-black overflow-hidden ">
+    <div className=" w-full bg-black  ">
       <div className="flex flex-col gap-7 w-full">
-        <div>
+        <div className="overflow-hidden">
           <DashboadrNavbar />
         </div>
         <div className="w-full h-screen  ">
           {/* <NewCollections /> */}
-          <MenCollection/>
+         {/* <Brands/> */}
+         <Sales/>
         </div>
       </div>
     </div>

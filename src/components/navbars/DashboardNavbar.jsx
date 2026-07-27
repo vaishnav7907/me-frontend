@@ -6,7 +6,7 @@ const DashboardNavbar = () => {
     { name: "New" },
     // { name: "Women" },
     // { name: "Men" },
-    { name: "Collections" },
+    { name: "Brands" },
     { name: "Sales" },
     { name: "Cart" },
   ];
