@@ -1,29 +1,35 @@
-import React from 'react'
+import React from "react";
 import { motion } from "motion/react";
-import {
-  FiHome,
-  FiGrid,
-  FiShoppingBag,
-  FiHeart,
-  FiUser,
-  FiSettings,
-} from "react-icons/fi";
+import { FiUser, FiSettings } from "react-icons/fi";
+import { PiSignInBold, PiUserPlusBold } from "react-icons/pi";
+
 const MaindashboardSidebar = () => {
-     const menus = [
-    { icon: <FiHome />, name: "Home" },
-    { icon: <FiGrid />, name: "Collections" },
-    { icon: <FiShoppingBag />, name: "Shop" },
-    { icon: <FiHeart />, name: "Wishlist" },
-    { icon: <FiUser />, name: "Profile" },
-    { icon: <FiSettings />, name: "Settings" },
+  const menus = [
+    {
+      icon: <PiSignInBold />,
+      name: "Sign In",
+    },
+    {
+      icon: <PiUserPlusBold />,
+      name: "Sign Up",
+    },
+    {
+      icon: <FiUser />,
+      name: "Profile",
+    },
+    {
+      icon: <FiSettings />,
+      name: "Settings",
+    },
   ];
 
   return (
-   <motion.aside
-      initial={{ x: -80, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.8 }}
-      className="h-screen w-72 bg-[#0b0b0b] border-r border-white/10 flex flex-col justify-between"
+    <motion.aside
+      initial={{ x: "100%" }}
+      animate={{ x: 0 }}
+      exit={{ x: "100%" }}
+      transition={{ duration: 0.4 }}
+      className="h-screen w-72 bg-[#0b0b0b] border-l border-white/10 flex flex-col justify-between"
     >
       {/* Logo */}
       <div>
@@ -40,15 +46,15 @@ const MaindashboardSidebar = () => {
 
         {/* Menu */}
         <div className="mt-10 flex flex-col gap-2 px-4">
-          {menus.map((item, index) => (
+          {menus.map((item) => (
             <motion.button
-              key={index}
+              key={item.name}
               whileHover={{
                 x: 8,
                 backgroundColor: "rgba(255,255,255,0.05)",
               }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-5 rounded-xl px-6 py-4 text-gray-400 hover:text-white transition"
+              className="flex items-center gap-4 rounded-xl px-6 py-4 text-gray-400 hover:text-white transition-all duration-300"
             >
               <span className="text-xl">{item.icon}</span>
 
@@ -60,10 +66,18 @@ const MaindashboardSidebar = () => {
         </div>
       </div>
 
-      {/* Bottom */}
-    
-    </motion.aside>
-  )
-}
+      {/* Footer */}
+      <div className="border-t border-white/10 px-8 py-6">
+        <p className="text-xs uppercase tracking-[0.3em] text-gray-600">
+          ME Fashion
+        </p>
 
-export default MaindashboardSidebar
+        <p className="text-gray-500 text-sm mt-2">
+          Timeless elegance for every season.
+        </p>
+      </div>
+    </motion.aside>
+  );
+};
+
+export default MaindashboardSidebar;

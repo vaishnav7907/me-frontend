@@ -1,6 +1,7 @@
 import React from "react";
 
-import women1 from "../../../assets/women2.jpg";
+import women1 from "../../../../assets/women2.jpg";
+import { NavLink } from "react-router-dom";
 
 const collections = [
   {
@@ -10,6 +11,7 @@ const collections = [
     hover: "Shirts",
     description:
       "A well-crafted shirt is more than clothing—it's a statement of confidence. Designed with clean lines, exceptional comfort, and premium quality, our collection brings timeless elegance to every occasion.",
+      path:"/premiumShirts"
   },
   {
     id: "02",
@@ -39,7 +41,7 @@ const collections = [
 
 const NewCollections = () => {
   return (
-    <div className="bg-black text-white h-screen px-8 lg:px-16 py-14 overflow-auto">
+    <div className="bg-black text-white min-h-screen px-8 lg:px-16 py-14 ">
       {/* Heading */}
       <div className="border-b border-white/10 pb-6 mb-20">
         <p className="uppercase tracking-[8px] text-gray-500 text-sm">
@@ -52,9 +54,10 @@ const NewCollections = () => {
       </div>
 
       {collections.map((data, index) => (
-        <div
+        <NavLink
           className={`flex flex-col lg:flex-row items-center gap-16 mb-32 ${index % 2 !== 0 ? "lg:flex-row-reverse" : ""}`}
           key={data.id}
+          to={data.path}
         >
           <div className="group relative w-full max-w-[380px] h-[500px] border border-white/10 cursor-pointer overflow-hidden">
             <img
@@ -110,7 +113,7 @@ const NewCollections = () => {
               </div>
             </div>
           </div>
-        </div>
+        </NavLink>
       ))}
     </div>
   );
