@@ -1,6 +1,8 @@
 import React from "react";
 
 import women1 from "../../../../assets/women2.jpg";
+import jacket1 from "../../../../assets/premjackets/jacket1.jpg"
+// import jacket1 from "../../../../assets/premjackets/jacket1.jpg"
 import { NavLink } from "react-router-dom";
 
 const collections = [
@@ -16,11 +18,12 @@ const collections = [
   {
     id: "02",
     title: "Luxury Jackets",
-    // image: jacket,
+    image: jacket1,
     hover: "Jackets",
     description:
       "Crafted for every season, our jackets combine refined tailoring with premium fabrics, delivering warmth, durability, and effortless sophistication.",
-  },
+  path:"/luxuryJackets"
+    },
   {
     id: "03",
     title: "Essential T-Shirts",

@@ -2,8 +2,11 @@ import React from "react";
 import premiumshirt1 from "../../../../../../assets/premiumshirts/premiumshirt1.jpg";
 import premiumshirt2 from "../../../../../../assets/premiumshirts/premiumshirt2.jpg";
 import { motion } from "motion/react";
-
+import { IoArrowBack } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 const PremiumShirts = () => {
+  const navigate = useNavigate();
+  
   const shirts = [
     {
       id: 1,
@@ -82,24 +85,44 @@ const PremiumShirts = () => {
         SHIRTS
       </h1>
 
+      <button
+        className="group flex items-center gap-3 absolute top-10 left-7"
+        onClick={() => navigate(-1)}
+      >
+        <span className="text-xl transition-transform duration-300 group-hover:-translate-x-2">
+          <IoArrowBack className="transition-transform duration-300 group-hover:-translate-x-1" />
+        </span>
+        <span className="uppercase tracking-[0.35em] text-sm">Back</span>
+      </button>
       {/* heading portion */}
 
       <div className="max-w-7xl mx-auto px-6 lg:px-20 pt-32">
-        <div className="text-center">
-          <p className="uppercase tracking-[0.45em] text-neutral-500 text-sm">
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, y: 70 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          {/* <p className="uppercase tracking-[0.45em] text-neutral-500 text-sm">
             Latest Arrival
-          </p>
+          </p> */}
           <h2 className="font-serif text-5xl lg:text-7xl mt-6">
-            Premium Shirts
+            Latest Arrival
           </h2>
           <p className="max-w-2xl mx-auto mt-8 text-neutral-400 leading-8">
             Discover timeless silhouettes crafted from premium fabrics. Designed
             for modern elegance and everyday luxury.
           </p>
-        </div>
+        </motion.div>
 
         {/* content section */}
-        <div className="grid  lg:grid-cols-5 gap-8 mt-24">
+        <motion.div
+          className="grid  lg:grid-cols-5 gap-8 mt-24"
+          initial={{ opacity: 0, scale: 0.96 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
           {/* large image */}
 
           <div className="lg:col-span-3 overflow-hidden relative group">
@@ -136,9 +159,16 @@ const PremiumShirts = () => {
           {/* smll img */}
           <div className="lg:col-span-2 flex flex-col gap-8">
             {shirts.slice(1, 3).map((items, index) => (
-              <div
+              <motion.div
                 className="h-[346px] overflow-hidden group cursor-pointer relative"
                 key={items}
+                initial={{ opacity: 0, x: 60 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{
+                  duration: 0.6,
+                  delay: index * 0.15,
+                }}
+                viewport={{ once: true }}
               >
                 <img
                   src={items.image}
@@ -161,13 +191,18 @@ const PremiumShirts = () => {
                     </button>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
         {/* latest shirt///// */}
         <div className=" max-w-7xl mx-auto px-6  py-32 ">
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+          >
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between  mb-16">
               <div>
                 <p className="uppercase tracking-[0.45em] text-neutral-500 text-sm">
@@ -186,7 +221,7 @@ const PremiumShirts = () => {
                 </p>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           <div className=" grid grid-cols-4 gap-6 auto-rows-[346px]">
             {shirts.map((data, index) => {
@@ -195,11 +230,16 @@ const PremiumShirts = () => {
                 <motion.div
                   className={` overflow-hidden group cursor-pointer relative ${large ? "lg:row-span-2" : ""}`}
                   key={data.id}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.12 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -5 }}
                 >
                   <img
                     src={data.image}
                     alt=""
-                    className={`w-full h-full object-cover duration-700 group-hover:scale-110 ${large ? "h-[666px]" : "h-[330px]"} `}
+                    className={`w-full h-full object-cover duration-700 group-hover:scale-110  ${large ? "h-[666px]" : "h-[330px]"} `}
                   />
 
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
@@ -229,7 +269,13 @@ const PremiumShirts = () => {
 
         <hr className="w-full text-gray-500" />
 
-        <div className=" max-w-7xl mx-auto px-6  py-32 ">
+        <motion.div
+          className=" max-w-7xl mx-auto px-6  py-32 "
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
           <div className="text-center">
             <p className="uppercase tracking-[0.45em] text-neutral-500 text-sm">
               crafted for you
@@ -242,7 +288,7 @@ const PremiumShirts = () => {
               you'll wear for years.
             </h2>
           </div>
-        </div>
+        </motion.div>
         <hr className="w-full text-gray-500" />
         <div className=" max-w-7xl mx-auto px-6  py-32 ">
           <div>
@@ -293,7 +339,9 @@ const PremiumShirts = () => {
         </div>
 
         <div className="max-w-7xl mx-auto px-6  py-10 text-center">
-            <h2 className="font-serif text-4xl mt-3">Crafted for confidence. Designed by ME.</h2>
+          <h2 className="font-serif text-4xl mt-3">
+            Crafted for confidence. Designed by ME.
+          </h2>
         </div>
       </div>
     </section>
