@@ -1,8 +1,8 @@
 import React from "react";
 
 import women1 from "../../../../assets/women2.jpg";
-import jacket1 from "../../../../assets/premjackets/jacket1.jpg"
-// import jacket1 from "../../../../assets/premjackets/jacket1.jpg"
+import jacket1 from "../../../../assets/premjackets/jacket1.jpg";
+import tshirt1 from "../../../../assets/tshirts/tshirt1.webp";
 import { NavLink } from "react-router-dom";
 
 const collections = [
@@ -13,7 +13,7 @@ const collections = [
     hover: "Shirts",
     description:
       "A well-crafted shirt is more than clothing—it's a statement of confidence. Designed with clean lines, exceptional comfort, and premium quality, our collection brings timeless elegance to every occasion.",
-      path:"/premiumShirts"
+    path: "/premiumShirts",
   },
   {
     id: "02",
@@ -22,23 +22,25 @@ const collections = [
     hover: "Jackets",
     description:
       "Crafted for every season, our jackets combine refined tailoring with premium fabrics, delivering warmth, durability, and effortless sophistication.",
-  path:"/luxuryJackets"
-    },
+    path: "/luxuryJackets",
+  },
   {
     id: "03",
     title: "Essential T-Shirts",
-    // image: tshirt,
+    image: tshirt1,
     hover: "T-Shirts",
     description:
       "Minimal, versatile, and comfortable. Our premium T-shirts are designed with soft fabrics and modern silhouettes that elevate everyday style.",
+    path: "/Tshirts",
   },
   {
     id: "04",
-    title: "Modern Denim",
+    title: "Premium Pants",
     // image: jeans,
     hover: "Jeans",
     description:
       "From relaxed fits to timeless classics, our denim collection is crafted to provide lasting comfort while maintaining a refined contemporary look.",
+    path: "/PremiumPants",
   },
 ];
 

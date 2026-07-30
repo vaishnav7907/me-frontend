@@ -6,7 +6,9 @@ import Brands from "./components/dashboard/dashboardPages/brands/Brands";
 import Cart from "./components/dashboard/dashboardPages/cart/Cart";
 import MainPage from "./components/dashboard/dashboardPages/MainPage/MainPage";
 import LuxurJackets from "./components/dashboard/dashboardPages/newcollections/newcollectionpages/jackets/LuxurJackets";
+import PremiumPants from "./components/dashboard/dashboardPages/newcollections/newcollectionpages/pants/PremiumPants";
 import PremiumShirts from "./components/dashboard/dashboardPages/newcollections/newcollectionpages/premiumShirts/PremiumShirts";
+import Tshirts from "./components/dashboard/dashboardPages/newcollections/newcollectionpages/tshirts/Tshirts";
 import NewCollections from "./components/dashboard/dashboardPages/newcollections/NewCollections";
 import Sales from "./components/dashboard/dashboardPages/sales/Sales";
 import Maindashboard from "./components/dashboard/maindashboard/Maindashboard";
@@ -39,6 +41,8 @@ function App() {
           {/* new collections */}
           <Route path="/premiumShirts" element={<PremiumShirts/>} />
           <Route path="/luxuryJackets" element={<LuxurJackets/>}/>
+          <Route path="/Tshirts" element={<Tshirts/>}/>
+          <Route path="/PremiumPants" element={<PremiumPants/>} />
           {/* end new collections */}
         </Routes>
       </BrowserRouter>
