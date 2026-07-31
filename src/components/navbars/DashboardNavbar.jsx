@@ -15,7 +15,9 @@ const {setSidebar,sidebar}=UseMe()
       path:"/mainpage"
     },
     // { name: "Women" },
-    // { name: "Men" },
+    { name: "Collections",
+      path:"/mainpage/Collections"
+     },
     { name: "Brands",
       path:"/mainpage/Brands"
      },

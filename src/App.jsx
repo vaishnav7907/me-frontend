@@ -4,6 +4,7 @@ import Signup from "./components/authentication/signup/Signup";
 import { MeProvider } from "./components/context/Meprovider";
 import Brands from "./components/dashboard/dashboardPages/brands/Brands";
 import Cart from "./components/dashboard/dashboardPages/cart/Cart";
+import MenCollection from "./components/dashboard/dashboardPages/collections/Collections";
 import MainPage from "./components/dashboard/dashboardPages/MainPage/MainPage";
 import LuxurJackets from "./components/dashboard/dashboardPages/newcollections/newcollectionpages/jackets/LuxurJackets";
 import PremiumPants from "./components/dashboard/dashboardPages/newcollections/newcollectionpages/pants/PremiumPants";
@@ -33,6 +34,7 @@ function App() {
             <Route path="Brands" element={<Brands/>} />
             <Route path="Sales" element={<Sales/>} />
             <Route path="Cart" element={<Cart/>} />
+            <Route path="Collections" element={<MenCollection/>} />
             {/* <Route path="DashboardSidebar" element={<MaindashboardSidebar/> } /> */}
           </Route>
           {/* main page navbar */}
