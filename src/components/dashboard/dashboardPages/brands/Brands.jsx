@@ -1,7 +1,11 @@
 import React from "react";
 import { motion } from "motion/react";
 import { GoArrowUpRight } from "react-icons/go";
+import { useNavigate } from "react-router-dom";
 const Brands = () => {
+
+const navigate= useNavigate()
+
   const brands = [
     {
       name: "Zara",
@@ -65,7 +69,7 @@ const Brands = () => {
                 duration: 0.35,
               }}
             >
-              <div className="group h-48 rounded-2xl border border-zinc-800 bg-zinc-950 hover:border-white transition-all duration-300 flex flex-col items-center justify-center p-8">
+              <div className="group h-48 rounded-2xl border border-zinc-800 bg-zinc-950 hover:border-white transition-all duration-300 flex flex-col items-center justify-center p-8" onClick={()=>navigate("/BrandSubpage")}>
                 <img
                   src={brand.logo}
                 //   alt={brand.name}

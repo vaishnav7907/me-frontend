@@ -125,7 +125,7 @@ const PremiumShirts = () => {
         >
           {/* large image */}
 
-          <div className="lg:col-span-3 overflow-hidden relative group">
+          <div className="lg:col-span-3 overflow-hidden relative group" onClick={()=>navigate("/productInfo")}>
             <img
               src={premiumshirt1}
               alt=""

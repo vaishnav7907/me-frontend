@@ -1,7 +1,12 @@
 import React from "react";
 import { motion } from "motion/react";
 import { GoArrowUpRight } from "react-icons/go";
+import { useNavigate } from "react-router-dom";
 
+
+const Sales = () => {
+  const navigate= useNavigate()
+  
 const offers = [
   {
     title: "Summer Sale",
@@ -28,8 +33,6 @@ const offers = [
       "Enjoy additional savings on all premium collections this weekend only.",
   },
 ];
-
-const Sales = () => {
   return (
     <section className="bg-black text-white px-6 lg:px-20 py-28">
       {/* Heading */}
@@ -74,7 +77,7 @@ const Sales = () => {
               <div className=" flex items-center gap-5">
                 <span className="text-zinc-500 group-hover:text-white transition">Shop Now</span>
                 <div className="w-12 h-12 rounded-full border border-zinc-700 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all duration-300">
-                  <GoArrowUpRight size={22 } />
+                  <GoArrowUpRight size={22 }  onClick={()=>navigate("/Offers")}/>
                 </div>
               </div>
             

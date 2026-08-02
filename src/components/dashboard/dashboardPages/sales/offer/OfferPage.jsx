@@ -1,12 +1,15 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
-import pant1 from "../../../../assets/pants/pants1.jpg";
-import pant2 from "../../../../assets/pants/pants3.webp";
-import shirt1 from "../../../../assets/premiumshirts/premiumshirt1.jpg";
-import shirt2 from "../../../../assets/premiumshirts/premiumshirt2.jpg";
-import jacket1 from "../../../../assets/premjackets/jacket3.webp";
-import tshirt1 from "../../../../assets/tshirts/tshirt1.webp";
-const MenCollection = () => {
+import { IoArrowBack } from "react-icons/io5";
+import pant1 from "../../../../../assets/pants/pants1.jpg";
+import pant2 from "../../../../../assets/pants/pants3.webp";
+import shirt1 from "../../../../../assets/premiumshirts/premiumshirt1.jpg";
+import shirt2 from "../../../../../assets/premiumshirts/premiumshirt2.jpg";
+import jacket1 from "../../../../../assets/premjackets/jacket3.webp";
+import tshirt1 from "../../../../../assets/tshirts/tshirt1.webp";
+const OfferPage = () => {
+  const navigate = useNavigate();
   const products = [
     {
       id: 1,
@@ -67,43 +70,37 @@ const MenCollection = () => {
     selectedCategory === "All"
       ? products
       : products.filter((item) => item.category === selectedCategory);
-
   return (
-    <div className="min-h-screen bg-black text-white pb-14">
-      {/* Hero */}
+    <section className="bg-black text-white min-h-screen overflow-hidden ">
+      <h1 className="absolute top-24 left-0 text-[180px] lg:text-[260px] font-bold text-white/[0.03] uppercase pointer-events-none select-none">
+        Offers
+      </h1>
 
-      <section className="max-w-7xl mx-auto px-6 py-24">
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="uppercase tracking-[8px] text-sm text-gray-500"
-        >
-          Premium Fashion
-        </motion.p>
+      <button
+        className="group flex items-center gap-3 absolute top-10 left-7"
+        onClick={() => navigate(-1)}
+      >
+        <span className="text-xl transition-transform duration-300 group-hover:-translate-x-2">
+          <IoArrowBack className="transition-transform duration-300 group-hover:-translate-x-1" />
+        </span>
+        <span className="uppercase tracking-[0.35em] text-sm">Back</span>
+      </button>
+      <section className="max-w-7xl mx-auto px-6 py-28">
+        <p className="uppercase tracking-[10px] text-gray-500 text-sm">
+          Exclusive Event
+        </p>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-6xl md:text-8xl font-extralight mt-6"
-        >
-          Men's Collection
-        </motion.h1>
+        <h1 className="mt-6 text-[80px] md:text-[140px] font-black leading-none">
+          50%
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="max-w-2xl mt-8 text-gray-500 leading-8"
-        >
-          Discover timeless menswear crafted with premium fabrics, modern
-          tailoring and effortless elegance.
-        </motion.p>
+        <h2 className="text-4xl md:text-6xl font-light mt-6">OFF EVERYTHING</h2>
+
+        <p className="mt-10 max-w-xl text-gray-400 leading-8">
+          Upgrade your wardrobe with timeless essentials and premium tailoring.
+        </p>
       </section>
-
-      {/* Category Navbar */}
-
-      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-xl border-y border-white/10">
+      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-xl border-y border-white/10 ">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-8 overflow-x-auto py-5 no-scrollbar">
             {categories.map((data) => (
@@ -140,7 +137,7 @@ const MenCollection = () => {
       </div>
 
       {/* Products */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-14 ">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-14 pb-16">
         {filteredProducts.map((data, index) => (
           <motion.div
             key={data.id}
@@ -202,10 +199,8 @@ const MenCollection = () => {
           </motion.div>
         ))}
       </div>
-
-      
-    </div>
+    </section>
   );
 };
 
-export default MenCollection;
+export default OfferPage;

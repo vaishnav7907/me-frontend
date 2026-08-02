@@ -2,8 +2,10 @@ import React from "react";
 import { motion } from "motion/react";
 import { GoArrowUpRight, GoTrash } from "react-icons/go";
 import { FiMinus, FiPlus } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
+  const navigate= useNavigate()
   const cartItems = [
     {
       id: 1,
@@ -189,7 +191,7 @@ const Cart = () => {
             </div>
           </div>
 
-          <button className="mt-12 w-full bg-white text-black py-4 rounded-full flex items-center justify-center gap-3 hover:bg-zinc-200 transition duration-300">
+          <button className="mt-12 w-full bg-white text-black py-4 rounded-full flex items-center justify-center gap-3 hover:bg-zinc-200 transition duration-300" onClick={()=>navigate("/CartOrder")}>
             Checkout
             <GoArrowUpRight size={22} />
           </button>
