@@ -208,7 +208,7 @@ const Signin = () => {
           {/* Footer */}
 
           <div className="w-full max-w-md mt-20">
-            <div className="h-px bg-white/10"></div>
+            <div className="h-[2px] bg-white/10"></div>
 
             <div className="flex flex-col items-center justify-between mt-8 text-sm">
               <p className="text-gray-500">New to ME?</p>

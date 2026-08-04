@@ -14,14 +14,17 @@ const MaindashboardSidebar = () => {
     {
       icon: <PiUserPlusBold />,
       name: "Sign Up",
+      path:"/signup"
     },
     {
       icon: <FiUser />,
       name: "Profile",
+      path:"/profile"
     },
     {
       icon: <FiSettings />,
       name: "Settings",
+      path:"/settings"
     },
   ];
 

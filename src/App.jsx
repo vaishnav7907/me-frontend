@@ -1,4 +1,6 @@
 import "./App.css";
+import Profile from "./components/authentication/profile/Profile";
+import Settings from "./components/authentication/settings/Settings";
 import Signin from "./components/authentication/signin/Signin";
 import Signup from "./components/authentication/signup/Signup";
 import { MeProvider } from "./components/context/Meprovider";
@@ -27,8 +29,10 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Welcomepage />} />
-            <Route path='/signup' element={<Signup/>} />
-      <Route path='/signin' element={<Signin/>} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/signin" element={<Signin />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings/>}/>
             <Route path="/dashboard" element={<Maindashboard />} />
 
             {/* main page navbar */}
@@ -51,9 +55,9 @@ function App() {
 
             {/* brand subpage*/}
             <Route path="/BrandSubpage" element={<BrandSubpage />} />
-           <Route path="/productInfo" element={<ProductInfo/>} /> 
-           <Route  path="/Offers" element={<OfferPage/>} />
-           <Route path="/CartOrder"  element={<CartOrder/>}/>
+            <Route path="/productInfo" element={<ProductInfo />} />
+            <Route path="/Offers" element={<OfferPage />} />
+            <Route path="/CartOrder" element={<CartOrder />} />
             {/* end brand subpage */}
           </Routes>
         </BrowserRouter>
