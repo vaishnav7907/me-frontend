@@ -2,12 +2,14 @@ import React from "react";
 import { motion } from "motion/react";
 import { FiUser, FiSettings } from "react-icons/fi";
 import { PiSignInBold, PiUserPlusBold } from "react-icons/pi";
+import { NavLink } from "react-router-dom";
 
 const MaindashboardSidebar = () => {
   const menus = [
     {
       icon: <PiSignInBold />,
       name: "Sign In",
+      path:"/signin"
     },
     {
       icon: <PiUserPlusBold />,
@@ -47,8 +49,9 @@ const MaindashboardSidebar = () => {
         {/* Menu */}
         <div className="mt-10 flex flex-col gap-2 px-4">
           {menus.map((item) => (
+            <NavLink key={item.name} to={item.path}>
             <motion.button
-              key={item.name}
+              
               whileHover={{
                 x: 8,
                 backgroundColor: "rgba(255,255,255,0.05)",
@@ -62,6 +65,7 @@ const MaindashboardSidebar = () => {
                 {item.name}
               </span>
             </motion.button>
+            </NavLink>
           ))}
         </div>
       </div>
