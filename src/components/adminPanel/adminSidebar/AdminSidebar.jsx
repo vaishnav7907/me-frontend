@@ -10,8 +10,12 @@ import {
   FiSettings,
   FiLogOut,
 } from "react-icons/fi";
+import { NavLink } from "react-router-dom";
+import { UseMe } from "../../context/Meprovider";
 
 const AdminSidebar = () => {
+ 
+
   const navigation = [
     {
       title: "Overview",
@@ -19,60 +23,66 @@ const AdminSidebar = () => {
         {
           name: "Dashboard",
           icon: <FiGrid />,
+          path: "/adminDash",
         },
       ],
     },
+
     {
       title: "Store",
       items: [
         {
           name: "Products",
           icon: <FiShoppingBag />,
+          path: "/adminDash/storeProducts",
         },
         {
           name: "New Arrivals",
           icon: <FiBox />,
+          path: "/adminDash/storeNewArrivals",
         },
         {
           name: "Brands",
           icon: <FiTag />,
+          path: "/adminDash/storeBrands",
         },
         {
           name: "Orders",
           icon: <FiPackage />,
           badge: "24",
+          path: "/adminDash/storeOrders",
         },
         {
           name: "Customers",
           icon: <FiUsers />,
+          path: "/adminDash/storeCustomers",
         },
         {
           name: "Sales",
           icon: <FiDollarSign />,
+          path: "/adminDash/storeSales",
         },
       ],
     },
+
     {
       title: "System",
       items: [
         {
           name: "Settings",
           icon: <FiSettings />,
+          path: "/adminDash/settings",
         },
       ],
     },
   ];
 
+  
   const [navigationBtn, setNavigationBtn] = useState("Dashboard");
-
-  const handleclick = (name) => {
-    setNavigationBtn(name);
-  };
-
   return (
     <aside className="fixed top-0 left-0 z-50 h-screen w-[260px] bg-[#0B0D10] border-r border-[#242932] flex flex-col">
-      
-      {/* Logo */}
+
+      {/* ================= LOGO ================= */}
       <div className="h-[90px] px-7 flex flex-col items-start justify-center border-b border-[#242932]">
         <h1 className="text-3xl font-bold tracking-[0.35em] text-white">
           ME
@@ -83,14 +93,16 @@ const AdminSidebar = () => {
         </p>
       </div>
 
-      {/* Navigation */}
-      <div className="flex-1 overflow-y-auto px-5 py-6">
+      {/* ================= NAVIGATION ================= */}
+      <div className="flex-1 overflow-y-auto admin-sidebar-scroll px-5 py-6">
+
         {navigation.map((service, index) => (
           <div
             key={index}
-            className={`${index !== 0 ? "mt-8" : ""}`}
+            className="mt-4"
           >
-            {/* Section title */}
+
+            {/* Section Title */}
             <p
               className="
                 px-3
@@ -105,91 +117,100 @@ const AdminSidebar = () => {
               {service.title}
             </p>
 
-            {/* Items */}
+            {/* Navigation Items */}
             <div className="space-y-1">
-              {service.items.map((item, itemIndex) => {
-                const isActive = navigationBtn === item.name;
 
-                return (
-                  <button
-                    key={itemIndex}
-                    onClick={() => handleclick(item.name)}
-                    className={`
-                      group
-                      w-full
-                      flex
-                      items-center
-                      gap-3
-                      px-3
-                      py-3
-                      rounded-lg
-                      text-sm
-                      transition-all
-                      duration-200
+              {service.items.map((item, itemIndex) => (
 
-                      ${
-                        isActive
-                          ? "bg-[#8B5CF6]/10 text-[#A78BFA]"
-                          : "text-[#8B93A1] hover:bg-[#181C22] hover:text-white"
-                      }
-                    `}
-                  >
-                    {/* Icon */}
-                    <span
-                      className={`
-                        text-[17px]
-                        transition-colors
-                        duration-200
+                <NavLink
+                  key={itemIndex}
+                  to={item.path}
+                  onClick={() => {setNavigationBtn(item.name)}}
+                  className={({ isActive }) => `
+                    group
+                    w-full
+                    flex
+                    items-center
+                    gap-3
+                    px-3
+                    py-3
+                    rounded-lg
+                    text-sm
+                    transition-all
+                    duration-200
 
-                        ${
-                          isActive
-                            ? "text-[#8B5CF6]"
-                            : "text-[#68707C] group-hover:text-white"
-                        }
-                      `}
-                    >
-                      {item.icon}
-                    </span>
+                    ${
+                      isActive
+                        ? "bg-[#8B5CF6]/10 text-[#A78BFA]"
+                        : "text-[#8B93A1] hover:bg-[#181C22] hover:text-white"
+                    }
+                  `}
+                >
 
-                    {/* Name */}
-                    <span className="flex-1 text-left">
-                      {item.name}
-                    </span>
-
-                    {/* Badge */}
-                    {item.badge && (
+                  {({ isActive }) => (
+                    <>
+                      {/* ================= ICON ================= */}
                       <span
                         className={`
-                          min-w-[22px]
-                          h-[22px]
-                          px-1.5
-                          flex
-                          items-center
-                          justify-center
-                          rounded-full
-                          text-[10px]
-                          font-semibold
-                          
+                          text-[17px]
+                          transition-colors
+                          duration-200
+
                           ${
                             isActive
-                              ? "bg-[#8B5CF6] text-white"
-                              : "bg-[#242932] text-[#8B93A1]"
+                              ? "text-[#8B5CF6]"
+                              : "text-[#68707C] group-hover:text-white"
                           }
                         `}
                       >
-                        {item.badge}
+                        {item.icon}
                       </span>
-                    )}
-                  </button>
-                );
-              })}
+
+                      {/* ================= NAME ================= */}
+                      <span className="flex-1 text-left">
+                        {item.name}
+                      </span>
+
+                      {/* ================= BADGE ================= */}
+                      {item.badge && (
+                        <span
+                          className={`
+                            min-w-[22px]
+                            h-[22px]
+                            px-1.5
+                            flex
+                            items-center
+                            justify-center
+                            rounded-full
+                            text-[10px]
+                            font-semibold
+
+                            ${
+                              isActive
+                                ? "bg-[#8B5CF6] text-white"
+                                : "bg-[#242932] text-[#8B93A1]"
+                            }
+                          `}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </>
+                  )}
+
+                </NavLink>
+
+              ))}
+
             </div>
           </div>
         ))}
+
       </div>
 
-      {/* Logout */}
+      {/* ================= LOGOUT ================= */}
       <div className="p-5 border-t border-[#242932]">
+
         <button
           className="
             group
@@ -208,6 +229,7 @@ const AdminSidebar = () => {
             duration-200
           "
         >
+
           <FiLogOut
             className="
               text-[17px]
@@ -216,9 +238,14 @@ const AdminSidebar = () => {
             "
           />
 
-          <span>Logout</span>
+          <span>
+            Logout
+          </span>
+
         </button>
+
       </div>
+
     </aside>
   );
 };

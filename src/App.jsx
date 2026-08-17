@@ -1,5 +1,13 @@
 import "./App.css";
 import AdminDashboard from "./components/adminPanel/adminDashboard/AdminDashboard";
+import AdminSettings from "./components/adminPanel/adminPages/AdminSettings";
+import StoreBrands from "./components/adminPanel/adminPages/StoreBrands";
+import StoreCustomers from "./components/adminPanel/adminPages/StoreCustomers";
+import StoreNewArrivals from "./components/adminPanel/adminPages/StoreNewArrivals";
+import StoreOrders from "./components/adminPanel/adminPages/StoreOrders";
+import StoreOverview from "./components/adminPanel/adminPages/StoreOverview";
+import StoreProducts from "./components/adminPanel/adminPages/StoreProducts";
+import StoreSales from "./components/adminPanel/adminPages/StoreSales";
 // import AdminDashboard from "./components/adminPanel/adminDashboard/AdminDashboard";
 import Profile from "./components/authentication/profile/Profile";
 import Settings from "./components/authentication/settings/Settings";
@@ -34,7 +42,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/signin" element={<Signin />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/settings" element={<Settings/>}/>
+            <Route path="/settings" element={<Settings />} />
             <Route path="/dashboard" element={<Maindashboard />} />
 
             {/* main page navbar */}
@@ -62,8 +70,16 @@ function App() {
             <Route path="/CartOrder" element={<CartOrder />} />
             {/* end brand subpage */}
 
-
-            <Route path="/adminDash" element={<AdminDashboard/>}/>
+            <Route path="/adminDash" element={<AdminDashboard />}>
+              <Route index element={<StoreOverview />} />
+              <Route path="storeProducts" element={<StoreProducts />} />
+              <Route path="storeNewArrivals" element={<StoreNewArrivals />} />
+              <Route path="storeBrands" element={<StoreBrands />} />
+              <Route path="storeOrders" element={<StoreOrders />} />
+              <Route path="storeCustomers" element={<StoreCustomers />} />
+              <Route path="storeSales" element={<StoreSales />} />
+              <Route path="settings" element={<AdminSettings />} />
+            </Route>
           </Routes>
         </BrowserRouter>
       </MeProvider>

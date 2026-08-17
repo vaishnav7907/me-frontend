@@ -1,6 +1,7 @@
 import React from "react";
 import AdminNavbar from "../adminNavbar/AdminNavbar";
 import AdminSidebar from "../adminSidebar/AdminSidebar";
+import { Outlet } from "react-router-dom";
 
 const AdminDashboard = () => {
   return (
@@ -12,7 +13,9 @@ const AdminDashboard = () => {
         <div className="">
           <AdminNavbar />
         </div>
-        <div></div>
+        <div>
+          <Outlet/>
+        </div>
       </div>
     </div>
   );
