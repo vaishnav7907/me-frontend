@@ -1,4 +1,6 @@
 import "./App.css";
+import AdminDashboard from "./components/adminPanel/adminDashboard/AdminDashboard";
+// import AdminDashboard from "./components/adminPanel/adminDashboard/AdminDashboard";
 import Profile from "./components/authentication/profile/Profile";
 import Settings from "./components/authentication/settings/Settings";
 import Signin from "./components/authentication/signin/Signin";
@@ -59,6 +61,9 @@ function App() {
             <Route path="/Offers" element={<OfferPage />} />
             <Route path="/CartOrder" element={<CartOrder />} />
             {/* end brand subpage */}
+
+
+            <Route path="/adminDash" element={<AdminDashboard/>}/>
           </Routes>
         </BrowserRouter>
       </MeProvider>
