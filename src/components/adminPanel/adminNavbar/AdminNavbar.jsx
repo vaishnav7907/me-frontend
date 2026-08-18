@@ -17,7 +17,7 @@ const AdminNavbar = () => {
 
   const navbarHead= pageNames[location.pathname] || "Dashboard"
   return (
-    <div className=" h-[80px] border-b  border-[#242932] flex  items-center px-6">
+    <div className=" h-[80px] border-b  border-[#242932] flex  items-center px-6 ">
       <div className=" w-full flex justify-between items-center ">
         <div>
           <p className=" hidden sm:block text-[9px] uppercase tracking-[0.3em] text-[#505762] ">
