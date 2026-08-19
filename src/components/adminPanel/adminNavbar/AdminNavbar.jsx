@@ -3,9 +3,9 @@ import { FiSearch, FiBell } from "react-icons/fi";
 import { UseMe } from "../../context/Meprovider";
 import { useLocation } from "react-router-dom";
 const AdminNavbar = () => {
-  const location= useLocation()
-  const pageNames={
-     "/adminDash": "Dashboard",
+  const location = useLocation();
+  const pageNames = {
+    "/adminDash": "Dashboard",
     "/adminDash/storeProducts": "Products",
     "/adminDash/storeNewArrivals": "New Arrivals",
     "/adminDash/storeBrands": "Brands",
@@ -13,9 +13,9 @@ const AdminNavbar = () => {
     "/adminDash/storeCustomers": "Customers",
     "/adminDash/storeSales": "Sales",
     "/adminDash/settings": "Settings",
-  }
+  };
 
-  const navbarHead= pageNames[location.pathname] || "Dashboard"
+  const navbarHead = pageNames[location.pathname] || "Dashboard";
   return (
     <div className=" h-[80px] border-b  border-[#242932] flex  items-center px-6 ">
       <div className=" w-full flex justify-between items-center ">
@@ -23,7 +23,10 @@ const AdminNavbar = () => {
           <p className=" hidden sm:block text-[9px] uppercase tracking-[0.3em] text-[#505762] ">
             ME / ADMIN
           </p>
-          <h2 className="text-lg font-semibold mt-1 text-white"> {navbarHead}</h2>
+          <h2 className="text-lg font-semibold mt-1 text-white">
+            {" "}
+            {navbarHead}
+          </h2>
         </div>
 
         <div className="flex gap-3">
@@ -44,7 +47,7 @@ const AdminNavbar = () => {
             <FiSearch size={20} className="text-[#666D78]" />
             <input
               type="text"
-               placeholder="Search products, orders..."
+              placeholder="Search products, orders..."
               className="
                   bg-transparent
                   outline-none

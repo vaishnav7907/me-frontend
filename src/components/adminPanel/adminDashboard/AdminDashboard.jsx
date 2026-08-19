@@ -10,7 +10,7 @@ const AdminDashboard = () => {
         <AdminSidebar />
       </div>
       <div  className="min-h-screen ml-[260px] w-full">
-        <div className=" ">
+        <div className=" sticky top-0 z-50 bg-black">
           <AdminNavbar />
         </div>
         <div>
