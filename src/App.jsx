@@ -6,7 +6,7 @@ import StoreCustomers from "./components/adminPanel/adminPages/StoreCustomers";
 import StoreNewArrivals from "./components/adminPanel/adminPages/StoreNewArrivals";
 import StoreOrders from "./components/adminPanel/adminPages/StoreOrders";
 import StoreOverview from "./components/adminPanel/adminPages/StoreOverview";
-import StoreProducts from "./components/adminPanel/adminPages/StoreProducts";
+import StoreProducts from "./components/adminPanel/adminPages/productControl/AddProducts/StoreProducts";
 import StoreSales from "./components/adminPanel/adminPages/StoreSales";
 // import AdminDashboard from "./components/adminPanel/adminDashboard/AdminDashboard";
 import Profile from "./components/authentication/profile/Profile";

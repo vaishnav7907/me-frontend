@@ -4,6 +4,11 @@ import { BiError } from "react-icons/bi";
 import { SiHackthebox } from "react-icons/si";
 import { FiLayers, FiTrendingUp } from "react-icons/fi";
 import { FaArrowTrendUp } from "react-icons/fa6";
+import { FiSearch } from "react-icons/fi";
+import { RiArrowDownSLine } from "react-icons/ri";
+import { CiGrid41 } from "react-icons/ci";
+import { CiCircleList } from "react-icons/ci";
+import ProductList from "../list/ProductList";
 const StoreProducts = () => {
   const products = [
     {
@@ -162,6 +167,98 @@ const StoreProducts = () => {
           </div>
 
           <hr className="mt-0 border-[#242932]" />
+        </div>
+
+        {/* search setion */}
+        <div className="py-7 px-6">
+          <div className="flex justify-between">
+            <div
+              className="   hidden
+                md:flex
+                items-center
+                gap-3
+                bg-[#12151A]
+                border
+                border-[#242932]
+                px-4
+                h-10
+                w-[220px]
+                lg:w-96
+                rounded-lg"
+            >
+              <FiSearch size={20} className="text-[#666D78]" />
+              <input
+                type="text"
+                placeholder="Search products, brands..."
+                className="
+                  bg-transparent
+                  outline-none
+                  w-full
+                  text-xs
+                  text-white
+                  placeholder:text-[#505762] "
+              />
+            </div>
+
+            <div className="flex gap-3 text-white">
+              <div className="bg-[#101318]  border border-[#242932] rounded-lg py-0.5 px-4  flex justify-center items-center ">
+                all
+              </div>
+              <div className="bg-[#101318]  border border-[#242932] rounded-lg py-0.5 px-4 flex justify-center items-center ">
+                Active
+              </div>
+              <div className="bg-[#101318]  border border-[#242932] rounded-lg py-0.5 px-4 flex justify-center items-center ">
+                Inactive
+              </div>
+              <div className="bg-[#101318]  border border-[#242932] rounded-lg py-0.5  px-4 flex justify-center gap-3 items-center ">
+                lowStock
+              </div>
+              <div className="bg-[#101318]  border border-[#242932] rounded-lg py-0.5 px-4 flex justify-center items-center gap-3 ">
+                <p>newest</p>{" "}
+                <button>
+                  <RiArrowDownSLine />
+                </button>
+              </div>
+              <div className="bg-[#101318]  border border-[#242932] rounded-lg py-0.5 px-4 flex justify-center items-center ">
+                <div className="flex justify-evenly items-center gap-2">
+                  <button>
+                    <CiGrid41 />
+                  </button>
+                  <button>
+                    <CiCircleList />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* product section */}
+        <div className="py-7 px-6">
+          <div>
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] ">
+                  collection
+                </p>
+
+                <h3 className="text-white text-lg font-semibold">
+                  All products
+                </h3>
+              </div>
+              <div>
+                <p className="text-blue-300">select all</p>
+              </div>
+            </div>
+
+            {/* product info */}
+
+            <div className="py-5">
+              <div className="text-white">
+                <ProductList/>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -118,7 +118,7 @@ const AdminSidebar = () => {
             </p>
 
             {/* Navigation Items */}
-            <div className="space-y-1">
+            <div className="space-y-1 ">
 
               {service.items.map((item, itemIndex) => (
 
