@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { IoAdd } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
 import { SiHackthebox } from "react-icons/si";
@@ -9,6 +9,7 @@ import { RiArrowDownSLine } from "react-icons/ri";
 import { CiGrid41 } from "react-icons/ci";
 import { CiCircleList } from "react-icons/ci";
 import ProductList from "../list/ProductList";
+import ProductGrid from "../Grid/ProductGrid";
 const StoreProducts = () => {
   const products = [
     {
@@ -37,6 +38,7 @@ const StoreProducts = () => {
     },
   ];
 
+  const [gridListView, setGridListView] = useState(false);
   return (
     <div className="min-h-screen">
       <div className="">
@@ -219,13 +221,17 @@ const StoreProducts = () => {
                   <RiArrowDownSLine />
                 </button>
               </div>
-              <div className="bg-[#101318]  border border-[#242932] rounded-lg py-0.5 px-4 flex justify-center items-center ">
-                <div className="flex justify-evenly items-center gap-2">
-                  <button>
-                    <CiGrid41 />
+              <div className="bg-[#101318]  border border-[#242932] rounded-lg py-0.5 px-2 flex justify-center items-center ">
+                <div className="flex justify-evenly items-center gap-2 ">
+                  <button
+                    className={`${!gridListView ? "bg-white/20" : ""} h-6 w-6 flex justify-center items-center rounded-md transition-all duration-500`}
+                  >
+                    <CiGrid41 onClick={() => setGridListView(false)} />
                   </button>
-                  <button>
-                    <CiCircleList />
+                  <button
+                    className={`${gridListView ? "bg-white/20" : ""} h-6 w-6 flex justify-center items-center rounded-md transition-all duration-500`}
+                  >
+                    <CiCircleList onClick={() => setGridListView(true)} />
                   </button>
                 </div>
               </div>
@@ -255,7 +261,10 @@ const StoreProducts = () => {
 
             <div className="py-5">
               <div className="text-white">
-                <ProductList/>
+                {/* <ProductList/> */}
+                {/* <ProductGrid/> */}
+
+                {!gridListView ? <ProductGrid /> : <ProductList />}
               </div>
             </div>
           </div>
