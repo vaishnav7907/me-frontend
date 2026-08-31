@@ -1,10 +1,9 @@
 import "./App.css";
 import AdminDashboard from "./components/adminPanel/adminDashboard/AdminDashboard";
 import AdminSettings from "./components/adminPanel/adminPages/AdminSettings";
-import StoreBrands from "./components/adminPanel/adminPages/StoreBrands";
+// import StoreBrands from "./components/adminPanel/adminPages/brands/brandPage/StoreBrands";
 import StoreCustomers from "./components/adminPanel/adminPages/StoreCustomers";
-import StoreNewArrivals from "./components/adminPanel/adminPages/StoreNewArrivals";
-import StoreOrders from "./components/adminPanel/adminPages/StoreOrders";
+// import StoreOrders from "./components/adminPanel/adminPages/order/StoreOrders";
 import StoreOverview from "./components/adminPanel/adminPages/StoreOverview";
 import StoreProducts from "./components/adminPanel/adminPages/productControl/AddProducts/StoreProducts";
 import StoreSales from "./components/adminPanel/adminPages/StoreSales";
@@ -32,6 +31,9 @@ import ProductInfo from "./components/productInformation/ProductInfo";
 // import MaindashboardSidebar from "./components/sidebars/MaindashboardSidebar";
 import Welcomepage from "./components/welcomePage/Welcomepage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import StoreNewArrivals from "./components/adminPanel/adminPages/storeLatestArrivals/Arrivals/StoreNewArrivals";
+import StoreBrands from "./components/adminPanel/adminPages/brands/brandPage/StoreBrands";
+import StoreOrders from "./components/adminPanel/adminPages/order/StoreOrders";
 function App() {
   return (
     <>
