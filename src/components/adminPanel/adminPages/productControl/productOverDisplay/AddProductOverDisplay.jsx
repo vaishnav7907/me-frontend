@@ -3,120 +3,8 @@ import { IoClose, IoAdd } from "react-icons/io5";
 import { FiUploadCloud } from "react-icons/fi";
 
 const AddProductOverDisplay = ({ onClose }) => {
-  const [images, setImages] = useState([]);
-
-  const [product, setProduct] = useState({
-    name: "",
-    description: "",
-    category: "",
-    brand: "",
-    price: "",
-    realPrice: "",
-    sku: "",
-    status: "Active",
-    material: "",
-    fit: "",
-    pattern: "",
-  });
-
-  const [variants, setVariants] = useState([
-    {
-      color: "",
-      code: "#000000",
-      sizes: [],
-      stock: "",
-    },
-  ]);
-
-  const categories = [
-    "Shirts",
-    "T-Shirts",
-    "Pants",
-    "Jackets",
-    "Innerwear",
-    "Shorts",
-  ];
-
-  const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
-
-  const handleChange = (e) => {
-    setProduct({
-      ...product,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleImages = (e) => {
-    const files = Array.from(e.target.files);
-
-    const newImages = files.map((file) => ({
-      file,
-      preview: URL.createObjectURL(file),
-    }));
-
-    setImages((prev) => [...prev, ...newImages]);
-  };
-
-  const removeImage = (index) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const addVariant = () => {
-    setVariants([
-      ...variants,
-      {
-        color: "",
-        code: "#000000",
-        sizes: [],
-        stock: "",
-      },
-    ]);
-  };
-
-  const removeVariant = (index) => {
-    setVariants((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const updateVariant = (index, field, value) => {
-    setVariants((prev) =>
-      prev.map((variant, i) =>
-        i === index
-          ? { ...variant, [field]: value }
-          : variant,
-      ),
-    );
-  };
-
-  const toggleSize = (variantIndex, size) => {
-    setVariants((prev) =>
-      prev.map((variant, i) => {
-        if (i !== variantIndex) return variant;
-
-        return {
-          ...variant,
-          sizes: variant.sizes.includes(size)
-            ? variant.sizes.filter((item) => item !== size)
-            : [...variant.sizes, size],
-        };
-      }),
-    );
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const formData = {
-      ...product,
-      images,
-      variants,
-    };
-
-    console.log(formData);
-  };
-
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-
       <div
         className="
           w-full
@@ -132,9 +20,7 @@ const AddProductOverDisplay = ({ onClose }) => {
           flex-col
         "
       >
-
         <div className="flex items-center justify-between px-6 py-5 border-b border-[#242932] shrink-0">
-
           <div>
             <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-600">
               Store / Products
@@ -170,20 +56,12 @@ const AddProductOverDisplay = ({ onClose }) => {
           >
             <IoClose size={20} />
           </button>
-
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="overflow-y-auto"
-        >
-
+        <form className="overflow-y-auto">
           <div className="p-6 grid grid-cols-1 xl:grid-cols-3 gap-5">
-
             <div className="xl:col-span-2 space-y-5">
-
               <section className="bg-[#101318] border border-[#242932] rounded-xl p-5">
-
                 <div className="mb-5">
                   <h3 className="text-sm font-semibold text-white">
                     Basic Information
@@ -195,7 +73,6 @@ const AddProductOverDisplay = ({ onClose }) => {
                 </div>
 
                 <div className="space-y-4">
-
                   <div>
                     <label className="text-xs text-neutral-400 block mb-2">
                       Product Name
@@ -203,8 +80,6 @@ const AddProductOverDisplay = ({ onClose }) => {
 
                     <input
                       name="name"
-                      value={product.name}
-                      onChange={handleChange}
                       placeholder="Classic White Shirt"
                       className="
                         w-full
@@ -230,8 +105,6 @@ const AddProductOverDisplay = ({ onClose }) => {
 
                     <textarea
                       name="description"
-                      value={product.description}
-                      onChange={handleChange}
                       rows="4"
                       placeholder="Describe your product..."
                       className="
@@ -253,7 +126,6 @@ const AddProductOverDisplay = ({ onClose }) => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                     <div>
                       <label className="text-xs text-neutral-400 block mb-2">
                         Category
@@ -261,8 +133,6 @@ const AddProductOverDisplay = ({ onClose }) => {
 
                       <select
                         name="category"
-                        value={product.category}
-                        onChange={handleChange}
                         className="
                           w-full
                           h-10
@@ -276,18 +146,14 @@ const AddProductOverDisplay = ({ onClose }) => {
                           outline-none
                         "
                       >
-                        <option value="">
-                          Select category
-                        </option>
+                        <option value="">Select category</option>
 
-                        {categories.map((category) => (
-                          <option
-                            key={category}
-                            value={category}
-                          >
-                            {category}
-                          </option>
-                        ))}
+                        <option value="">Shirts</option>
+                        <option value="">T-Shirts</option>
+                        <option value="">Pants</option>
+                        <option value="">Jackets</option>
+                        <option value="">Innerwear</option>
+                        <option value="">Shorts</option>
                       </select>
                     </div>
 
@@ -298,8 +164,7 @@ const AddProductOverDisplay = ({ onClose }) => {
 
                       <input
                         name="brand"
-                        value={product.brand}
-                        onChange={handleChange}
+                        
                         placeholder="Nike"
                         className="
                           w-full
@@ -317,11 +182,9 @@ const AddProductOverDisplay = ({ onClose }) => {
                         "
                       />
                     </div>
-
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                     <div>
                       <label className="text-xs text-neutral-400 block mb-2">
                         SKU
@@ -329,8 +192,7 @@ const AddProductOverDisplay = ({ onClose }) => {
 
                       <input
                         name="sku"
-                        value={product.sku}
-                        onChange={handleChange}
+                        
                         placeholder="ME-SHIRT-001"
                         className="
                           w-full
@@ -355,8 +217,7 @@ const AddProductOverDisplay = ({ onClose }) => {
 
                       <select
                         name="status"
-                        value={product.status}
-                        onChange={handleChange}
+                      
                         className="
                           w-full
                           h-10
@@ -375,18 +236,13 @@ const AddProductOverDisplay = ({ onClose }) => {
                         <option value="Draft">Draft</option>
                       </select>
                     </div>
-
                   </div>
-
                 </div>
               </section>
 
               <section className="bg-[#101318] border border-[#242932] rounded-xl p-5">
-
                 <div className="mb-5">
-                  <h3 className="text-sm font-semibold text-white">
-                    Pricing
-                  </h3>
+                  <h3 className="text-sm font-semibold text-white">Pricing</h3>
 
                   <p className="text-xs text-neutral-600 mt-1">
                     Set the product pricing.
@@ -394,7 +250,6 @@ const AddProductOverDisplay = ({ onClose }) => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                   <div>
                     <label className="text-xs text-neutral-400 block mb-2">
                       Selling Price
@@ -408,8 +263,7 @@ const AddProductOverDisplay = ({ onClose }) => {
                       <input
                         type="number"
                         name="price"
-                        value={product.price}
-                        onChange={handleChange}
+                       
                         placeholder="1499"
                         className="
                           w-full
@@ -442,8 +296,7 @@ const AddProductOverDisplay = ({ onClose }) => {
                       <input
                         type="number"
                         name="realPrice"
-                        value={product.realPrice}
-                        onChange={handleChange}
+                        
                         placeholder="1999"
                         className="
                           w-full
@@ -462,14 +315,11 @@ const AddProductOverDisplay = ({ onClose }) => {
                       />
                     </div>
                   </div>
-
                 </div>
               </section>
 
               <section className="bg-[#101318] border border-[#242932] rounded-xl p-5">
-
                 <div className="flex justify-between items-center mb-5">
-
                   <div>
                     <h3 className="text-sm font-semibold text-white">
                       Variants
@@ -482,7 +332,7 @@ const AddProductOverDisplay = ({ onClose }) => {
 
                   <button
                     type="button"
-                    onClick={addVariant}
+                 
                     className="
                       flex
                       items-center
@@ -502,48 +352,33 @@ const AddProductOverDisplay = ({ onClose }) => {
                     <IoAdd size={15} />
                     Add Variant
                   </button>
-
                 </div>
 
                 <div className="space-y-3">
-
-                  {variants.map((variant, index) => (
+                  
                     <div
-                      key={index}
+                     
                       className="p-4 rounded-xl border border-[#292e35] bg-[#0C0F12]"
                     >
-
                       <div className="flex justify-between mb-4">
-
                         <span className="text-[11px] text-neutral-600 uppercase tracking-wider">
-                          Variant {String(index + 1).padStart(2, "0")}
+                          sss
                         </span>
 
-                        {variants.length > 1 && (
+                        
                           <button
                             type="button"
-                            onClick={() =>
-                              removeVariant(index)
-                            }
+                           
                             className="text-neutral-600 hover:text-white"
                           >
                             <IoClose size={16} />
                           </button>
-                        )}
-
+                       
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-
                         <input
-                          value={variant.color}
-                          onChange={(e) =>
-                            updateVariant(
-                              index,
-                              "color",
-                              e.target.value,
-                            )
-                          }
+                          
                           placeholder="Color"
                           className="
                             h-10
@@ -560,29 +395,14 @@ const AddProductOverDisplay = ({ onClose }) => {
                         />
 
                         <div className="flex gap-2">
-
                           <input
                             type="color"
-                            value={variant.code}
-                            onChange={(e) =>
-                              updateVariant(
-                                index,
-                                "code",
-                                e.target.value,
-                              )
-                            }
+                            
                             className="w-11 h-10 rounded-lg bg-transparent border border-[#292e35]"
                           />
 
                           <input
-                            value={variant.code}
-                            onChange={(e) =>
-                              updateVariant(
-                                index,
-                                "code",
-                                e.target.value,
-                              )
-                            }
+                           
                             className="
                               flex-1
                               h-10
@@ -596,19 +416,11 @@ const AddProductOverDisplay = ({ onClose }) => {
                               outline-none
                             "
                           />
-
                         </div>
 
                         <input
                           type="number"
-                          value={variant.stock}
-                          onChange={(e) =>
-                            updateVariant(
-                              index,
-                              "stock",
-                              e.target.value,
-                            )
-                          }
+                          
                           placeholder="Stock"
                           className="
                             h-10
@@ -623,22 +435,15 @@ const AddProductOverDisplay = ({ onClose }) => {
                             placeholder:text-neutral-700
                           "
                         />
-
                       </div>
 
                       <div className="flex flex-wrap gap-2 mt-4">
+                       
 
-                        {sizes.map((size) => {
-                          const selected =
-                            variant.sizes.includes(size);
-
-                          return (
+                          
                             <button
                               type="button"
-                              key={size}
-                              onClick={() =>
-                                toggleSize(index, size)
-                              }
+                              
                               className={`
                                 h-8
                                 min-w-9
@@ -649,31 +454,25 @@ const AddProductOverDisplay = ({ onClose }) => {
                                 font-medium
                                 transition-all
                                 ${
-                                  selected
-                                    ? "bg-white text-black border-white"
-                                    : "bg-[#101318] text-neutral-500 border-[#292e35] hover:text-white"
+                                 
+                                    
+                                     "bg-[#101318] text-neutral-500 border-[#292e35] hover:text-white"
                                 }
                               `}
                             >
-                              {size}
+                              M
                             </button>
-                          );
-                        })}
-
+                          
+                       
                       </div>
-
                     </div>
-                  ))}
-
+                
                 </div>
               </section>
-
             </div>
 
             <div>
-
               <section className="bg-[#101318] border border-[#242932] rounded-xl p-5 xl:sticky xl:top-0">
-
                 <div className="mb-5">
                   <h3 className="text-sm font-semibold text-white">
                     Product Images
@@ -702,14 +501,9 @@ const AddProductOverDisplay = ({ onClose }) => {
                     transition-all
                   "
                 >
-                  <FiUploadCloud
-                    size={26}
-                    className="text-neutral-500"
-                  />
+                  <FiUploadCloud size={26} className="text-neutral-500" />
 
-                  <p className="text-sm text-neutral-300 mt-3">
-                    Upload images
-                  </p>
+                  <p className="text-sm text-neutral-300 mt-3">Upload images</p>
 
                   <p className="text-[10px] text-neutral-600 mt-1">
                     PNG, JPG, WEBP
@@ -720,30 +514,27 @@ const AddProductOverDisplay = ({ onClose }) => {
                     type="file"
                     multiple
                     accept="image/*"
-                    onChange={handleImages}
+                    
                     className="hidden"
                   />
                 </label>
 
-                {images.length > 0 && (
+                
                   <div className="grid grid-cols-2 gap-2 mt-3">
-
-                    {images.map((image, index) => (
+                    
                       <div
-                        key={index}
+                       
                         className="relative aspect-square rounded-lg overflow-hidden border border-[#292e35]"
                       >
                         <img
-                          src={image.preview}
+                          src=""
                           alt=""
                           className="w-full h-full object-cover"
                         />
 
                         <button
                           type="button"
-                          onClick={() =>
-                            removeImage(index)
-                          }
+                          
                           className="
                             absolute
                             top-1.5
@@ -761,43 +552,30 @@ const AddProductOverDisplay = ({ onClose }) => {
                           <IoClose size={14} />
                         </button>
                       </div>
-                    ))}
-
+                  
                   </div>
-                )}
+               
 
                 <div className="mt-5 pt-4 border-t border-[#242932]">
-
                   <div className="flex justify-between text-xs">
-                    <span className="text-neutral-600">
-                      Images
-                    </span>
+                    <span className="text-neutral-600">Images</span>
 
                     <span className="text-neutral-400">
-                      {images.length} uploaded
+                      uploaded
                     </span>
                   </div>
 
                   <div className="flex justify-between text-xs mt-3">
-                    <span className="text-neutral-600">
-                      Variants
-                    </span>
+                    <span className="text-neutral-600">Variants</span>
 
-                    <span className="text-neutral-400">
-                      {variants.length}
-                    </span>
+                    <span className="text-neutral-400">222</span>
                   </div>
-
                 </div>
-
               </section>
-
             </div>
-
           </div>
 
           <div className="px-6 py-4 border-t border-[#242932] flex justify-end gap-3 sticky bottom-0 bg-[#0B0D10]">
-
             <button
               type="button"
               onClick={onClose}
@@ -833,11 +611,8 @@ const AddProductOverDisplay = ({ onClose }) => {
             >
               Add Product
             </button>
-
           </div>
-
         </form>
-
       </div>
     </div>
   );
