@@ -16,9 +16,15 @@ import {
 } from "recharts";
 // import { FiArrowDownRight } from "react-icons/fi";
 // import { MdOutlineArrowOutward } from "react-icons/md";
+import { FiActivity } from "react-icons/fi";
+import { VscPercentage } from "react-icons/vsc";
+import { FaArrowTrendUp } from "react-icons/fa6";
 import { MdOutlineArrowOutward } from "react-icons/md";
 import { BsBoxSeam } from "react-icons/bs";
+import { FiShoppingBag } from "react-icons/fi";
 import AnalyticsCompleteChart from "../charts/AnalyticsCompleteChart";
+import { RxPeople } from "react-icons/rx";
+import { PiCurrencyDollarBold } from "react-icons/pi";
 import { tableFeatures, useTable } from "@tanstack/react-table";
 
 const StoreSales = () => {
@@ -33,72 +39,6 @@ const StoreSales = () => {
     { month: "Aug", revenue: 94000, profit: 47000 },
   ];
 
-  const products = [
-    {
-      id: 1,
-      name: "Classic White Shirt",
-      category: "Shirts",
-      sold: 1240,
-      revenue: 97960,
-      profit: 31200,
-    },
-    {
-      id: 2,
-      name: "Slim Fit Jeans",
-      category: "Pants",
-      sold: 1085,
-      revenue: 107415,
-      profit: 35800,
-    },
-    {
-      id: 3,
-      name: "Oversized T-Shirt",
-      category: "T-Shirts",
-      sold: 980,
-      revenue: 44100,
-      profit: 16400,
-    },
-    {
-      id: 4,
-      name: "Essential Hoodie",
-      category: "T-Shirts",
-      sold: 865,
-      revenue: 82175,
-      profit: 28900,
-    },
-    {
-      id: 5,
-      name: "Tailored Blazer",
-      category: "Jackets",
-      sold: 720,
-      revenue: 128880,
-      profit: 42700,
-    },
-    {
-      id: 6,
-      name: "Leather Jacket",
-      category: "Jackets",
-      sold: 615,
-      revenue: 122385,
-      profit: 39600,
-    },
-    {
-      id: 7,
-      name: "Classic Chinos",
-      category: "Pants",
-      sold: 580,
-      revenue: 57420,
-      profit: 18900,
-    },
-    {
-      id: 8,
-      name: "Premium Polo",
-      category: "Shirts",
-      sold: 510,
-      revenue: 40290,
-      profit: 14100,
-    },
-  ];
   const ageGroups = [
     {
       age: "18–24",
@@ -283,6 +223,107 @@ const StoreSales = () => {
     columns,
     features: tableFeatures(),
   });
+
+  const products = [
+    {
+      id: 1,
+      name: "Classic White Shirt",
+      category: "Shirts",
+      sold: 1240,
+      revenue: 97960,
+      profit: 31200,
+    },
+    {
+      id: 2,
+      name: "Slim Fit Jeans",
+      category: "Pants",
+      sold: 1085,
+      revenue: 107415,
+      profit: 35800,
+    },
+    {
+      id: 3,
+      name: "Oversized T-Shirt",
+      category: "T-Shirts",
+      sold: 980,
+      revenue: 44100,
+      profit: 16400,
+    },
+    {
+      id: 4,
+      name: "Essential Hoodie",
+      category: "T-Shirts",
+      sold: 865,
+      revenue: 82175,
+      profit: 28900,
+    },
+    {
+      id: 5,
+      name: "Tailored Blazer",
+      category: "Jackets",
+      sold: 720,
+      revenue: 128880,
+      profit: 42700,
+    },
+    {
+      id: 6,
+      name: "Leather Jacket",
+      category: "Jackets",
+      sold: 615,
+      revenue: 122385,
+      profit: 39600,
+    },
+    {
+      id: 7,
+      name: "Classic Chinos",
+      category: "Pants",
+      sold: 580,
+      revenue: 57420,
+      profit: 18900,
+    },
+    {
+      id: 8,
+      name: "Premium Polo",
+      category: "Shirts",
+      sold: 510,
+      revenue: 40290,
+      profit: 14100,
+    },
+  ];
+
+  const columnn = [
+    {
+      accessorKey: "name",
+      header: "Product",
+    },
+    {
+      accessorKey: "sold",
+      header: "Unit Sold",
+    },
+    {
+      accessorKey: "revenue",
+      header: "Revenue",
+    },
+    {
+      accessorKey: "profit",
+      header: "Profit",
+    },
+    {
+      id: "profitMargin",
+      header: "Profit Margin",
+      // accessorFn: (row) =>
+      //   row.revenue > 0
+      //     ? Number(((row.profit / row.revenue) * 100).toFixed(1))
+      //     : 0,
+    },
+  ];
+
+  const topProductTable = useTable({
+    data: products,
+    columns: columnn,
+    features: tableFeatures(),
+  });
+
   return (
     <div className="min-h-full w-full ">
       <div className="">
@@ -772,30 +813,31 @@ const StoreSales = () => {
               </div>
 
               {/* profit strategy */}
-              <div className=" mt-4">
-                <div className="grid grid-cols-2 gap-3">
-                  {/* most sold products */}
-                  <div className="bg-[#101318] border border-[#242932] rounded-2xl  ">
+              <div className="mt-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  {/* most sold product section*/}
+                  <div className="bg-[#101318] border border-[#242932] rounded-2xl overflow-hidden">
                     <div className="flex justify-between items-end p-4">
                       <div className="flex flex-col gap-1">
-                        <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] ">
+                        <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px]">
                           product intelligence
                         </p>
 
                         <h3 className="text-white text-lg">
-                          most sold products
+                          Most Sold Products
                         </h3>
+
                         <p className="text-neutral-500 text-xs">
-                          product generating the highest sales volume
+                          Products generating the highest sales volume
                         </p>
                       </div>
 
-                      <div>
+                      <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center">
                         <BsBoxSeam size={16} className="text-white" />
                       </div>
                     </div>
 
-                    <hr className="w-full text-[#242932]" />
+                    <hr className="border-[#242932]" />
 
                     <div className="p-4 space-y-1">
                       {products.slice(0, 5).map((productData) => {
@@ -806,15 +848,15 @@ const StoreSales = () => {
                         const percentage = (productData.sold / maxSold) * 100;
 
                         return (
-                          <div key={productData.id} className="py-2">
-                            <div className="flex justify-between items-end">
-                              <div className="flex gap-2 items-center">
-                                <div className="h-8 w-8 bg-gray-700/70 rounded-md flex justify-center items-center text-xs text-white font-medium">
+                          <div key={productData.id} className="py-4">
+                            <div className="flex justify-between items-center">
+                              <div className="flex gap-2 items-center min-w-0">
+                                <div className="h-8 w-8 shrink-0 bg-gray-700/70 rounded-md flex justify-center items-center text-xs text-white font-medium">
                                   {productData.id}
                                 </div>
 
-                                <div>
-                                  <h4 className="text-sm text-white font-medium">
+                                <div className="min-w-0">
+                                  <h4 className="text-sm text-white font-medium truncate">
                                     {productData.name}
                                   </h4>
 
@@ -824,16 +866,14 @@ const StoreSales = () => {
                                 </div>
                               </div>
 
-                              <div>
-                                <h4 className="text-sm text-white font-medium">
-                                  {productData.sold}
-                                </h4>
-                              </div>
+                              <span className="text-sm text-white font-medium ml-3">
+                                {productData.sold}
+                              </span>
                             </div>
 
                             <div className="w-full h-[3px] bg-white/5 rounded-full mt-3 overflow-hidden">
                               <div
-                                className="bg-white h-[3px] rounded-full transition-all duration-500"
+                                className="bg-white h-full rounded-full transition-all duration-500"
                                 style={{ width: `${percentage}%` }}
                               />
                             </div>
@@ -842,73 +882,545 @@ const StoreSales = () => {
                       })}
                     </div>
                   </div>
-
-                  {/* age overview */}
-                  <div className="bg-[#101318] border border-[#242932] rounded-2xl  ">
+                  {/* age section */}
+                  <div className="bg-[#101318] border border-[#242932] rounded-2xl overflow-hidden">
                     <div className="flex justify-between items-end p-4">
                       <div className="flex flex-col gap-1">
-                        <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] ">
-                          product intelligence
+                        <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px]">
+                          customer intelligence
                         </p>
 
                         <h3 className="text-white text-lg">
-                          most sold products
+                          Customer Age Overview
                         </h3>
+
                         <p className="text-neutral-500 text-xs">
-                          product generating the highest sales volume
+                          Age groups generating the highest number of orders
                         </p>
                       </div>
 
-                      <div>
+                      <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center">
                         <BsBoxSeam size={16} className="text-white" />
                       </div>
                     </div>
 
-                    <hr className="w-full text-[#242932]" />
+                    <hr className="border-[#242932]" />
 
                     <div className="p-4 space-y-1">
-                      {products.slice(0, 5).map((productData) => {
-                        const maxSold = Math.max(
-                          ...products.map((product) => product.sold),
+                      {ageGroups.slice(0, 5).map((ageData) => {
+                        const maxOrders = Math.max(
+                          ...ageGroups.map((data) => data.orders),
                         );
 
-                        const percentage = (productData.sold / maxSold) * 100;
+                        const orderPercentage =
+                          (ageData.orders / maxOrders) * 100;
 
                         return (
-                          <div key={productData.id} className="py-2">
-                            <div className="flex justify-between items-end">
+                          <div key={ageData.id} className="py-2">
+                            <div className="flex justify-between items-center">
                               <div className="flex gap-2 items-center">
-                                <div className="h-8 w-8 bg-gray-700/70 rounded-md flex justify-center items-center text-xs text-white font-medium">
-                                  {productData.id}
-                                </div>
-
-                                <div>
-                                  <h4 className="text-sm text-white font-medium">
-                                    {productData.name}
-                                  </h4>
-
-                                  <p className="text-xs text-neutral-500">
-                                    {productData.category}
-                                  </p>
+                                <div className="h-8 w-12 bg-gray-700/70 rounded-md flex justify-center items-center text-xs text-white font-medium">
+                                  {ageData.age}
                                 </div>
                               </div>
 
-                              <div>
+                              <div className="text-right">
                                 <h4 className="text-sm text-white font-medium">
-                                  {productData.sold}
+                                  {ageData.customers} Customers
                                 </h4>
                               </div>
                             </div>
 
                             <div className="w-full h-[3px] bg-white/5 rounded-full mt-3 overflow-hidden">
                               <div
-                                className="bg-white h-[3px] rounded-full transition-all duration-500"
-                                style={{ width: `${percentage}%` }}
+                                className="bg-white h-full rounded-full transition-all duration-500"
+                                style={{ width: `${orderPercentage}%` }}
                               />
+                            </div>
+
+                            <div className="flex justify-between mt-2">
+                              <span className="text-xs text-neutral-500">
+                                {ageData.orders} Orders
+                              </span>
+
+                              <span className="text-xs text-neutral-500">
+                                {ageData.revenue}
+                              </span>
                             </div>
                           </div>
                         );
                       })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="bg-[#101318] border border-[#242932] rounded-2xl overflow-hidden p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 shrink-0 bg-white/10 flex justify-center items-center rounded-md">
+                        <FiShoppingBag className="text-white" size={20} />
+                      </div>
+
+                      <div>
+                        <h4 className="text-sm text-white font-medium">
+                          Top Category
+                        </h4>
+                        <p className="text-[11px] text-neutral-500">
+                          By units sold
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-end mt-6">
+                      <div>
+                        <h3 className="text-xl text-white font-semibold">
+                          T-Shirts
+                        </h3>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          1,845 units sold
+                        </p>
+                      </div>
+
+                      <div className="text-right">
+                        <p className="text-sm text-white font-medium">27%</p>
+                        <p className="text-[10px] text-neutral-500">
+                          sales share
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#101318] border border-[#242932] rounded-2xl overflow-hidden p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 shrink-0 bg-white/10 flex justify-center items-center rounded-md">
+                        <RxPeople className="text-white" size={20} />
+                      </div>
+
+                      <div>
+                        <h4 className="text-sm text-white font-medium">
+                          Highest Customer Group
+                        </h4>
+                        <p className="text-[11px] text-neutral-500">
+                          By customer count
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-end mt-6">
+                      <div>
+                        <h3 className="text-xl text-white font-semibold">
+                          25–34
+                        </h3>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          920 customers
+                        </p>
+                      </div>
+
+                      <div className="text-right">
+                        <p className="text-sm text-white font-medium">1,340</p>
+                        <p className="text-[10px] text-neutral-500">orders</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#101318] border border-[#242932] rounded-2xl overflow-hidden p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 shrink-0 bg-white/10 flex justify-center items-center rounded-md">
+                        <PiCurrencyDollarBold
+                          className="text-white"
+                          size={20}
+                        />
+                      </div>
+
+                      <div>
+                        <h4 className="text-sm text-white font-medium">
+                          Highest Value Group
+                        </h4>
+                        <p className="text-[11px] text-neutral-500">
+                          By revenue generated
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-end mt-6">
+                      <div>
+                        <h3 className="text-xl text-white font-semibold">
+                          25–34
+                        </h3>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          $556K revenue
+                        </p>
+                      </div>
+
+                      <div className="text-right">
+                        <p className="text-sm text-white font-medium">$23</p>
+                        <p className="text-[10px] text-neutral-500">AOV</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* top products by revenue */}
+
+              <div className="bg-[#101318] border  border-[#242932]  rounded-2xl overflow-hidden  mt-4">
+                <div>
+                  <div className="flex justify-between items-center p-4 border-b  border-[#242932]">
+                    <div className="flex flex-col gap-1">
+                      <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px]">
+                        product intelligence
+                      </p>
+
+                      <h3 className="text-white text-lg">Most Sold Products</h3>
+
+                      <p className="text-neutral-500 text-xs">
+                        Products generating the highest sales volume
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaArrowTrendUp className="text-neutral-500" />{" "}
+                      <p className="text-neutral-500 text-xs">
+                        Revenue leaders
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="w-full overflow-x-auto">
+                      <table className="w-full min-w-[850px] table-fixed">
+                        <thead>
+                          {topProductTable
+                            .getHeaderGroups()
+                            .map((headerGroup) => (
+                              <tr
+                                key={headerGroup.id}
+                                className="border-b border-[#242932]"
+                              >
+                                {headerGroup.headers.map((heading) => (
+                                  <th
+                                    key={heading.id}
+                                    className={`
+                px-6 py-4
+                text-left
+                text-[11px]
+                font-medium
+                text-neutral-500
+                uppercase
+                tracking-[0.12em]
+                ${heading.column.id === "name" ? "w-[32%]" : ""}
+                ${heading.column.id === "sold" ? "w-[15%]" : ""}
+                ${heading.column.id === "revenue" ? "w-[18%]" : ""}
+                ${heading.column.id === "profit" ? "w-[18%]" : ""}
+                ${heading.column.id === "profitMargin" ? "w-[17%]" : ""}
+              `}
+                                  >
+                                    {heading.column.columnDef.header}
+                                  </th>
+                                ))}
+                              </tr>
+                            ))}
+                        </thead>
+
+                        <tbody>
+                          {topProductTable
+                            .getRowModel()
+                            .rows.map((row, index) => (
+                              <tr
+                                key={row.id}
+                                className="
+            group
+            border-b border-[#242932]
+            hover:bg-white/[0.025]
+            transition-colors
+            duration-200
+          "
+                              >
+                                {row.getAllCells().map((cell) => {
+                                  const value = cell.getValue();
+
+                                  return (
+                                    <td
+                                      key={cell.id}
+                                      className="px-6 py-5 align-middle"
+                                    >
+                                      {cell.column.id === "name" && (
+                                        <div className="flex items-center gap-4">
+                                          <div
+                                            className="
+                      flex
+                      h-9
+                      w-9
+                      shrink-0
+                      items-center
+                      justify-center
+                      rounded-lg
+                      border
+                      border-[#2b3038]
+                      bg-[#1b1f24]
+                    "
+                                          >
+                                            <span className="text-[11px] font-semibold text-neutral-500">
+                                              {String(index + 1).padStart(
+                                                2,
+                                                "0",
+                                              )}
+                                            </span>
+                                          </div>
+
+                                          <div className="min-w-0">
+                                            <p
+                                              className="
+                        truncate
+                        text-sm
+                        font-medium
+                        text-neutral-100
+                        transition-colors
+                        group-hover:text-white
+                      "
+                                            >
+                                              {value}
+                                            </p>
+
+                                            <p className="mt-1 text-[11px] text-neutral-600">
+                                              Product
+                                            </p>
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {cell.column.id === "sold" && (
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-sm font-medium text-neutral-200">
+                                            {Number(value).toLocaleString(
+                                              "en-IN",
+                                            )}
+                                          </span>
+
+                                          <span
+                                            className="
+                      rounded-md
+                      border
+                      border-[#292e35]
+                      bg-[#1b1f24]
+                      px-2
+                      py-1
+                      text-[10px]
+                      font-medium
+                      text-neutral-500
+                    "
+                                          >
+                                            units
+                                          </span>
+                                        </div>
+                                      )}
+
+                                      {cell.column.id === "revenue" && (
+                                        <span className="text-sm font-medium text-neutral-200">
+                                          ₹
+                                          {Number(value).toLocaleString(
+                                            "en-IN",
+                                          )}
+                                        </span>
+                                      )}
+
+                                      {cell.column.id === "profit" && (
+                                        <span className="text-sm font-semibold text-neutral-100">
+                                          ₹
+                                          {Number(value).toLocaleString(
+                                            "en-IN",
+                                          )}
+                                        </span>
+                                      )}
+
+                                      {cell.column.id === "profitMargin" && (
+                                        <div className="flex items-center gap-3">
+                                          <div
+                                            className="
+                      h-1.5
+                      w-16
+                      overflow-hidden
+                      rounded-full
+                      bg-[#252a31]
+                    "
+                                          >
+                                            <div
+                                              className="
+                          h-full
+                          rounded-full
+                          bg-neutral-400
+                          transition-all
+                        "
+                                              style={{
+                                                width: `${Math.min(Number(value), 100)}%`,
+                                              }}
+                                            />
+                                          </div>
+
+                                          <span className="text-sm font-medium text-neutral-300">
+                                            {value}%
+                                          </span>
+                                        </div>
+                                      )}
+                                    </td>
+                                  );
+                                })}
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 bg-[#101318] border  border-[#242932]  rounded-2xl overflow-hidden  py-4 px-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 shrink-0 bg-white/10 flex justify-center items-center rounded-md">
+                    <FiActivity className="text-white" size={20} />
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm text-white font-medium">
+                      Bussiness Decision Overview
+                    </h4>
+                    <p className="text-[11px] text-neutral-500">
+                      Key information admin canuse for bussiness planning
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-5">
+                  <div className="group bg-[#101318] border border-[#242932] rounded-2xl p-5 hover:border-[#343941] transition-all duration-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.06] flex items-center justify-center">
+                          <BsBoxSeam className="text-neutral-300" size={18} />
+                        </div>
+
+                        <span className="text-sm font-medium text-neutral-400">
+                          Best Selling Product
+                        </span>
+                      </div>
+
+                      <span className="text-[10px] uppercase tracking-wider text-neutral-600">
+                        Product
+                      </span>
+                    </div>
+
+                    <div className="mt-7">
+                      <h3 className="text-xl font-semibold text-white tracking-tight">
+                        T-Shirts
+                      </h3>
+
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-sm text-neutral-300">1,845</span>
+
+                        <span className="text-xs text-neutral-600">
+                          units sold
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="group bg-[#101318] border border-[#242932] rounded-2xl p-5 hover:border-[#343941] transition-all duration-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.06] flex items-center justify-center">
+                          <RxPeople className="text-neutral-300" size={19} />
+                        </div>
+
+                        <span className="text-sm font-medium text-neutral-400">
+                          Largest Customer Segment
+                        </span>
+                      </div>
+
+                      <span className="text-[10px] uppercase tracking-wider text-neutral-600">
+                        Customers
+                      </span>
+                    </div>
+
+                    <div className="mt-7">
+                      <h3 className="text-xl font-semibold text-white tracking-tight">
+                        25–34
+                      </h3>
+
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-sm text-neutral-300">920</span>
+
+                        <span className="text-xs text-neutral-600">
+                          customers
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="group bg-[#101318] border border-[#242932] rounded-2xl p-5 hover:border-[#343941] transition-all duration-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.06] flex items-center justify-center">
+                          <PiCurrencyDollarBold
+                            className="text-neutral-300"
+                            size={19}
+                          />
+                        </div>
+
+                        <span className="text-sm font-medium text-neutral-400">
+                          Highest Customer Value
+                        </span>
+                      </div>
+
+                      <span className="text-[10px] uppercase tracking-wider text-neutral-600">
+                        Revenue
+                      </span>
+                    </div>
+
+                    <div className="mt-7">
+                      <h3 className="text-xl font-semibold text-white tracking-tight">
+                        25–34
+                      </h3>
+
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-sm text-neutral-300">₹5.56L</span>
+
+                        <span className="text-xs text-neutral-600">
+                          revenue
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="group bg-[#101318] border border-[#242932] rounded-2xl p-5 hover:border-[#343941] transition-all duration-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.06] flex items-center justify-center">
+                          <VscPercentage
+                            className="text-neutral-300"
+                            size={19}
+                          />
+                        </div>
+
+                        <span className="text-sm font-medium text-neutral-400">
+                          Highest AOV Segment
+                        </span>
+                      </div>
+
+                      <span className="text-[10px] uppercase tracking-wider text-neutral-600">
+                        AOV
+                      </span>
+                    </div>
+
+                    <div className="mt-7">
+                      <h3 className="text-xl font-semibold text-white tracking-tight">
+                        45–50
+                      </h3>
+
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-sm text-neutral-300">₹556</span>
+
+                        <span className="text-xs text-neutral-600">
+                          per order
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
