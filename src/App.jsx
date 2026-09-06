@@ -30,13 +30,20 @@ import Maindashboard from "./components/dashboard/maindashboard/Maindashboard";
 import ProductInfo from "./components/productInformation/ProductInfo";
 // import MaindashboardSidebar from "./components/sidebars/MaindashboardSidebar";
 import Welcomepage from "./components/welcomePage/Welcomepage";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import StoreNewArrivals from "./components/adminPanel/adminPages/storeLatestArrivals/Arrivals/StoreNewArrivals";
 import StoreBrands from "./components/adminPanel/adminPages/brands/brandPage/StoreBrands";
 import StoreOrders from "./components/adminPanel/adminPages/order/StoreOrders";
 import StoreCustomers from "./components/adminPanel/adminPages/allCustomers/StoreCustomers";
 import StoreSales from "./components/adminPanel/adminPages/salesOverview/StoreSales";
+import AdminWelcomePage from "./components/adminPanel/adminAuthentication/adminWelcomePage/AdminWelcomePage";
+import { useState } from "react";
+import AdminSignup from "./components/adminPanel/adminAuthentication/adminSignup/AdminSignup";
+import AdminLogin from "./components/adminPanel/adminAuthentication/adminLogin/AdminLogin";
+// import AdminWelcomePage from "./components/adminPanel/adminAuthentication/adminWelcomePage/AdminWelcomePage";
+
 function App() {
+  const[isAuth,setIsAuth]=useState(false)
   return (
     <>
       <MeProvider>
@@ -74,7 +81,12 @@ function App() {
             <Route path="/CartOrder" element={<CartOrder />} />
             {/* end brand subpage */}
 
-            <Route path="/adminDash" element={<AdminDashboard />}>
+            {/* <Route element={}/> */}
+
+            <Route path="/AdminSection" element={!isAuth?<AdminWelcomePage/>:<Navigate to={"/adminDash"}/>}/>
+<Route element={<AdminSignup adminSignupToDash={setIsAuth}/>}/>
+<Route element={<AdminLogin adminLoginToDash={setIsAuth}/>}/>
+            <Route path="/adminDash" element={isAuth?<AdminDashboard />:<Navigate to={"/AdminSection"}/>}>
               <Route index element={<StoreOverview />} />
               <Route path="storeProducts" element={<StoreProducts />} />
               <Route path="storeNewArrivals" element={<StoreNewArrivals />} />

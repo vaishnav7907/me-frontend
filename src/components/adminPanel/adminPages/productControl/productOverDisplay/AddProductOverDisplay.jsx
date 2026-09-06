@@ -164,7 +164,6 @@ const AddProductOverDisplay = ({ onClose }) => {
 
                       <input
                         name="brand"
-                        
                         placeholder="Nike"
                         className="
                           w-full
@@ -192,7 +191,6 @@ const AddProductOverDisplay = ({ onClose }) => {
 
                       <input
                         name="sku"
-                        
                         placeholder="ME-SHIRT-001"
                         className="
                           w-full
@@ -217,7 +215,6 @@ const AddProductOverDisplay = ({ onClose }) => {
 
                       <select
                         name="status"
-                      
                         className="
                           w-full
                           h-10
@@ -263,7 +260,6 @@ const AddProductOverDisplay = ({ onClose }) => {
                       <input
                         type="number"
                         name="price"
-                       
                         placeholder="1499"
                         className="
                           w-full
@@ -296,7 +292,6 @@ const AddProductOverDisplay = ({ onClose }) => {
                       <input
                         type="number"
                         name="realPrice"
-                        
                         placeholder="1999"
                         className="
                           w-full
@@ -332,7 +327,6 @@ const AddProductOverDisplay = ({ onClose }) => {
 
                   <button
                     type="button"
-                 
                     className="
                       flex
                       items-center
@@ -355,32 +349,24 @@ const AddProductOverDisplay = ({ onClose }) => {
                 </div>
 
                 <div className="space-y-3">
-                  
-                    <div
-                     
-                      className="p-4 rounded-xl border border-[#292e35] bg-[#0C0F12]"
-                    >
-                      <div className="flex justify-between mb-4">
-                        <span className="text-[11px] text-neutral-600 uppercase tracking-wider">
-                          sss
-                        </span>
+                  <div className="p-4 rounded-xl border border-[#292e35] bg-[#0C0F12]">
+                    <div className="flex justify-between mb-4">
+                      <span className="text-[11px] text-neutral-600 uppercase tracking-wider">
+                        sss
+                      </span>
 
-                        
-                          <button
-                            type="button"
-                           
-                            className="text-neutral-600 hover:text-white"
-                          >
-                            <IoClose size={16} />
-                          </button>
-                       
-                      </div>
+                      <button
+                        type="button"
+                        className="text-neutral-600 hover:text-white"
+                      >
+                        <IoClose size={16} />
+                      </button>
+                    </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <input
-                          
-                          placeholder="Color"
-                          className="
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <input
+                        placeholder="Color"
+                        className="
                             h-10
                             px-3
                             rounded-lg
@@ -392,18 +378,16 @@ const AddProductOverDisplay = ({ onClose }) => {
                             outline-none
                             placeholder:text-neutral-700
                           "
+                      />
+
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          className="w-11 h-10 rounded-lg bg-transparent border border-[#292e35]"
                         />
 
-                        <div className="flex gap-2">
-                          <input
-                            type="color"
-                            
-                            className="w-11 h-10 rounded-lg bg-transparent border border-[#292e35]"
-                          />
-
-                          <input
-                           
-                            className="
+                        <input
+                          className="
                               flex-1
                               h-10
                               px-3
@@ -415,14 +399,13 @@ const AddProductOverDisplay = ({ onClose }) => {
                               text-white
                               outline-none
                             "
-                          />
-                        </div>
+                        />
+                      </div>
 
-                        <input
-                          type="number"
-                          
-                          placeholder="Stock"
-                          className="
+                      <input
+                        type="number"
+                        placeholder="Stock"
+                        className="
                             h-10
                             px-3
                             rounded-lg
@@ -434,17 +417,13 @@ const AddProductOverDisplay = ({ onClose }) => {
                             outline-none
                             placeholder:text-neutral-700
                           "
-                        />
-                      </div>
+                      />
+                    </div>
 
-                      <div className="flex flex-wrap gap-2 mt-4">
-                       
-
-                          
-                            <button
-                              type="button"
-                              
-                              className={`
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      <button
+                        type="button"
+                        className={`
                                 h-8
                                 min-w-9
                                 px-2.5
@@ -453,20 +432,13 @@ const AddProductOverDisplay = ({ onClose }) => {
                                 text-[11px]
                                 font-medium
                                 transition-all
-                                ${
-                                 
-                                    
-                                     "bg-[#101318] text-neutral-500 border-[#292e35] hover:text-white"
-                                }
+                                ${"bg-[#101318] text-neutral-500 border-[#292e35] hover:text-white"}
                               `}
-                            >
-                              M
-                            </button>
-                          
-                       
-                      </div>
+                      >
+                        M
+                      </button>
                     </div>
-                
+                  </div>
                 </div>
               </section>
             </div>
@@ -514,28 +486,17 @@ const AddProductOverDisplay = ({ onClose }) => {
                     type="file"
                     multiple
                     accept="image/*"
-                    
                     className="hidden"
                   />
                 </label>
 
-                
-                  <div className="grid grid-cols-2 gap-2 mt-3">
-                    
-                      <div
-                       
-                        className="relative aspect-square rounded-lg overflow-hidden border border-[#292e35]"
-                      >
-                        <img
-                          src=""
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
+                <div className="grid grid-cols-2 gap-2 mt-3">
+                  <div className="relative aspect-square rounded-lg overflow-hidden border border-[#292e35]">
+                    <img src="" alt="" className="w-full h-full object-cover" />
 
-                        <button
-                          type="button"
-                          
-                          className="
+                    <button
+                      type="button"
+                      className="
                             absolute
                             top-1.5
                             right-1.5
@@ -548,21 +509,17 @@ const AddProductOverDisplay = ({ onClose }) => {
                             justify-center
                             text-white
                           "
-                        >
-                          <IoClose size={14} />
-                        </button>
-                      </div>
-                  
+                    >
+                      <IoClose size={14} />
+                    </button>
                   </div>
-               
+                </div>
 
                 <div className="mt-5 pt-4 border-t border-[#242932]">
                   <div className="flex justify-between text-xs">
                     <span className="text-neutral-600">Images</span>
 
-                    <span className="text-neutral-400">
-                      uploaded
-                    </span>
+                    <span className="text-neutral-400">uploaded</span>
                   </div>
 
                   <div className="flex justify-between text-xs mt-3">
