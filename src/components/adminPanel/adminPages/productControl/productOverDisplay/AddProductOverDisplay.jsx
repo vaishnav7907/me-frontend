@@ -1,575 +1,751 @@
 import React, { useState } from "react";
-import { IoClose, IoAdd } from "react-icons/io5";
-import { FiUploadCloud } from "react-icons/fi";
+import {
+  FiX,
+  FiUpload,
+  FiTrash2,
+  FiPlus,
+  FiMinus,
+} from "react-icons/fi";
+import axios from "axios";
+import { UseMe } from "../../../../context/Meprovider";
 
-const AddProductOverDisplay = ({ onClose }) => {
+const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
+  const {
+    productName,
+    setProductName,
+    productDescription,
+    setProductDescription,
+    productCategory,
+    setProductCategory,
+    productBrandName,
+    setProductBrandName,
+    productPrice,
+    setProductPrice,
+    productRealPrice,
+    setProductRealPrice,
+    productImage,
+    setProductImage,
+    sku,
+    setSku,
+    status,
+    setStatus,
+  } = UseMe();
+
+  const [variants, setVariants] = useState([
+    {
+      color: {
+        name: "",
+        code: "#000000",
+      },
+      sizes: [
+        { size: "XS", stock: 0 },
+        { size: "S", stock: 0 },
+        { size: "M", stock: 0 },
+        { size: "L", stock: 0 },
+        { size: "XL", stock: 0 },
+        { size: "XXL", stock: 0 },
+      ],
+    },
+  ]);
+
+  const [loading, setLoading] = useState(false);
+
+  const addVariant = () => {
+    setVariants((prev) => [
+      ...prev,
+      {
+        color: {
+          name: "",
+          code: "#000000",
+        },
+        sizes: [
+          { size: "XS", stock: 0 },
+          { size: "S", stock: 0 },
+          { size: "M", stock: 0 },
+          { size: "L", stock: 0 },
+          { size: "XL", stock: 0 },
+          { size: "XXL", stock: 0 },
+        ],
+      },
+    ]);
+  };
+
+  const removeVariant = (variantIndex) => {
+    if (variants.length === 1) return;
+
+    setVariants((prev) =>
+      prev.filter((_, index) => index !== variantIndex)
+    );
+  };
+
+  const updateColor = (variantIndex, value) => {
+    setVariants((prev) =>
+      prev.map((variant, index) =>
+        index === variantIndex
+          ? {
+              ...variant,
+              color: {
+                ...variant.color,
+                name: value,
+              },
+            }
+          : variant
+      )
+    );
+  };
+
+  const updateColorCode = (variantIndex, value) => {
+    setVariants((prev) =>
+      prev.map((variant, index) =>
+        index === variantIndex
+          ? {
+              ...variant,
+              color: {
+                ...variant.color,
+                code: value,
+              },
+            }
+          : variant
+      )
+    );
+  };
+
+  const updateStock = (variantIndex, sizeIndex, value) => {
+    const stock = Math.max(0, Number(value) || 0);
+
+    setVariants((prev) =>
+      prev.map((variant, index) =>
+        index === variantIndex
+          ? {
+              ...variant,
+              sizes: variant.sizes.map((item, index) =>
+                index === sizeIndex
+                  ? {
+                      ...item,
+                      stock,
+                    }
+                  : item
+              ),
+            }
+          : variant
+      )
+    );
+  };
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files || []);
+
+    if (!files.length) return;
+
+    setProductImage((prev) => [...prev, ...files]);
+
+    e.target.value = "";
+  };
+
+  const removeImage = (imageIndex) => {
+    setProductImage((prev) =>
+      prev.filter((_, index) => index !== imageIndex)
+    );
+  };
+
+  const resetForm = () => {
+    setProductName("");
+    setProductDescription("");
+    setProductCategory("");
+    setProductBrandName("");
+    setProductPrice("");
+    setProductRealPrice("");
+    setProductImage([]);
+    setSku("");
+    setStatus("Active");
+
+    setVariants([
+      {
+        color: {
+          name: "",
+          code: "#000000",
+        },
+        sizes: [
+          { size: "XS", stock: 0 },
+          { size: "S", stock: 0 },
+          { size: "M", stock: 0 },
+          { size: "L", stock: 0 },
+          { size: "XL", stock: 0 },
+          { size: "XXL", stock: 0 },
+        ],
+      },
+    ]);
+  };
+
+  const closeModal = () => {
+    
+    onClose
+  };
+
+  const createProduct = async () => {
+    if (!productName.trim()) {
+      alert("Product name is required");
+      return;
+    }
+
+    if (!productDescription.trim()) {
+      alert("Product description is required");
+      return;
+    }
+
+    if (!productCategory) {
+      alert("Please select a category");
+      return;
+    }
+
+    if (!productBrandName.trim()) {
+      alert("Brand name is required");
+      return;
+    }
+
+    if (!productPrice || Number(productPrice) <= 0) {
+      alert("Enter a valid selling price");
+      return;
+    }
+
+    if (!productRealPrice || Number(productRealPrice) <= 0) {
+      alert("Enter a valid real price");
+      return;
+    }
+
+    if (Number(productRealPrice) < Number(productPrice)) {
+      alert("Real price should be greater than or equal to selling price");
+      return;
+    }
+
+    if (!sku.trim()) {
+      alert("SKU is required");
+      return;
+    }
+
+    if (!productImage.length) {
+      alert("Please upload at least one product image");
+      return;
+    }
+
+    if (!variants.length) {
+      alert("Please add at least one variant");
+      return;
+    }
+
+    const invalidVariant = variants.some(
+      (variant) => !variant.color.name.trim()
+    );
+
+    if (invalidVariant) {
+      alert("Please enter color name for every variant");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+
+      formData.append("name", productName.trim());
+      formData.append("description", productDescription.trim());
+      formData.append("category", productCategory);
+      formData.append("brandName", productBrandName.trim());
+      formData.append("price", Number(productPrice));
+      formData.append("realPrice", Number(productRealPrice));
+      formData.append("sku", sku.trim());
+      formData.append("status", status);
+      formData.append("variants", JSON.stringify(variants));
+
+      productImage.forEach((image) => {
+        formData.append("images", image);
+      });
+
+      const adminToken = localStorage.getItem("adminToken");
+
+      if (!adminToken) {
+        alert("Admin token not found. Please login again.");
+        return;
+      }
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/Me/createDress`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        alert("Product created successfully");
+        resetForm();
+        setAddProduct(false);
+      }
+    } catch (error) {
+      console.error("Create product error:", error);
+
+      alert(
+        error.response?.data?.message ||
+          "Failed to create product"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div
-        className="
-          w-full
-          max-w-6xl
-          max-h-[92vh]
-          overflow-hidden
-          bg-[#0B0D10]
-          border
-          border-[#292e35]
-          rounded-2xl
-          shadow-2xl
-          flex
-          flex-col
-        "
-      >
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[#242932] shrink-0">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+      <div className="w-full max-w-6xl max-h-[94vh] overflow-y-auto rounded-2xl border border-neutral-800 bg-[#0d0f12] text-white shadow-2xl">
+        <div className="sticky top-0 z-20 flex items-center justify-between border-b border-neutral-800 bg-[#0d0f12] px-6 py-5">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-600">
-              Store / Products
-            </p>
-
-            <h2 className="text-xl font-semibold text-white mt-1">
-              Add Product
+            <h2 className="text-xl font-semibold">
+              Add New Product
             </h2>
 
-            <p className="text-xs text-neutral-500 mt-1">
-              Add a new product to your ME collection.
+            <p className="mt-1 text-sm text-neutral-500">
+              Create and manage your product details
             </p>
           </div>
 
           <button
-            type="button"
             onClick={onClose}
-            className="
-              w-9
-              h-9
-              rounded-lg
-              border
-              border-[#292e35]
-              bg-[#101318]
-              flex
-              items-center
-              justify-center
-              text-neutral-500
-              hover:text-white
-              hover:bg-[#181b20]
-              transition-all
-            "
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
           >
-            <IoClose size={20} />
+            <FiX size={19} />
           </button>
         </div>
 
-        <form className="overflow-y-auto">
-          <div className="p-6 grid grid-cols-1 xl:grid-cols-3 gap-5">
-            <div className="xl:col-span-2 space-y-5">
-              <section className="bg-[#101318] border border-[#242932] rounded-xl p-5">
-                <div className="mb-5">
-                  <h3 className="text-sm font-semibold text-white">
-                    Basic Information
-                  </h3>
+        <div className="space-y-8 p-6">
+          <section>
+            <div className="mb-5">
+              <h3 className="text-base font-medium">
+                Basic Information
+              </h3>
 
-                  <p className="text-xs text-neutral-600 mt-1">
-                    General information about the product.
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-xs text-neutral-400 block mb-2">
-                      Product Name
-                    </label>
-
-                    <input
-                      name="name"
-                      placeholder="Classic White Shirt"
-                      className="
-                        w-full
-                        h-10
-                        px-3
-                        rounded-lg
-                        bg-[#0B0D10]
-                        border
-                        border-[#292e35]
-                        text-sm
-                        text-white
-                        outline-none
-                        placeholder:text-neutral-700
-                        focus:border-[#444a53]
-                      "
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs text-neutral-400 block mb-2">
-                      Description
-                    </label>
-
-                    <textarea
-                      name="description"
-                      rows="4"
-                      placeholder="Describe your product..."
-                      className="
-                        w-full
-                        px-3
-                        py-3
-                        rounded-lg
-                        bg-[#0B0D10]
-                        border
-                        border-[#292e35]
-                        text-sm
-                        text-white
-                        outline-none
-                        resize-none
-                        placeholder:text-neutral-700
-                        focus:border-[#444a53]
-                      "
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs text-neutral-400 block mb-2">
-                        Category
-                      </label>
-
-                      <select
-                        name="category"
-                        className="
-                          w-full
-                          h-10
-                          px-3
-                          rounded-lg
-                          bg-[#0B0D10]
-                          border
-                          border-[#292e35]
-                          text-sm
-                          text-neutral-300
-                          outline-none
-                        "
-                      >
-                        <option value="">Select category</option>
-
-                        <option value="">Shirts</option>
-                        <option value="">T-Shirts</option>
-                        <option value="">Pants</option>
-                        <option value="">Jackets</option>
-                        <option value="">Innerwear</option>
-                        <option value="">Shorts</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="text-xs text-neutral-400 block mb-2">
-                        Brand
-                      </label>
-
-                      <input
-                        name="brand"
-                        placeholder="Nike"
-                        className="
-                          w-full
-                          h-10
-                          px-3
-                          rounded-lg
-                          bg-[#0B0D10]
-                          border
-                          border-[#292e35]
-                          text-sm
-                          text-white
-                          outline-none
-                          placeholder:text-neutral-700
-                          focus:border-[#444a53]
-                        "
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs text-neutral-400 block mb-2">
-                        SKU
-                      </label>
-
-                      <input
-                        name="sku"
-                        placeholder="ME-SHIRT-001"
-                        className="
-                          w-full
-                          h-10
-                          px-3
-                          rounded-lg
-                          bg-[#0B0D10]
-                          border
-                          border-[#292e35]
-                          text-sm
-                          text-white
-                          outline-none
-                          placeholder:text-neutral-700
-                        "
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs text-neutral-400 block mb-2">
-                        Status
-                      </label>
-
-                      <select
-                        name="status"
-                        className="
-                          w-full
-                          h-10
-                          px-3
-                          rounded-lg
-                          bg-[#0B0D10]
-                          border
-                          border-[#292e35]
-                          text-sm
-                          text-neutral-300
-                          outline-none
-                        "
-                      >
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                        <option value="Draft">Draft</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <section className="bg-[#101318] border border-[#242932] rounded-xl p-5">
-                <div className="mb-5">
-                  <h3 className="text-sm font-semibold text-white">Pricing</h3>
-
-                  <p className="text-xs text-neutral-600 mt-1">
-                    Set the product pricing.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs text-neutral-400 block mb-2">
-                      Selling Price
-                    </label>
-
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm">
-                        ₹
-                      </span>
-
-                      <input
-                        type="number"
-                        name="price"
-                        placeholder="1499"
-                        className="
-                          w-full
-                          h-10
-                          pl-8
-                          pr-3
-                          rounded-lg
-                          bg-[#0B0D10]
-                          border
-                          border-[#292e35]
-                          text-sm
-                          text-white
-                          outline-none
-                          placeholder:text-neutral-700
-                        "
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs text-neutral-400 block mb-2">
-                      Original Price
-                    </label>
-
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm">
-                        ₹
-                      </span>
-
-                      <input
-                        type="number"
-                        name="realPrice"
-                        placeholder="1999"
-                        className="
-                          w-full
-                          h-10
-                          pl-8
-                          pr-3
-                          rounded-lg
-                          bg-[#0B0D10]
-                          border
-                          border-[#292e35]
-                          text-sm
-                          text-white
-                          outline-none
-                          placeholder:text-neutral-700
-                        "
-                      />
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <section className="bg-[#101318] border border-[#242932] rounded-xl p-5">
-                <div className="flex justify-between items-center mb-5">
-                  <div>
-                    <h3 className="text-sm font-semibold text-white">
-                      Variants
-                    </h3>
-
-                    <p className="text-xs text-neutral-600 mt-1">
-                      Manage colors, sizes and stock.
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="
-                      flex
-                      items-center
-                      gap-1.5
-                      h-8
-                      px-3
-                      rounded-lg
-                      border
-                      border-[#292e35]
-                      bg-[#16191e]
-                      text-xs
-                      text-neutral-300
-                      hover:text-white
-                      transition-all
-                    "
-                  >
-                    <IoAdd size={15} />
-                    Add Variant
-                  </button>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="p-4 rounded-xl border border-[#292e35] bg-[#0C0F12]">
-                    <div className="flex justify-between mb-4">
-                      <span className="text-[11px] text-neutral-600 uppercase tracking-wider">
-                        sss
-                      </span>
-
-                      <button
-                        type="button"
-                        className="text-neutral-600 hover:text-white"
-                      >
-                        <IoClose size={16} />
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <input
-                        placeholder="Color"
-                        className="
-                            h-10
-                            px-3
-                            rounded-lg
-                            bg-[#101318]
-                            border
-                            border-[#292e35]
-                            text-sm
-                            text-white
-                            outline-none
-                            placeholder:text-neutral-700
-                          "
-                      />
-
-                      <div className="flex gap-2">
-                        <input
-                          type="color"
-                          className="w-11 h-10 rounded-lg bg-transparent border border-[#292e35]"
-                        />
-
-                        <input
-                          className="
-                              flex-1
-                              h-10
-                              px-3
-                              rounded-lg
-                              bg-[#101318]
-                              border
-                              border-[#292e35]
-                              text-sm
-                              text-white
-                              outline-none
-                            "
-                        />
-                      </div>
-
-                      <input
-                        type="number"
-                        placeholder="Stock"
-                        className="
-                            h-10
-                            px-3
-                            rounded-lg
-                            bg-[#101318]
-                            border
-                            border-[#292e35]
-                            text-sm
-                            text-white
-                            outline-none
-                            placeholder:text-neutral-700
-                          "
-                      />
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      <button
-                        type="button"
-                        className={`
-                                h-8
-                                min-w-9
-                                px-2.5
-                                rounded-md
-                                border
-                                text-[11px]
-                                font-medium
-                                transition-all
-                                ${"bg-[#101318] text-neutral-500 border-[#292e35] hover:text-white"}
-                              `}
-                      >
-                        M
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </section>
+              <p className="mt-1 text-xs text-neutral-500">
+                Add the main information about your product
+              </p>
             </div>
 
-            <div>
-              <section className="bg-[#101318] border border-[#242932] rounded-xl p-5 xl:sticky xl:top-0">
-                <div className="mb-5">
-                  <h3 className="text-sm font-semibold text-white">
-                    Product Images
-                  </h3>
-
-                  <p className="text-xs text-neutral-600 mt-1">
-                    Upload product photos.
-                  </p>
-                </div>
-
-                <label
-                  htmlFor="productImages"
-                  className="
-                    h-44
-                    flex
-                    flex-col
-                    items-center
-                    justify-center
-                    rounded-xl
-                    border
-                    border-dashed
-                    border-[#343941]
-                    bg-[#0C0F12]
-                    cursor-pointer
-                    hover:border-[#555b64]
-                    transition-all
-                  "
-                >
-                  <FiUploadCloud size={26} className="text-neutral-500" />
-
-                  <p className="text-sm text-neutral-300 mt-3">Upload images</p>
-
-                  <p className="text-[10px] text-neutral-600 mt-1">
-                    PNG, JPG, WEBP
-                  </p>
-
-                  <input
-                    id="productImages"
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    className="hidden"
-                  />
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div className="md:col-span-2">
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Product Name
                 </label>
 
-                <div className="grid grid-cols-2 gap-2 mt-3">
-                  <div className="relative aspect-square rounded-lg overflow-hidden border border-[#292e35]">
-                    <img src="" alt="" className="w-full h-full object-cover" />
+                <input
+                  type="text"
+                  value={productName}
+                  onChange={(e) =>
+                    setProductName(e.target.value)
+                  }
+                  placeholder="Enter product name"
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none transition placeholder:text-neutral-600 focus:border-neutral-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Description
+                </label>
+
+                <textarea
+                  value={productDescription}
+                  onChange={(e) =>
+                    setProductDescription(e.target.value)
+                  }
+                  placeholder="Enter product description"
+                  rows={5}
+                  className="w-full resize-none rounded-lg border border-neutral-800 bg-[#12151a] px-4 py-3 text-sm outline-none transition placeholder:text-neutral-600 focus:border-neutral-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Category
+                </label>
+
+                <select
+                  value={productCategory}
+                  onChange={(e) =>
+                    setProductCategory(e.target.value)
+                  }
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none focus:border-neutral-500"
+                >
+                  <option value="">Select category</option>
+                  <option value="Shirts">Shirts</option>
+                  <option value="Pants">Pants</option>
+                  <option value="Jackets">Jackets</option>
+                  <option value="Innerwear">Innerwear</option>
+                  <option value="Shorts">Shorts</option>
+                  <option value="T-Shirts">T-Shirts</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Brand
+                </label>
+
+                <input
+                  type="text"
+                  value={productBrandName}
+                  onChange={(e) =>
+                    setProductBrandName(e.target.value)
+                  }
+                  placeholder="Enter brand name"
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="border-t border-neutral-800 pt-8">
+            <div className="mb-5">
+              <h3 className="text-base font-medium">
+                Pricing & Inventory
+              </h3>
+
+              <p className="mt-1 text-xs text-neutral-500">
+                Set pricing and inventory information
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+              <div>
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Selling Price
+                </label>
+
+                <input
+                  type="number"
+                  min="0"
+                  value={productPrice}
+                  onChange={(e) =>
+                    setProductPrice(e.target.value)
+                  }
+                  placeholder="0.00"
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Real Price
+                </label>
+
+                <input
+                  type="number"
+                  min="0"
+                  value={productRealPrice}
+                  onChange={(e) =>
+                    setProductRealPrice(e.target.value)
+                  }
+                  placeholder="0.00"
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm text-neutral-300">
+                  SKU
+                </label>
+
+                <input
+                  type="text"
+                  value={sku}
+                  onChange={(e) =>
+                    setSku(e.target.value.toUpperCase())
+                  }
+                  placeholder="ME-SHIRT-001"
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm uppercase outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="border-t border-neutral-800 pt-8">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-medium">
+                  Product Variants
+                </h3>
+
+                <p className="mt-1 text-xs text-neutral-500">
+                  Add colors and stock for each size
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={addVariant}
+                className="flex items-center gap-2 rounded-lg border border-neutral-700 px-3 py-2 text-sm transition hover:border-neutral-500 hover:bg-neutral-900"
+              >
+                <FiPlus size={16} />
+                Add Variant
+              </button>
+            </div>
+
+            <div className="space-y-5">
+              {variants.map((variant, variantIndex) => (
+                <div
+                  key={variantIndex}
+                  className="rounded-xl border border-neutral-800 bg-[#111419] p-5"
+                >
+                  <div className="mb-5 flex items-center justify-between">
+                    <span className="text-sm font-medium">
+                      Variant {variantIndex + 1}
+                    </span>
+
+                    {variants.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeVariant(variantIndex)
+                        }
+                        className="flex items-center gap-2 text-xs text-neutral-500 transition hover:text-white"
+                      >
+                        <FiTrash2 size={15} />
+                        Remove
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm text-neutral-300">
+                        Color Name
+                      </label>
+
+                      <input
+                        type="text"
+                        value={variant.color.name}
+                        onChange={(e) =>
+                          updateColor(
+                            variantIndex,
+                            e.target.value
+                          )
+                        }
+                        placeholder="Black"
+                        className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-neutral-300">
+                        Color
+                      </label>
+
+                      <div className="flex h-11 items-center gap-3 rounded-lg border border-neutral-800 bg-[#0d0f12] px-3">
+                        <input
+                          type="color"
+                          value={variant.color.code}
+                          onChange={(e) =>
+                            updateColorCode(
+                              variantIndex,
+                              e.target.value
+                            )
+                          }
+                          className="h-7 w-9 cursor-pointer rounded border-0 bg-transparent"
+                        />
+
+                        <span className="text-sm text-neutral-400">
+                          {variant.color.code}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-5">
+                    <label className="mb-3 block text-sm text-neutral-300">
+                      Size & Stock
+                    </label>
+
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                      {variant.sizes.map(
+                        (sizeItem, sizeIndex) => (
+                          <div
+                            key={sizeItem.size}
+                            className="rounded-lg border border-neutral-800 bg-[#0d0f12] p-3"
+                          >
+                            <div className="mb-2 flex items-center justify-between">
+                              <span className="text-sm font-medium">
+                                {sizeItem.size}
+                              </span>
+
+                              <span className="text-[10px] uppercase tracking-wider text-neutral-600">
+                                Stock
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateStock(
+                                    variantIndex,
+                                    sizeIndex,
+                                    sizeItem.stock - 1
+                                  )
+                                }
+                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
+                              >
+                                <FiMinus size={13} />
+                              </button>
+
+                              <input
+                                type="number"
+                                min="0"
+                                value={sizeItem.stock}
+                                onChange={(e) =>
+                                  updateStock(
+                                    variantIndex,
+                                    sizeIndex,
+                                    e.target.value
+                                  )
+                                }
+                                className="h-8 min-w-0 w-full rounded-md border border-neutral-800 bg-[#111419] text-center text-xs outline-none focus:border-neutral-600"
+                              />
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateStock(
+                                    variantIndex,
+                                    sizeIndex,
+                                    sizeItem.stock + 1
+                                  )
+                                }
+                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
+                              >
+                                <FiPlus size={13} />
+                              </button>
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="border-t border-neutral-800 pt-8">
+            <div className="mb-5">
+              <h3 className="text-base font-medium">
+                Product Images
+              </h3>
+
+              <p className="mt-1 text-xs text-neutral-500">
+                Upload high-quality images of your product
+              </p>
+            </div>
+
+            <label className="flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-neutral-700 bg-[#111419] transition hover:border-neutral-500 hover:bg-[#14171c]">
+              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-neutral-800 bg-[#0d0f12]">
+                <FiUpload
+                  size={20}
+                  className="text-neutral-400"
+                />
+              </div>
+
+              <p className="text-sm text-neutral-300">
+                Click to upload images
+              </p>
+
+              <p className="mt-1 text-xs text-neutral-600">
+                PNG, JPG, JPEG or WEBP
+              </p>
+
+              <input
+                type="file"
+                multiple
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </label>
+
+            {productImage.length > 0 && (
+              <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {productImage.map((image, index) => (
+                  <div
+                    key={`${image.name}-${index}`}
+                    className="group relative overflow-hidden rounded-lg border border-neutral-800 bg-[#111419]"
+                  >
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt={image.name}
+                      className="aspect-square w-full object-cover"
+                    />
 
                     <button
                       type="button"
-                      className="
-                            absolute
-                            top-1.5
-                            right-1.5
-                            w-6
-                            h-6
-                            rounded-md
-                            bg-black/70
-                            flex
-                            items-center
-                            justify-center
-                            text-white
-                          "
+                      onClick={() => removeImage(index)}
+                      className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-md bg-black/80 text-neutral-300 opacity-0 transition group-hover:opacity-100 hover:text-white"
                     >
-                      <IoClose size={14} />
+                      <FiTrash2 size={15} />
                     </button>
+
+                    <div className="absolute bottom-0 left-0 right-0 truncate bg-black/70 px-2 py-2 text-[10px] text-neutral-300">
+                      {image.name}
+                    </div>
                   </div>
-                </div>
+                ))}
+              </div>
+            )}
+          </section>
 
-                <div className="mt-5 pt-4 border-t border-[#242932]">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-neutral-600">Images</span>
-
-                    <span className="text-neutral-400">uploaded</span>
-                  </div>
-
-                  <div className="flex justify-between text-xs mt-3">
-                    <span className="text-neutral-600">Variants</span>
-
-                    <span className="text-neutral-400">222</span>
-                  </div>
-                </div>
-              </section>
+          <section className="border-t border-neutral-800 pt-8">
+            <div className="mb-5">
+              <h3 className="text-base font-medium">
+                Product Status
+              </h3>
             </div>
-          </div>
 
-          <div className="px-6 py-4 border-t border-[#242932] flex justify-end gap-3 sticky bottom-0 bg-[#0B0D10]">
-            <button
-              type="button"
-              onClick={onClose}
-              className="
-                h-10
-                px-5
-                rounded-lg
-                border
-                border-[#292e35]
-                bg-[#101318]
-                text-sm
-                text-neutral-400
-                hover:text-white
-                transition-all
-              "
-            >
-              Cancel
-            </button>
+            <div className="flex flex-wrap gap-3">
+              {["Active", "Inactive", "Draft"].map(
+                (item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => setStatus(item)}
+                    className={`rounded-lg border px-5 py-2.5 text-sm transition ${
+                      status === item
+                        ? "border-white bg-white text-black"
+                        : "border-neutral-800 bg-[#111419] text-neutral-400 hover:border-neutral-600 hover:text-white"
+                    }`}
+                  >
+                    {item}
+                  </button>
+                )
+              )}
+            </div>
+          </section>
+        </div>
 
-            <button
-              type="submit"
-              className="
-                h-10
-                px-5
-                rounded-lg
-                bg-white
-                text-black
-                text-sm
-                font-semibold
-                hover:bg-neutral-200
-                transition-colors
-              "
-            >
-              Add Product
-            </button>
-          </div>
-        </form>
+        <div className="sticky bottom-0 flex items-center justify-end gap-3 border-t border-neutral-800 bg-[#0d0f12] px-6 py-5">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="rounded-lg border border-neutral-800 px-5 py-2.5 text-sm text-neutral-400 transition hover:border-neutral-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={createProduct}
+            disabled={loading}
+            className="rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading ? "Creating..." : "Add Product"}
+          </button>
+        </div>
       </div>
     </div>
   );

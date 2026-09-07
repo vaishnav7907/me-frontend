@@ -1,14 +1,41 @@
 import React, { useState } from "react";
 import { FiArrowLeft, FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
-const AdminLogin = ({ setAdminSignIn }) => {
+import { UseMe } from "../../../context/Meprovider";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+const AdminLogin = ({ setAdminSignIn, todash }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const { FullName, setFullName, Password, setPassword } = UseMe();
+  const navigate = useNavigate();
+  const fullNameOnchange = (e) => {
+    setFullName(e.target.value);
   };
-  const handleSubmit = (e) => {
+
+  const passwordOnChange = (e) => {
+    setPassword(e.target.value);
+  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    try {
+      const adminSigninApi = await axios.post(
+        `${import.meta.env.VITE_API_URL}/Me/userAdminLogin`,
+        {
+          FullName,
+          Password,
+        },
+      );
+
+      console.log("login data", adminSigninApi.data);
+
+      alert("Admin login successfully ✅");
+      setAdminSignIn(false);
+      todash(true);
+      navigate("/adminDash");
+    } catch (error) {
+      console.log("Error in admin signup:", error);
+      console.log("Server response:", error.response?.data);
+    }
   };
   return (
     <div className="fixed inset-0 z-[200] bg-[#070809] flex items-center justify-center px-5">
@@ -53,7 +80,7 @@ const AdminLogin = ({ setAdminSignIn }) => {
             <form onSubmit={handleSubmit} className="mt-7 space-y-5">
               <div>
                 <label className="block text-xs font-medium text-neutral-400 mb-2">
-                  Email address
+                  User Name
                 </label>
                 <div className="relative">
                   <FiMail
@@ -61,10 +88,10 @@ const AdminLogin = ({ setAdminSignIn }) => {
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-600"
                   />
                   <input
-                    type="email"
+                    type="text"
                     name="email"
-                    value={formData.email}
-                    onChange={handleChange}
+                    value={FullName}
+                    onChange={fullNameOnchange}
                     placeholder="admin@example.com"
                     required
                     className="w-full h-11 pl-11 pr-4 rounded-xl bg-[#15171b] border border-[#292c32] text-sm text-white placeholder:text-neutral-600 outline-none focus:border-neutral-500 transition"
@@ -91,8 +118,8 @@ const AdminLogin = ({ setAdminSignIn }) => {
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password"
-                    value={formData.password}
-                    onChange={handleChange}
+                    value={Password}
+                    onChange={passwordOnChange}
                     placeholder="Enter your password"
                     required
                     className="w-full h-11 pl-11 pr-11 rounded-xl bg-[#15171b] border border-[#292c32] text-sm text-white placeholder:text-neutral-600 outline-none focus:border-neutral-500 transition"

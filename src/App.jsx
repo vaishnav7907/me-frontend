@@ -43,7 +43,7 @@ import AdminLogin from "./components/adminPanel/adminAuthentication/adminLogin/A
 // import AdminWelcomePage from "./components/adminPanel/adminAuthentication/adminWelcomePage/AdminWelcomePage";
 
 function App() {
-  const[isAuth,setIsAuth]=useState(false)
+  const [isAuth, setIsAuth] = useState(false);
   return (
     <>
       <MeProvider>
@@ -83,10 +83,23 @@ function App() {
 
             {/* <Route element={}/> */}
 
-            <Route path="/AdminSection" element={!isAuth?<AdminWelcomePage/>:<Navigate to={"/adminDash"}/>}/>
-<Route element={<AdminSignup adminSignupToDash={setIsAuth}/>}/>
-<Route element={<AdminLogin adminLoginToDash={setIsAuth}/>}/>
-            <Route path="/adminDash" element={isAuth?<AdminDashboard />:<Navigate to={"/AdminSection"}/>}>
+            <Route
+              path="/AdminSection"
+              element={
+                !isAuth ? (
+                  <AdminWelcomePage adminLoginToDash={setIsAuth} />
+                ) : (
+                  <Navigate to="/adminDash" />
+                )
+              }
+            />
+           
+            <Route
+              path="/adminDash"
+              element={
+                isAuth ? <AdminDashboard /> : <Navigate to={"/AdminSection"} />
+              }
+            >
               <Route index element={<StoreOverview />} />
               <Route path="storeProducts" element={<StoreProducts />} />
               <Route path="storeNewArrivals" element={<StoreNewArrivals />} />

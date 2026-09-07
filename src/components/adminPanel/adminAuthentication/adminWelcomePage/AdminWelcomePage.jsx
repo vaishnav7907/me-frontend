@@ -4,7 +4,7 @@ import { FiArrowRight, FiLock, FiUserPlus } from "react-icons/fi";
 import AdminLogin from "../adminLogin/AdminLogin";
 import AdminSignup from "../adminSignup/AdminSignup";
 
-const AdminWelcomePage = () => {
+const AdminWelcomePage = ({adminLoginToDash}) => {
   const [adminSignIn, setAdminSignIn] = useState(false);
   const [adminSignUp, setAdminSignUp] = useState(false);
 
@@ -150,6 +150,7 @@ const AdminWelcomePage = () => {
         <AdminLogin
           setAdminSignIn={setAdminSignIn}
           setAdminSignUp={setAdminSignUp}
+          todash={adminLoginToDash}
         />
       )}
 
