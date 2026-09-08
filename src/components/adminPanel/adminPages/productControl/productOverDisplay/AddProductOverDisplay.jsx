@@ -9,7 +9,7 @@ import {
 import axios from "axios";
 import { UseMe } from "../../../../context/Meprovider";
 
-const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
+const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
   const {
     productName,
     setProductName,
@@ -31,6 +31,8 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
     setStatus,
   } = UseMe();
 
+  const [discount, setDiscount] = useState("");
+
   const [variants, setVariants] = useState([
     {
       color: {
@@ -49,6 +51,20 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
   ]);
 
   const [loading, setLoading] = useState(false);
+
+  const calculateDiscount = (realPrice, price) => {
+    const original = Number(realPrice);
+    const selling = Number(price);
+
+    if (!original || !selling || selling >= original) {
+      setDiscount(0);
+      return;
+    }
+
+    const discountValue = ((original - selling) / original) * 100;
+
+    setDiscount(Math.round(discountValue));
+  };
 
   const addVariant = () => {
     setVariants((prev) => [
@@ -96,17 +112,19 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
 
   const updateColorCode = (variantIndex, value) => {
     setVariants((prev) =>
-      prev.map((variant, index) =>
-        index === variantIndex
-          ? {
-              ...variant,
-              color: {
-                ...variant.color,
-                code: value,
-              },
-            }
-          : variant
-      )
+      prev.map((variant, index) => {
+        if (index !== variantIndex) {
+          return variant;
+        }
+
+        return {
+          ...variant,
+          color: {
+            ...variant.color,
+            code: value,
+          },
+        };
+      })
     );
   };
 
@@ -129,6 +147,19 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
             }
           : variant
       )
+    );
+  };
+
+  const getTotalStock = () => {
+    return variants.reduce(
+      (total, variant) =>
+        total +
+        variant.sizes.reduce(
+          (sizeTotal, size) =>
+            sizeTotal + Number(size.stock || 0),
+          0
+        ),
+      0
     );
   };
 
@@ -158,6 +189,7 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
     setProductImage([]);
     setSku("");
     setStatus("Active");
+    setDiscount("");
 
     setVariants([
       {
@@ -175,11 +207,6 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
         ],
       },
     ]);
-  };
-
-  const closeModal = () => {
-    
-    onClose
   };
 
   const createProduct = async () => {
@@ -214,7 +241,9 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
     }
 
     if (Number(productRealPrice) < Number(productPrice)) {
-      alert("Real price should be greater than or equal to selling price");
+      alert(
+        "Real price should be greater than or equal to selling price"
+      );
       return;
     }
 
@@ -242,29 +271,72 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
       return;
     }
 
+    const invalidColorCode = variants.some(
+      (variant) =>
+        !/^#[0-9A-Fa-f]{6}$/.test(variant.color.code)
+    );
+
+    if (invalidColorCode) {
+      alert(
+        "Please enter a valid color code like #000000"
+      );
+      return;
+    }
+
+    const totalStock = getTotalStock();
+
+    if (totalStock <= 0) {
+      alert("Product stock must be greater than 0");
+      return;
+    }
+
     try {
       setLoading(true);
+
+      const realPrice = Number(productRealPrice);
+      const price = Number(productPrice);
+
+      const calculatedDiscount =
+        realPrice > 0 && price < realPrice
+          ? Math.round(
+              ((realPrice - price) / realPrice) * 100
+            )
+          : 0;
 
       const formData = new FormData();
 
       formData.append("name", productName.trim());
-      formData.append("description", productDescription.trim());
+      formData.append(
+        "description",
+        productDescription.trim()
+      );
       formData.append("category", productCategory);
-      formData.append("brandName", productBrandName.trim());
-      formData.append("price", Number(productPrice));
-      formData.append("realPrice", Number(productRealPrice));
+      formData.append(
+        "brandName",
+        productBrandName.trim()
+      );
+      formData.append("price", price);
+      formData.append("realPrice", realPrice);
+      formData.append("discount", calculatedDiscount);
+      formData.append("stock", totalStock);
       formData.append("sku", sku.trim());
       formData.append("status", status);
-      formData.append("variants", JSON.stringify(variants));
+      formData.append(
+        "variants",
+        JSON.stringify(variants)
+      );
 
       productImage.forEach((image) => {
         formData.append("images", image);
       });
 
-      const adminToken = localStorage.getItem("adminToken");
+      const adminToken =
+        localStorage.getItem("token");
 
       if (!adminToken) {
-        alert("Admin token not found. Please login again.");
+        alert(
+          "Admin token not found. Please login again."
+        );
         return;
       }
 
@@ -280,11 +352,16 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
 
       if (response.status === 201) {
         alert("Product created successfully");
+
         resetForm();
+
         setAddProduct(false);
       }
     } catch (error) {
-      console.error("Create product error:", error);
+      console.error(
+        "Create product error:",
+        error
+      );
 
       alert(
         error.response?.data?.message ||
@@ -296,7 +373,7 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
       <div className="w-full max-w-6xl max-h-[94vh] overflow-y-auto rounded-2xl border border-neutral-800 bg-[#0d0f12] text-white shadow-2xl">
         <div className="sticky top-0 z-20 flex items-center justify-between border-b border-neutral-800 bg-[#0d0f12] px-6 py-5">
           <div>
@@ -342,7 +419,7 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
                     setProductName(e.target.value)
                   }
                   placeholder="Enter product name"
-                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none transition placeholder:text-neutral-600 focus:border-neutral-500"
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                 />
               </div>
 
@@ -358,7 +435,7 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
                   }
                   placeholder="Enter product description"
                   rows={5}
-                  className="w-full resize-none rounded-lg border border-neutral-800 bg-[#12151a] px-4 py-3 text-sm outline-none transition placeholder:text-neutral-600 focus:border-neutral-500"
+                  className="w-full resize-none rounded-lg border border-neutral-800 bg-[#12151a] px-4 py-3 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                 />
               </div>
 
@@ -374,13 +451,33 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
                   }
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none focus:border-neutral-500"
                 >
-                  <option value="">Select category</option>
-                  <option value="Shirts">Shirts</option>
-                  <option value="Pants">Pants</option>
-                  <option value="Jackets">Jackets</option>
-                  <option value="Innerwear">Innerwear</option>
-                  <option value="Shorts">Shorts</option>
-                  <option value="T-Shirts">T-Shirts</option>
+                  <option value="">
+                    Select category
+                  </option>
+
+                  <option value="Shirts">
+                    Shirts
+                  </option>
+
+                  <option value="Pants">
+                    Pants
+                  </option>
+
+                  <option value="Jackets">
+                    Jackets
+                  </option>
+
+                  <option value="Innerwear">
+                    Innerwear
+                  </option>
+
+                  <option value="Shorts">
+                    Shorts
+                  </option>
+
+                  <option value="T-Shirts">
+                    T-Shirts
+                  </option>
                 </select>
               </div>
 
@@ -413,7 +510,7 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
               <div>
                 <label className="mb-2 block text-sm text-neutral-300">
                   Selling Price
@@ -423,9 +520,16 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
                   type="number"
                   min="0"
                   value={productPrice}
-                  onChange={(e) =>
-                    setProductPrice(e.target.value)
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value;
+
+                    setProductPrice(value);
+
+                    calculateDiscount(
+                      productRealPrice,
+                      value
+                    );
+                  }}
                   placeholder="0.00"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                 />
@@ -440,12 +544,39 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
                   type="number"
                   min="0"
                   value={productRealPrice}
-                  onChange={(e) =>
-                    setProductRealPrice(e.target.value)
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value;
+
+                    setProductRealPrice(value);
+
+                    calculateDiscount(
+                      value,
+                      productPrice
+                    );
+                  }}
                   placeholder="0.00"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                 />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Discount
+                </label>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={discount}
+                    readOnly
+                    placeholder="0"
+                    className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 pr-10 text-sm outline-none placeholder:text-neutral-600"
+                  />
+
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-neutral-500">
+                    %
+                  </span>
+                </div>
               </div>
 
               <div>
@@ -457,10 +588,12 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
                   type="text"
                   value={sku}
                   onChange={(e) =>
-                    setSku(e.target.value.toUpperCase())
+                    setSku(
+                      e.target.value.toUpperCase()
+                    )
                   }
                   placeholder="ME-SHIRT-001"
-                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm uppercase outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm uppercase outline-none placeholder:text-neutral-600"
                 />
               </div>
             </div>
@@ -489,147 +622,215 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
             </div>
 
             <div className="space-y-5">
-              {variants.map((variant, variantIndex) => (
-                <div
-                  key={variantIndex}
-                  className="rounded-xl border border-neutral-800 bg-[#111419] p-5"
-                >
-                  <div className="mb-5 flex items-center justify-between">
-                    <span className="text-sm font-medium">
-                      Variant {variantIndex + 1}
-                    </span>
+              {variants.map(
+                (variant, variantIndex) => (
+                  <div
+                    key={variantIndex}
+                    className="rounded-xl border border-neutral-800 bg-[#111419] p-5"
+                  >
+                    <div className="mb-5 flex items-center justify-between">
+                      <span className="text-sm font-medium">
+                        Variant {variantIndex + 1}
+                      </span>
 
-                    {variants.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          removeVariant(variantIndex)
-                        }
-                        className="flex items-center gap-2 text-xs text-neutral-500 transition hover:text-white"
-                      >
-                        <FiTrash2 size={15} />
-                        Remove
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                    <div>
-                      <label className="mb-2 block text-sm text-neutral-300">
-                        Color Name
-                      </label>
-
-                      <input
-                        type="text"
-                        value={variant.color.name}
-                        onChange={(e) =>
-                          updateColor(
-                            variantIndex,
-                            e.target.value
-                          )
-                        }
-                        placeholder="Black"
-                        className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
-                      />
+                      {variants.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            removeVariant(
+                              variantIndex
+                            )
+                          }
+                          className="flex items-center gap-2 text-xs text-neutral-500 transition hover:text-white"
+                        >
+                          <FiTrash2 size={15} />
+                          Remove
+                        </button>
+                      )}
                     </div>
 
-                    <div>
-                      <label className="mb-2 block text-sm text-neutral-300">
-                        Color
-                      </label>
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                      <div>
+                        <label className="mb-2 block text-sm text-neutral-300">
+                          Color Name
+                        </label>
 
-                      <div className="flex h-11 items-center gap-3 rounded-lg border border-neutral-800 bg-[#0d0f12] px-3">
                         <input
-                          type="color"
-                          value={variant.color.code}
+                          type="text"
+                          value={
+                            variant.color.name
+                          }
                           onChange={(e) =>
-                            updateColorCode(
+                            updateColor(
                               variantIndex,
                               e.target.value
                             )
                           }
-                          className="h-7 w-9 cursor-pointer rounded border-0 bg-transparent"
+                          placeholder="Black"
+                          className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                         />
+                      </div>
 
-                        <span className="text-sm text-neutral-400">
-                          {variant.color.code}
+                      <div>
+                        <label className="mb-2 block text-sm text-neutral-300">
+                          Color Code
+                        </label>
+
+                        <div className="flex h-11 items-center gap-3 rounded-lg border border-neutral-800 bg-[#0d0f12] px-3">
+                          <input
+                            type="color"
+                            value={
+                              /^#[0-9A-Fa-f]{6}$/.test(
+                                variant.color.code
+                              )
+                                ? variant.color.code
+                                : "#000000"
+                            }
+                            onChange={(e) =>
+                              updateColorCode(
+                                variantIndex,
+                                e.target.value
+                              )
+                            }
+                            className="h-8 w-10 cursor-pointer rounded border-0 bg-transparent p-0"
+                          />
+
+                          <input
+                            type="text"
+                            value={
+                              variant.color.code
+                            }
+                            onChange={(e) =>
+                              updateColorCode(
+                                variantIndex,
+                                e.target.value
+                              )
+                            }
+                            placeholder="#000000"
+                            maxLength={7}
+                            className="h-8 w-full bg-transparent text-sm text-neutral-300 uppercase outline-none placeholder:text-neutral-600"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-5">
+                      <div className="mb-3 flex items-center justify-between">
+                        <label className="block text-sm text-neutral-300">
+                          Size & Stock
+                        </label>
+
+                        <span className="text-xs text-neutral-500">
+                          Variant Stock:{" "}
+                          <span className="text-white">
+                            {variant.sizes.reduce(
+                              (total, size) =>
+                                total +
+                                Number(
+                                  size.stock || 0
+                                ),
+                              0
+                            )}
+                          </span>
                         </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                        {variant.sizes.map(
+                          (
+                            sizeItem,
+                            sizeIndex
+                          ) => (
+                            <div
+                              key={sizeItem.size}
+                              className="rounded-lg border border-neutral-800 bg-[#0d0f12] p-3"
+                            >
+                              <div className="mb-2 flex items-center justify-between">
+                                <span className="text-sm font-medium">
+                                  {sizeItem.size}
+                                </span>
+
+                                <span className="text-[10px] uppercase tracking-wider text-neutral-600">
+                                  Stock
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    updateStock(
+                                      variantIndex,
+                                      sizeIndex,
+                                      sizeItem.stock -
+                                        1
+                                    )
+                                  }
+                                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
+                                >
+                                  <FiMinus
+                                    size={13}
+                                  />
+                                </button>
+
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={
+                                    sizeItem.stock
+                                  }
+                                  onChange={(e) =>
+                                    updateStock(
+                                      variantIndex,
+                                      sizeIndex,
+                                      e.target.value
+                                    )
+                                  }
+                                  className="h-8 min-w-0 w-full rounded-md border border-neutral-800 bg-[#111419] text-center text-xs outline-none focus:border-neutral-600"
+                                />
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    updateStock(
+                                      variantIndex,
+                                      sizeIndex,
+                                      sizeItem.stock +
+                                        1
+                                    )
+                                  }
+                                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
+                                >
+                                  <FiPlus
+                                    size={13}
+                                  />
+                                </button>
+                              </div>
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
                   </div>
+                )
+              )}
+            </div>
 
-                  <div className="mt-5">
-                    <label className="mb-3 block text-sm text-neutral-300">
-                      Size & Stock
-                    </label>
+            <div className="mt-5 flex items-center justify-between rounded-xl border border-neutral-800 bg-[#111419] px-5 py-4">
+              <div>
+                <p className="text-sm font-medium">
+                  Total Product Stock
+                </p>
 
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-                      {variant.sizes.map(
-                        (sizeItem, sizeIndex) => (
-                          <div
-                            key={sizeItem.size}
-                            className="rounded-lg border border-neutral-800 bg-[#0d0f12] p-3"
-                          >
-                            <div className="mb-2 flex items-center justify-between">
-                              <span className="text-sm font-medium">
-                                {sizeItem.size}
-                              </span>
+                <p className="mt-1 text-xs text-neutral-500">
+                  Combined stock across all colors
+                  and sizes
+                </p>
+              </div>
 
-                              <span className="text-[10px] uppercase tracking-wider text-neutral-600">
-                                Stock
-                              </span>
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  updateStock(
-                                    variantIndex,
-                                    sizeIndex,
-                                    sizeItem.stock - 1
-                                  )
-                                }
-                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
-                              >
-                                <FiMinus size={13} />
-                              </button>
-
-                              <input
-                                type="number"
-                                min="0"
-                                value={sizeItem.stock}
-                                onChange={(e) =>
-                                  updateStock(
-                                    variantIndex,
-                                    sizeIndex,
-                                    e.target.value
-                                  )
-                                }
-                                className="h-8 min-w-0 w-full rounded-md border border-neutral-800 bg-[#111419] text-center text-xs outline-none focus:border-neutral-600"
-                              />
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  updateStock(
-                                    variantIndex,
-                                    sizeIndex,
-                                    sizeItem.stock + 1
-                                  )
-                                }
-                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
-                              >
-                                <FiPlus size={13} />
-                              </button>
-                            </div>
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+              <span className="text-2xl font-semibold">
+                {getTotalStock()}
+              </span>
             </div>
           </section>
 
@@ -640,7 +841,8 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
               </h3>
 
               <p className="mt-1 text-xs text-neutral-500">
-                Upload high-quality images of your product
+                Upload high-quality images of your
+                product
               </p>
             </div>
 
@@ -671,30 +873,36 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
 
             {productImage.length > 0 && (
               <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                {productImage.map((image, index) => (
-                  <div
-                    key={`${image.name}-${index}`}
-                    className="group relative overflow-hidden rounded-lg border border-neutral-800 bg-[#111419]"
-                  >
-                    <img
-                      src={URL.createObjectURL(image)}
-                      alt={image.name}
-                      className="aspect-square w-full object-cover"
-                    />
-
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-md bg-black/80 text-neutral-300 opacity-0 transition group-hover:opacity-100 hover:text-white"
+                {productImage.map(
+                  (image, index) => (
+                    <div
+                      key={`${image.name}-${index}`}
+                      className="group relative overflow-hidden rounded-lg border border-neutral-800 bg-[#111419]"
                     >
-                      <FiTrash2 size={15} />
-                    </button>
+                      <img
+                        src={URL.createObjectURL(
+                          image
+                        )}
+                        alt={image.name}
+                        className="aspect-square w-full object-cover"
+                      />
 
-                    <div className="absolute bottom-0 left-0 right-0 truncate bg-black/70 px-2 py-2 text-[10px] text-neutral-300">
-                      {image.name}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeImage(index)
+                        }
+                        className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-md bg-black/80 text-neutral-300 opacity-0 transition group-hover:opacity-100 hover:text-white"
+                      >
+                        <FiTrash2 size={15} />
+                      </button>
+
+                      <div className="absolute bottom-0 left-0 right-0 truncate bg-black/70 px-2 py-2 text-[10px] text-neutral-300">
+                        {image.name}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             )}
           </section>
@@ -707,22 +915,26 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              {["Active", "Inactive", "Draft"].map(
-                (item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => setStatus(item)}
-                    className={`rounded-lg border px-5 py-2.5 text-sm transition ${
-                      status === item
-                        ? "border-white bg-white text-black"
-                        : "border-neutral-800 bg-[#111419] text-neutral-400 hover:border-neutral-600 hover:text-white"
-                    }`}
-                  >
-                    {item}
-                  </button>
-                )
-              )}
+              {[
+                "Active",
+                "Inactive",
+                "Draft",
+              ].map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() =>
+                    setStatus(item)
+                  }
+                  className={`rounded-lg border px-5 py-2.5 text-sm transition ${
+                    status === item
+                      ? "border-white bg-white text-black"
+                      : "border-neutral-800 bg-[#111419] text-neutral-400 hover:border-neutral-600 hover:text-white"
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
             </div>
           </section>
         </div>
@@ -743,7 +955,9 @@ const AddProductOverDisplay = ({ setAddProduct,onClose }) => {
             disabled={loading}
             className="rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "Creating..." : "Add Product"}
+            {loading
+              ? "Creating..."
+              : "Add Product"}
           </button>
         </div>
       </div>

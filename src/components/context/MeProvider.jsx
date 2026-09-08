@@ -25,6 +25,9 @@ export const MeProvider = ({ children }) => {
   const [sku, setSku] = useState("");
   const [status, setStatus] = useState("Active");
 
+  // get products
+  const [allproducts, setAllProducts] = useState([]);
+
   return (
     <MeContext.Provider
       value={{
@@ -67,6 +70,9 @@ export const MeProvider = ({ children }) => {
 
         status,
         setStatus,
+
+        allproducts,
+        setAllProducts,
       }}
     >
       {children}
