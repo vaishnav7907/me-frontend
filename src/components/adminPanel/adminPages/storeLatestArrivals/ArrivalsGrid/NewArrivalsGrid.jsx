@@ -1,265 +1,54 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaEye } from "react-icons/fa";
 import { CiEdit } from "react-icons/ci";
 import { FiPackage, FiShoppingBag, FiTrendingUp } from "react-icons/fi";
+import { UseMe } from "../../../../context/Meprovider";
+import axios from "axios";
 
 const NewArrivalsGrid = () => {
-  const gridProductss = [
-    {
-      id: 1,
-      product:
-        "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400",
-      category: "Shirts",
-      price: 2499,
-      variants: 4,
-      stock: 42,
-      sold: 128,
-      revenue: 319872,
-      status: "In Stock",
-    },
-    {
-      id: 2,
-      product:
-        "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400",
-      category: "Shirts",
-      price: 2999,
-      variants: 3,
-      stock: 25,
-      sold: 96,
-      revenue: 287904,
-      status: "In Stock",
-    },
-    {
-      id: 3,
-      product:
-        "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400",
-      category: "T-Shirts",
-      price: 1499,
-      variants: 5,
-      stock: 67,
-      sold: 215,
-      revenue: 322285,
-      status: "In Stock",
-    },
-    {
-      id: 4,
-      product:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
-      category: "T-Shirts",
-      price: 1299,
-      variants: 4,
-      stock: 8,
-      sold: 189,
-      revenue: 245511,
-      status: "Low Stock",
-    },
-    {
-      id: 5,
-      product:
-        "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=400",
-      category: "Pants",
-      price: 3499,
-      variants: 4,
-      stock: 31,
-      sold: 74,
-      revenue: 258926,
-      status: "In Stock",
-    },
-    {
-      id: 6,
-      product:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400",
-      category: "Pants",
-      price: 3999,
-      variants: 3,
-      stock: 14,
-      sold: 63,
-      revenue: 251937,
-      status: "Low Stock",
-    },
-    {
-      id: 7,
-      product:
-        "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400",
-      category: "Jackets",
-      price: 6999,
-      variants: 3,
-      stock: 19,
-      sold: 41,
-      revenue: 286959,
-      status: "In Stock",
-    },
-    {
-      id: 8,
-      product:
-        "https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?w=400",
-      category: "Jackets",
-      price: 5999,
-      variants: 2,
-      stock: 5,
-      sold: 37,
-      revenue: 221963,
-      status: "Low Stock",
-    },
-    {
-      id: 9,
-      product:
-        "https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=400",
-      category: "Hoodies",
-      price: 2499,
-      variants: 5,
-      stock: 53,
-      sold: 156,
-      revenue: 389844,
-      status: "In Stock",
-    },
-    {
-      id: 10,
-      product:
-        "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400",
-      category: "Hoodies",
-      price: 2799,
-      variants: 4,
-      stock: 0,
-      sold: 112,
-      revenue: 313488,
-      status: "Out of Stock",
-    },
-    {
-      id: 11,
-      product:
-        "https://images.unsplash.com/photo-1598032895397-b9472444bf93?w=400",
-      category: "Shirts",
-      price: 2699,
-      variants: 3,
-      stock: 38,
-      sold: 87,
-      revenue: 234813,
-      status: "In Stock",
-    },
-    {
-      id: 12,
-      product:
-        "https://images.unsplash.com/photo-1603252109303-2751441dd157?w=400",
-      category: "Shirts",
-      price: 3199,
-      variants: 4,
-      stock: 12,
-      sold: 58,
-      revenue: 185542,
-      status: "Low Stock",
-    },
-    {
-      id: 13,
-      product:
-        "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400",
-      category: "T-Shirts",
-      price: 1599,
-      variants: 6,
-      stock: 72,
-      sold: 243,
-      revenue: 388557,
-      status: "In Stock",
-    },
-    {
-      id: 14,
-      product:
-        "https://images.unsplash.com/photo-1506629905607-d9b1b7a3f7f6?w=400",
-      category: "Pants",
-      price: 3299,
-      variants: 3,
-      stock: 21,
-      sold: 91,
-      revenue: 300209,
-      status: "In Stock",
-    },
-    {
-      id: 15,
-      product:
-        "https://images.unsplash.com/photo-1551028919-ac66f9b6f5a6?w=400",
-      category: "Jackets",
-      price: 7999,
-      variants: 2,
-      stock: 7,
-      sold: 29,
-      revenue: 231971,
-      status: "Low Stock",
-    },
-    {
-      id: 16,
-      product:
-        "https://images.unsplash.com/photo-1578681994506-b8f463449011?w=400",
-      category: "Hoodies",
-      price: 2299,
-      variants: 5,
-      stock: 44,
-      sold: 134,
-      revenue: 307866,
-      status: "In Stock",
-    },
-    {
-      id: 17,
-      product:
-        "https://images.unsplash.com/photo-1563630423918-b58f07336ac9?w=400",
-      category: "T-Shirts",
-      price: 999,
-      variants: 3,
-      stock: 3,
-      sold: 276,
-      revenue: 275724,
-      status: "Low Stock",
-    },
-    {
-      id: 18,
-      product:
-        "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400",
-      category: "Pants",
-      price: 2899,
-      variants: 4,
-      stock: 29,
-      sold: 68,
-      revenue: 197132,
-      status: "In Stock",
-    },
-    {
-      id: 19,
-      product:
-        "https://images.unsplash.com/photo-1548883354-7622d03aca27?w=400",
-      category: "Jackets",
-      price: 6499,
-      variants: 3,
-      stock: 0,
-      sold: 52,
-      revenue: 337948,
-      status: "Out of Stock",
-    },
-    {
-      id: 20,
-      product:
-        "https://images.unsplash.com/photo-1578681994506-b8f463449011?w=400",
-      category: "Hoodies",
-      price: 2999,
-      variants: 4,
-      stock: 36,
-      sold: 103,
-      revenue: 308897,
-      status: "In Stock",
-    },
-  ];
+  
+  const [latestArrivals, setLatestArrivals] = useState([]);
+  const getLatestArrivals = async () => {
+    try {
+      const latestArrivalsApi = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/NewArrivals`,
+      );
+      setLatestArrivals(latestArrivalsApi.data.products);
+      console.log("latest arrivals", latestArrivalsApi.data.products);
+    } catch (error) {
+      console.log("error in latest arrivals", error);
+    }
+  };
+
+  useEffect(() => {
+    getLatestArrivals();
+  }, []);
+
+  const getDiscount = (product) => {
+    const price = Number(product?.price) || 0;
+    const realPrice = Number(product?.realPrice) || 0;
+
+    if (!price || !realPrice || realPrice <= price) {
+      return 0;
+    }
+
+    return Math.round(((realPrice-price)/realPrice)*100)
+  };
+
   return (
     <div className="w-full">
       {/* Product Grid */}
       <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-        {gridProductss.map((productData) => (
+        {latestArrivals.map((productData) => (
           <div
-            key={productData.id}
+            key={productData._id}
             className="group overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0d0f11] shadow-[0_8px_30px_rgba(0,0,0,0.18)] transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.16] hover:bg-[#101214]"
           >
             {/* Image */}
             <div className="relative aspect-[4/4.7] overflow-hidden bg-[#151719]">
               <img
-                src={productData.product}
-                alt={productData.category}
+                src={productData.variants?.[0]?.images?.[0]}
+                alt={productData.name}
                 className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               />
 
@@ -277,11 +66,9 @@ const NewArrivalsGrid = () => {
               <div className="absolute right-3 top-3">
                 <span
                   className={`rounded-full border px-2.5 py-1 text-[9px] backdrop-blur-md ${
-                    productData.status === "In Stock"
+                    productData === "status"
                       ? "border-white/10 bg-black/60 text-white/70"
-                      : productData.status === "Low Stock"
-                        ? "border-amber-400/10 bg-amber-400/[0.08] text-amber-400"
-                        : "border-red-400/10 bg-red-400/[0.08] text-red-400"
+                      : "border-red-400/10 bg-red-400/[0.08] text-red-400"
                   }`}
                 >
                   {productData.status}
@@ -303,7 +90,7 @@ const NewArrivalsGrid = () => {
                   </h4>
 
                   <p className="mt-1 text-[9px] text-[#555b63]">
-                    ME Collection
+                    {productData.sku}
                   </p>
                 </div>
 
@@ -314,7 +101,7 @@ const NewArrivalsGrid = () => {
                   </p>
 
                   <p className="mt-1 whitespace-nowrap text-[9px] text-[#555b63] line-through">
-                    ₹{productData.price}
+                    ₹{productData.realPrice}
                   </p>
                 </div>
               </div>
@@ -327,11 +114,11 @@ const NewArrivalsGrid = () => {
                   </span>
 
                   <span className="rounded-md border border-[#25282d] bg-[#111316] px-2.5 py-1.5 text-[9px] text-[#686e75]">
-                    {productData.variants} Variants
+                    {productData.brandName}
                   </span>
 
                   <span className="rounded-md border border-green-400/10 bg-green-400/[0.05] px-2.5 py-1.5 text-[9px] text-green-400">
-                    % OFF
+                  {getDiscount(productData)}  % OFF
                   </span>
                 </div>
               </div>
@@ -348,7 +135,7 @@ const NewArrivalsGrid = () => {
                   </div>
 
                   <h4 className="mt-1 text-xs font-medium text-[#9da2a8]">
-                    {productData.stock}
+                    {productData.brandName}
                   </h4>
                 </div>
 
@@ -362,7 +149,7 @@ const NewArrivalsGrid = () => {
                   </div>
 
                   <h4 className="mt-1 text-xs font-medium text-[#9da2a8]">
-                    {productData.sold}
+                    {productData.brandName}
                   </h4>
                 </div>
 
@@ -376,7 +163,7 @@ const NewArrivalsGrid = () => {
                   </div>
 
                   <h4 className="mt-1 truncate text-xs font-medium text-[#9da2a8]">
-                    ₹{productData.revenue.toLocaleString("en-IN")}
+                    ₹123
                   </h4>
                 </div>
               </div>
@@ -389,14 +176,14 @@ const NewArrivalsGrid = () => {
                   </p>
 
                   <p className="text-[8px] text-[#555b63]">
-                    {productData.stock} units
+                    {productData.brandName} units
                   </p>
                 </div>
 
                 <div className="h-1 overflow-hidden rounded-full bg-[#24272b]">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
-                      productData.status === "Out of Stock"
+                      productData === "status "
                         ? "w-0"
                         : productData.status === "Low Stock"
                           ? "w-[25%] bg-amber-400"

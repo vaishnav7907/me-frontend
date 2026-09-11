@@ -6,8 +6,8 @@ import { FiSearch, FiFilter } from "react-icons/fi";
 import NewArrivalsList from "../ArrivalsLIst/NewArrivalsList";
 import NewArrivalsGrid from "../ArrivalsGrid/NewArrivalsGrid";
 const StoreNewArrivals = () => {
-  
   const [newArrivalsNavi, setNewArrivalsNavi] = useState(false);
+  const [category, setCategory] = useState("All");
   return (
     <div className="min-h-screen">
       <div className="py-7 px-7">
@@ -88,21 +88,32 @@ const StoreNewArrivals = () => {
                 />
               </div>
               <div className="flex items-center gap-3">
-                <button className="flex h-10 items-center gap-2 rounded-lg border border-[#292d33] bg-[#151719] px-4 text-sm text-gray-300 transition hover:bg-[#1b1e21]">
-                  <FiFilter size={16} />
-                  Filter
-                </button>
+                <div>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="h-10 rounded-lg border border-[#292d33] bg-[#151719] px-4 text-sm text-gray-300 outline-none"
+                  >
+                    <option value="">All</option>
+                    <option value="Shirts">Shirts</option>
+                    <option value="T-Shirts">T-Shirts</option>
+                    <option value="Pants">Pants</option>
+                    <option value="Jackets">Jackets</option>
+                    <option value="Innerwear">Innerwear</option>
+                    <option value="Shorts">Shorts</option>
+                  </select>
+                </div>
                 <div className="border border-[#292d33] bg-[#151719] text-gray-300 transition hover:bg-[#1b1e21] rounded-lg h-10 py-0.5 px-2 flex justify-center items-center ">
                   <div className="flex justify-evenly items-center gap-2 ">
                     <button
                       className={` h-6 w-6 flex justify-center items-center rounded-md transition-all duration-500`}
-                   onClick={()=>setNewArrivalsNavi(true)}
-                   >
+                      onClick={() => setNewArrivalsNavi(true)}
+                    >
                       <CiGrid41 />
                     </button>
                     <button
                       className={` h-6 w-6 flex justify-center items-center rounded-md transition-all duration-500`}
-                     onClick={()=>setNewArrivalsNavi(false)}
+                      onClick={() => setNewArrivalsNavi(false)}
                     >
                       <CiCircleList />
                     </button>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoAdd } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
 import { SiHackthebox } from "react-icons/si";
@@ -8,6 +8,7 @@ import { CiGrid41, CiCircleList } from "react-icons/ci";
 import ProductList from "../list/ProductList";
 import ProductGrid from "../Grid/ProductGrid";
 import AddProductOverDisplay from "../productOverDisplay/AddProductOverDisplay";
+import axios from "axios";
 const StoreProducts = () => {
   const categories = [
     { name: "All", item: 48 },
@@ -49,6 +50,23 @@ const StoreProducts = () => {
       icon: FiTrendingUp,
     },
   ];
+
+  const [getAllProducts,setGetAllProducts]=useState([])
+  const getProductsFn= async () =>{
+    try {
+      const getProductsApi= await axios.get(`${import.meta.env.VITE_API_URL}/Me/getProducts`)
+      setGetAllProducts(getProductsApi.data)
+      console.log("getProducts",getProductsApi.data);
+      
+    } catch (error) {
+      console.log("error in get products", error);
+      console.log("Server response:", error.response?.data);
+    }
+  }
+
+  useEffect(()=>{
+    getProductsFn
+  },[])
   return (
     <div className="min-h-screen bg-[#0B0D10] text-white">
       <div className="px-6 lg:px-8 pt-7">

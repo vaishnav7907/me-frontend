@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from "react";
+import axios from "axios";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 const MeContext = createContext();
 
@@ -28,6 +29,9 @@ export const MeProvider = ({ children }) => {
   // get products
   const [allproducts, setAllProducts] = useState([]);
 
+  // latest arrivals
+  
+  
   return (
     <MeContext.Provider
       value={{
@@ -73,6 +77,8 @@ export const MeProvider = ({ children }) => {
 
         allproducts,
         setAllProducts,
+
+       
       }}
     >
       {children}
