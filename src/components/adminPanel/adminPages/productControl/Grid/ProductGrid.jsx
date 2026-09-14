@@ -17,7 +17,7 @@ const ProductGrid = () => {
         `${import.meta.env.VITE_API_URL}/Me/getProducts`
       );
 
-      setAllProducts(getProductsApi.data.products);
+      setAllProducts(getProductsApi.data.products || []);
 
       console.log(
         "get all products",
@@ -26,7 +26,12 @@ const ProductGrid = () => {
 
       console.log(
         "IMAGE:",
-        getProductsApi.data.products[0]?.variants?.[0]?.images?.[0]
+        getProductsApi.data.products?.[0]?.variants?.[0]?.images?.[0]
+      );
+
+      console.log(
+        "BRAND:",
+        getProductsApi.data.products?.[0]?.brand
       );
     } catch (error) {
       console.log("error in get products", error);
@@ -162,11 +167,32 @@ const ProductGrid = () => {
               <div className="p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="text-[9px] uppercase tracking-[0.18em] text-[#555b63]">
-                      {productData.category}
-                    </p>
 
-                    <h4 className="mt-1.5 truncate text-sm font-medium text-[#e1e3e5]">
+                   {productData.brand && (
+  <div className="mb-2 flex items-center gap-2">
+    <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md border border-white/[0.08] bg-white">
+      {productData.brand.brandIcon ? (
+        <img
+          src={productData.brand.brandIcon}
+          alt={productData.brand.brandName}
+          className="h-full w-full object-contain p-1"
+        />
+      ) : (
+        <span className="text-[10px] font-medium text-black">
+          {productData.brand.brandName
+            ?.charAt(0)
+            ?.toUpperCase()}
+        </span>
+      )}
+    </div>
+
+    <p className="truncate text-[10px] font-medium uppercase tracking-[0.16em] text-[#8b9198]">
+      {productData.brand.brandName}
+    </p>
+  </div>
+)}
+
+                    <h4 className="truncate text-sm font-medium text-[#e1e3e5]">
                       {productData.name}
                     </h4>
 
