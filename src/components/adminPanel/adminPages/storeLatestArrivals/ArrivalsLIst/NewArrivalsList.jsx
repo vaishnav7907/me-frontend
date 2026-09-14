@@ -67,6 +67,7 @@ const NewArrivalsList = () => {
       image: products.variants?.[0]?.images?.[0] || "",
       brandName: products.brand?.brandName || "",
       brandIcon: products.brand?.brandIcon || "",
+      sku:products.sku,
       category: products.category,
       price,
       variants: products.variants?.length || 0,
@@ -150,15 +151,37 @@ const NewArrivalsList = () => {
                               <div className=" absolute inset-0 bg-black/0 transition group-hover:bg-black/10 " />{" "}
                             </div>
                             <div className="min-w-0">
-                              <p className=" truncate text-sm font-medium text-white transition-colors group-hover:text-gray-200 ">
-                                
+                              <p className="truncate text-sm font-medium text-white">
+                                {product.name}
                               </p>
+
+                              <div className="mt-1 flex items-center gap-2">
+                                {product.brandIcon && (
+
+                                  <div className="h-5 w-5">
+                                     <img
+                                    src={product.brandIcon}
+                                    alt={product.brandName}
+                                    className="  w-full h-full object-cover overflow-hidden"
+                                  />
+                                  </div>
+                                 
+                                )}
+
+                                {product.brandName && (
+                                  <span className="text-[11px] text-gray-400">
+                                    {product.brandName}
+                                  </span>
+                                )}
+                              </div>
+
                               <div className="mt-1 flex items-center gap-2">
                                 <span className="text-[11px] text-gray-600">
                                   SKU
                                 </span>
+
                                 <span className="text-[11px] text-gray-500">
-                                 
+                                  {product.sku}
                                 </span>
                               </div>
                             </div>

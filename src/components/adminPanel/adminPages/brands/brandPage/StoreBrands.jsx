@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { IoAdd } from "react-icons/io5";
 import BrandList from "../brandlist/BrandList";
+import BrandOverDisplay from "../brandOverDisplay/BrandOverDisplay";
 const StoreBrands = () => {
   const brands = [
     {
@@ -60,6 +61,8 @@ const StoreBrands = () => {
       status: "Active",
     },
   ];
+
+  const [addBrandBtn,setAddBrandBtn]=useState(false)
   return (
     <div className="min-h-screen">
       <div className="py-7 px-7">
@@ -79,7 +82,7 @@ const StoreBrands = () => {
             <button
               className="flex items-center gap-2 h-9 px-2.5 bg-white font-semibold text-sm rounded-lg  transition
                           hover:bg-[#e8e8e8]"
-            >
+              onClick={()=>setAddBrandBtn(true)}>
               <IoAdd className="text-black" size={20} /> <p>Add New Arrivals</p>
             </button>
           </div>
@@ -111,6 +114,8 @@ const StoreBrands = () => {
           <BrandList/>
         </div>
       </div>
+
+      {addBrandBtn && (<BrandOverDisplay  onclose={()=>setAddBrandBtn(false)}/>)}
     </div>
   );
 };
