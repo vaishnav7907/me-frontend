@@ -9,6 +9,8 @@ import ProductList from "../list/ProductList";
 import ProductGrid from "../Grid/ProductGrid";
 import AddProductOverDisplay from "../productOverDisplay/AddProductOverDisplay";
 import axios from "axios";
+import ProductUpdateOverDisplay from "../productUpdateOverDisplay/ProductUpdateOverDisplay";
+import { UseMe } from "../../../../context/Meprovider";
 const StoreProducts = () => {
   const categories = [
     { name: "All", item: 48 },
@@ -24,6 +26,8 @@ const StoreProducts = () => {
   const [activeStatus, setActiveStatus] = useState("All");
   const [search, setSearch] = useState("");
   const [showAddProduct, setShowAddProduct] = useState(false);
+  const{productUpdateModal,setProductUpdateModal}=UseMe()
+
   const stats = [
     {
       label: "Products",
@@ -210,6 +214,8 @@ const StoreProducts = () => {
       {showAddProduct && (
         <AddProductOverDisplay onClose={() => setShowAddProduct(false)} />
       )}
+
+      {productUpdateModal && (<ProductUpdateOverDisplay closeUpdate={()=> setProductUpdateModal(false)}/>)}
     </div>
   );
 };

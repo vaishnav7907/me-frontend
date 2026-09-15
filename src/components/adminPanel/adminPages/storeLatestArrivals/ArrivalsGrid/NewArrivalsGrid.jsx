@@ -5,6 +5,8 @@ import { FiPackage, FiShoppingBag, FiTrendingUp } from "react-icons/fi";
 import axios from "axios";
 
 const NewArrivalsGrid = () => {
+
+  
   const [latestArrivals, setLatestArrivals] = useState([]);
 
   const getLatestArrivals = async () => {

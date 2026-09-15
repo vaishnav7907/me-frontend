@@ -26,12 +26,18 @@ export const MeProvider = ({ children }) => {
   const [sku, setSku] = useState("");
   const [status, setStatus] = useState("Active");
 
+  const [discount, setDiscount] = useState(0);
+  const [brands, setBrands] = useState([]);
+
   // get products
   const [allproducts, setAllProducts] = useState([]);
 
+  const [productId, setProductId] = useState("");
+
+  // update products modal
+  const [productUpdateModal, setProductUpdateModal] = useState(false);
   // latest arrivals
-  
-  
+
   return (
     <MeContext.Provider
       value={{
@@ -78,7 +84,17 @@ export const MeProvider = ({ children }) => {
         allproducts,
         setAllProducts,
 
-       
+        productId,
+        setProductId,
+
+        discount,
+        setDiscount,
+
+        brands,
+        setBrands,
+
+        productUpdateModal,
+        setProductUpdateModal,
       }}
     >
       {children}

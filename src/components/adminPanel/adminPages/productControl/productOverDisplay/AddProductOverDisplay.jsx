@@ -31,10 +31,12 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
     setSku,
     status,
     setStatus,
+    discount,
+    setDiscount,
+    brands,
+    setBrands,
   } = UseMe();
 
-  const [discount, setDiscount] = useState(0);
-  const [brands, setBrands] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [brandSearchOpen, setBrandSearchOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -110,8 +112,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
 
     const existingBrand = brands.find(
       (brand) =>
-        brand.brandName?.trim().toLowerCase() ===
-        value.trim().toLowerCase(),
+        brand.brandName?.trim().toLowerCase() === value.trim().toLowerCase(),
     );
 
     setSelectedBrand(existingBrand || null);
@@ -152,9 +153,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
   const removeVariant = (variantIndex) => {
     if (variants.length === 1) return;
 
-    setVariants((prev) =>
-      prev.filter((_, index) => index !== variantIndex),
-    );
+    setVariants((prev) => prev.filter((_, index) => index !== variantIndex));
   };
 
   const updateColor = (variantIndex, value) => {
@@ -218,8 +217,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
       (total, variant) =>
         total +
         variant.sizes.reduce(
-          (sizeTotal, size) =>
-            sizeTotal + Number(size.stock || 0),
+          (sizeTotal, size) => sizeTotal + Number(size.stock || 0),
           0,
         ),
       0,
@@ -237,9 +235,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
   };
 
   const removeImage = (imageIndex) => {
-    setProductImage((prev) =>
-      prev.filter((_, index) => index !== imageIndex),
-    );
+    setProductImage((prev) => prev.filter((_, index) => index !== imageIndex));
   };
 
   const resetForm = () => {
@@ -318,9 +314,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
     }
 
     if (Number(productRealPrice) < Number(productPrice)) {
-      alert(
-        "Real price should be greater than or equal to selling price",
-      );
+      alert("Real price should be greater than or equal to selling price");
       return;
     }
 
@@ -349,10 +343,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
     }
 
     const invalidColorCode = variants.some(
-      (variant) =>
-        !/^#[0-9A-Fa-f]{6}$/.test(
-          variant.color.code,
-        ),
+      (variant) => !/^#[0-9A-Fa-f]{6}$/.test(variant.color.code),
     );
 
     if (invalidColorCode) {
@@ -375,79 +366,41 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
 
       const calculatedDiscount =
         realPrice > 0 && price < realPrice
-          ? Math.round(
-              ((realPrice - price) / realPrice) * 100,
-            )
+          ? Math.round(((realPrice - price) / realPrice) * 100)
           : 0;
 
       const formData = new FormData();
 
-      formData.append(
-        "name",
-        productName.trim(),
-      );
+      formData.append("name", productName.trim());
 
-      formData.append(
-        "description",
-        productDescription.trim(),
-      );
+      formData.append("description", productDescription.trim());
 
-      formData.append(
-        "category",
-        productCategory,
-      );
+      formData.append("category", productCategory);
 
-      formData.append(
-        "brand",
-        selectedBrand._id,
-      );
+      formData.append("brand", selectedBrand._id);
 
-      formData.append(
-        "price",
-        price,
-      );
+      formData.append("price", price);
 
-      formData.append(
-        "realPrice",
-        realPrice,
-      );
+      formData.append("realPrice", realPrice);
 
-      formData.append(
-        "discount",
-        calculatedDiscount,
-      );
+      formData.append("discount", calculatedDiscount);
 
-      formData.append(
-        "stock",
-        totalStock,
-      );
+      formData.append("stock", totalStock);
 
-      formData.append(
-        "sku",
-        sku.trim().toUpperCase(),
-      );
+      formData.append("sku", sku.trim().toUpperCase());
 
-      formData.append(
-        "status",
-        status,
-      );
+      formData.append("status", status);
 
-      formData.append(
-        "variants",
-        JSON.stringify(variants),
-      );
+      formData.append("variants", JSON.stringify(variants));
 
       productImage.forEach((image) => {
         formData.append("images", image);
       });
 
-      const adminToken =
-        localStorage.getItem("token");
+      const adminToken = localStorage.getItem("token");
 
       if (!adminToken) {
-        alert(
-          "Admin token not found. Please login again.",
-        );
+        alert("Admin token not found. Please login again.");
         return;
       }
 
@@ -469,15 +422,9 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
         setAddProduct(false);
       }
     } catch (error) {
-      console.error(
-        "Create product error:",
-        error,
-      );
+      console.error("Create product error:", error);
 
-      alert(
-        error.response?.data?.message ||
-          "Failed to create product",
-      );
+      alert(error.response?.data?.message || "Failed to create product");
     } finally {
       setLoading(false);
     }
@@ -486,12 +433,9 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
       <div className="max-h-[94vh] w-full max-w-6xl overflow-y-auto rounded-2xl border border-neutral-800 bg-[#0d0f12] text-white shadow-2xl">
-
         <div className="sticky top-0 z-20 flex items-center justify-between border-b border-neutral-800 bg-[#0d0f12] px-6 py-5">
           <div>
-            <h2 className="text-xl font-semibold">
-              Add New Product
-            </h2>
+            <h2 className="text-xl font-semibold">Add New Product</h2>
 
             <p className="mt-1 text-sm text-neutral-500">
               Create and manage your product details
@@ -509,12 +453,9 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
         </div>
 
         <div className="space-y-4 p-6">
-
           <section>
             <div className="mb-5">
-              <h3 className="text-base font-medium">
-                Basic Information
-              </h3>
+              <h3 className="text-base font-medium">Basic Information</h3>
 
               <p className="mt-1 text-xs text-neutral-500">
                 Add the main information about your product
@@ -522,7 +463,6 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
             </div>
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-
               <div className="md:col-span-2">
                 <label className="mb-2 block text-sm text-neutral-300">
                   Product Name
@@ -531,11 +471,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
                 <input
                   type="text"
                   value={productName}
-                  onChange={(e) =>
-                    setProductName(
-                      e.target.value,
-                    )
-                  }
+                  onChange={(e) => setProductName(e.target.value)}
                   placeholder="Enter product name"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                 />
@@ -548,11 +484,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
 
                 <textarea
                   value={productDescription}
-                  onChange={(e) =>
-                    setProductDescription(
-                      e.target.value,
-                    )
-                  }
+                  onChange={(e) => setProductDescription(e.target.value)}
                   placeholder="Enter product description"
                   rows={5}
                   className="w-full resize-none rounded-lg border border-neutral-800 bg-[#12151a] px-4 py-3 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
@@ -566,40 +498,22 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
 
                 <select
                   value={productCategory}
-                  onChange={(e) =>
-                    setProductCategory(
-                      e.target.value,
-                    )
-                  }
+                  onChange={(e) => setProductCategory(e.target.value)}
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none focus:border-neutral-500"
                 >
-                  <option value="">
-                    Select category
-                  </option>
+                  <option value="">Select category</option>
 
-                  <option value="Shirts">
-                    Shirts
-                  </option>
+                  <option value="Shirts">Shirts</option>
 
-                  <option value="Pants">
-                    Pants
-                  </option>
+                  <option value="Pants">Pants</option>
 
-                  <option value="Jackets">
-                    Jackets
-                  </option>
+                  <option value="Jackets">Jackets</option>
 
-                  <option value="Innerwear">
-                    Innerwear
-                  </option>
+                  <option value="Innerwear">Innerwear</option>
 
-                  <option value="Shorts">
-                    Shorts
-                  </option>
+                  <option value="Shorts">Shorts</option>
 
-                  <option value="T-Shirts">
-                    T-Shirts
-                  </option>
+                  <option value="T-Shirts">T-Shirts</option>
                 </select>
               </div>
 
@@ -618,9 +532,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
                     type="text"
                     value={productBrandName}
                     onChange={handleBrandChange}
-                    onFocus={() =>
-                      setBrandSearchOpen(true)
-                    }
+                    onFocus={() => setBrandSearchOpen(true)}
                     placeholder="Search brand"
                     className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] pl-10 pr-10 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                   />
@@ -628,9 +540,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
                   {productBrandName && (
                     <button
                       type="button"
-                      onClick={
-                        clearSelectedBrand
-                      }
+                      onClick={clearSelectedBrand}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-white"
                     >
                       <FiX size={16} />
@@ -638,148 +548,105 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
                   )}
                 </div>
 
-                {brandSearchOpen &&
-                  productBrandName.trim() && (
-                    <div className="absolute left-0 right-0 top-[76px] z-40 overflow-hidden rounded-xl border border-neutral-800 bg-[#111419] shadow-2xl">
-
-                      {brandsLoading ? (
-                        <div className="px-4 py-4 text-sm text-neutral-500">
-                          Loading brands...
-                        </div>
-                      ) : filteredBrands.length >
-                        0 ? (
-                        <div className="max-h-60 overflow-y-auto">
-
-                          {filteredBrands.map(
-                            (brand) => (
-                              <button
-                                type="button"
-                                key={brand._id}
-                                onClick={() =>
-                                  handleSelectBrand(
-                                    brand,
-                                  )
-                                }
-                                className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-neutral-800"
-                              >
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-[#0d0f12]">
-
-                                  {brand.brandIcon ? (
-                                    <img
-                                      src={
-                                        brand.brandIcon
-                                      }
-                                      alt={
-                                        brand.brandName
-                                      }
-                                      className="h-full w-full object-contain"
-                                    />
-                                  ) : (
-                                    <span className="text-xs text-neutral-600">
-                                      {brand.brandName
-                                        ?.charAt(
-                                          0,
-                                        )
-                                        ?.toUpperCase()}
-                                    </span>
-                                  )}
-
-                                </div>
-
-                                <div className="flex-1">
-                                  <p className="text-sm text-white">
-                                    {
-                                      brand.brandName
-                                    }
-                                  </p>
-
-                                  {brand.brandSlogan && (
-                                    <p className="mt-0.5 truncate text-xs text-neutral-600">
-                                      {
-                                        brand.brandSlogan
-                                      }
-                                    </p>
-                                  )}
-                                </div>
-
-                                <FiCheck
-                                  size={16}
-                                  className={
-                                    selectedBrand?._id ===
-                                    brand._id
-                                      ? "text-white"
-                                      : "text-transparent"
-                                  }
+                {brandSearchOpen && productBrandName.trim() && (
+                  <div className="absolute left-0 right-0 top-[76px] z-40 overflow-hidden rounded-xl border border-neutral-800 bg-[#111419] shadow-2xl">
+                    {brandsLoading ? (
+                      <div className="px-4 py-4 text-sm text-neutral-500">
+                        Loading brands...
+                      </div>
+                    ) : filteredBrands.length > 0 ? (
+                      <div className="max-h-60 overflow-y-auto">
+                        {filteredBrands.map((brand) => (
+                          <button
+                            type="button"
+                            key={brand._id}
+                            onClick={() => handleSelectBrand(brand)}
+                            className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-neutral-800"
+                          >
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-[#0d0f12]">
+                              {brand.brandIcon ? (
+                                <img
+                                  src={brand.brandIcon}
+                                  alt={brand.brandName}
+                                  className="h-full w-full object-contain"
                                 />
-                              </button>
-                            ),
-                          )}
+                              ) : (
+                                <span className="text-xs text-neutral-600">
+                                  {brand.brandName?.charAt(0)?.toUpperCase()}
+                                </span>
+                              )}
+                            </div>
 
-                        </div>
-                      ) : (
-                        <div className="px-4 py-4">
-                          <p className="text-sm text-neutral-400">
-                            {productBrandName}
-                          </p>
+                            <div className="flex-1">
+                              <p className="text-sm text-white">
+                                {brand.brandName}
+                              </p>
 
-                          <p className="mt-1 text-xs text-neutral-600">
-                            Brand not found
-                          </p>
+                              {brand.brandSlogan && (
+                                <p className="mt-0.5 truncate text-xs text-neutral-600">
+                                  {brand.brandSlogan}
+                                </p>
+                              )}
+                            </div>
 
-                          <p className="mt-2 text-xs text-neutral-700">
-                            Create this brand from
-                            the Brand section first.
-                          </p>
-                        </div>
-                      )}
+                            <FiCheck
+                              size={16}
+                              className={
+                                selectedBrand?._id === brand._id
+                                  ? "text-white"
+                                  : "text-transparent"
+                              }
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="px-4 py-4">
+                        <p className="text-sm text-neutral-400">
+                          {productBrandName}
+                        </p>
 
-                    </div>
-                  )}
+                        <p className="mt-1 text-xs text-neutral-600">
+                          Brand not found
+                        </p>
+
+                        <p className="mt-2 text-xs text-neutral-700">
+                          Create this brand from the Brand section first.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
             {productBrandName.trim() && (
               <div className="mt-4 flex items-center justify-end">
-
                 {selectedBrand ? (
                   <div className="flex w-full items-center justify-between rounded-xl border border-green-500/20 bg-green-500/[0.04] px-4 py-3 md:w-auto md:min-w-[300px]">
-
                     <div className="flex items-center gap-3">
-
                       <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-white">
-
                         {selectedBrand.brandIcon ? (
                           <img
-                            src={
-                              selectedBrand.brandIcon
-                            }
-                            alt={
-                              selectedBrand.brandName
-                            }
+                            src={selectedBrand.brandIcon}
+                            alt={selectedBrand.brandName}
                             className="h-full w-full object-contain p-1"
                           />
                         ) : (
                           <span className="text-sm text-neutral-500">
-                            {selectedBrand.brandName
-                              ?.charAt(0)
-                              ?.toUpperCase()}
+                            {selectedBrand.brandName?.charAt(0)?.toUpperCase()}
                           </span>
                         )}
-
                       </div>
 
                       <div>
                         <p className="text-sm font-medium text-white">
-                          {
-                            selectedBrand.brandName
-                          }
+                          {selectedBrand.brandName}
                         </p>
 
                         {selectedBrand.brandSlogan && (
                           <p className="mt-0.5 max-w-[180px] truncate text-xs text-neutral-500">
-                            {
-                              selectedBrand.brandSlogan
-                            }
+                            {selectedBrand.brandSlogan}
                           </p>
                         )}
 
@@ -787,53 +654,36 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
                           Existing Brand
                         </p>
                       </div>
-
                     </div>
 
-                    <FiCheck
-                      size={18}
-                      className="ml-4 text-green-500"
-                    />
-
+                    <FiCheck size={18} className="ml-4 text-green-500" />
                   </div>
                 ) : (
                   <div className="flex w-full items-center justify-between rounded-xl border border-red-500/10 bg-red-500/[0.03] px-4 py-3 md:w-auto md:min-w-[300px]">
-
                     <div className="flex items-center gap-3">
-
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-dashed border-neutral-800 bg-[#0d0f12]">
-                        <span className="text-xs text-neutral-700">
-                          No
-                        </span>
+                        <span className="text-xs text-neutral-700">No</span>
                       </div>
 
                       <div>
                         <p className="text-sm font-medium text-neutral-300">
-                          {
-                            productBrandName
-                          }
+                          {productBrandName}
                         </p>
 
                         <p className="mt-1 text-xs text-red-400">
                           Brand not found
                         </p>
                       </div>
-
                     </div>
-
                   </div>
                 )}
-
               </div>
             )}
           </section>
 
           <section className="border-t border-neutral-800 pt-8">
-
             <div className="mb-5">
-              <h3 className="text-base font-medium">
-                Pricing & Inventory
-              </h3>
+              <h3 className="text-base font-medium">Pricing & Inventory</h3>
 
               <p className="mt-1 text-xs text-neutral-500">
                 Set pricing and inventory information
@@ -841,7 +691,6 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
             </div>
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
-
               <div>
                 <label className="mb-2 block text-sm text-neutral-300">
                   Selling Price
@@ -852,15 +701,11 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
                   min="0"
                   value={productPrice}
                   onChange={(e) => {
-                    const value =
-                      e.target.value;
+                    const value = e.target.value;
 
                     setProductPrice(value);
 
-                    calculateDiscount(
-                      productRealPrice,
-                      value,
-                    );
+                    calculateDiscount(productRealPrice, value);
                   }}
                   placeholder="0.00"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
@@ -877,15 +722,11 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
                   min="0"
                   value={productRealPrice}
                   onChange={(e) => {
-                    const value =
-                      e.target.value;
+                    const value = e.target.value;
 
                     setProductRealPrice(value);
 
-                    calculateDiscount(
-                      value,
-                      productPrice,
-                    );
+                    calculateDiscount(value, productPrice);
                   }}
                   placeholder="0.00"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
@@ -920,31 +761,21 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
                 <input
                   type="text"
                   value={sku}
-                  onChange={(e) =>
-                    setSku(
-                      e.target.value.toUpperCase(),
-                    )
-                  }
+                  onChange={(e) => setSku(e.target.value.toUpperCase())}
                   placeholder="ME-SHIRT-001"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm uppercase outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                 />
               </div>
-
             </div>
           </section>
 
           <section className="border-t border-neutral-800 pt-8">
-
             <div className="mb-5 flex items-center justify-between">
-
               <div>
-                <h3 className="text-base font-medium">
-                  Product Variants
-                </h3>
+                <h3 className="text-base font-medium">Product Variants</h3>
 
                 <p className="mt-1 text-xs text-neutral-500">
-                  Add colors and stock for each
-                  size
+                  Add colors and stock for each size
                 </p>
               </div>
 
@@ -956,282 +787,193 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
                 <FiPlus size={16} />
                 Add Variant
               </button>
-
             </div>
 
             <div className="space-y-5">
+              {variants.map((variant, variantIndex) => (
+                <div
+                  key={variantIndex}
+                  className="rounded-xl border border-neutral-800 bg-[#111419] p-5"
+                >
+                  <div className="mb-5 flex items-center justify-between">
+                    <span className="text-sm font-medium">
+                      Variant {variantIndex + 1}
+                    </span>
 
-              {variants.map(
-                (variant, variantIndex) => (
-                  <div
-                    key={variantIndex}
-                    className="rounded-xl border border-neutral-800 bg-[#111419] p-5"
-                  >
+                    {variants.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeVariant(variantIndex)}
+                        className="flex items-center gap-2 text-xs text-neutral-500 transition hover:text-white"
+                      >
+                        <FiTrash2 size={15} />
+                        Remove
+                      </button>
+                    )}
+                  </div>
 
-                    <div className="mb-5 flex items-center justify-between">
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm text-neutral-300">
+                        Color Name
+                      </label>
 
-                      <span className="text-sm font-medium">
-                        Variant{" "}
-                        {variantIndex + 1}
-                      </span>
-
-                      {variants.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            removeVariant(
-                              variantIndex,
-                            )
-                          }
-                          className="flex items-center gap-2 text-xs text-neutral-500 transition hover:text-white"
-                        >
-                          <FiTrash2
-                            size={15}
-                          />
-                          Remove
-                        </button>
-                      )}
-
+                      <input
+                        type="text"
+                        value={variant.color.name}
+                        onChange={(e) =>
+                          updateColor(variantIndex, e.target.value)
+                        }
+                        placeholder="Black"
+                        className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                      />
                     </div>
 
-                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm text-neutral-300">
+                        Color Code
+                      </label>
 
-                      <div>
-                        <label className="mb-2 block text-sm text-neutral-300">
-                          Color Name
-                        </label>
+                      <div className="flex h-11 items-center gap-3 rounded-lg border border-neutral-800 bg-[#0d0f12] px-3">
+                        <input
+                          type="color"
+                          value={
+                            /^#[0-9A-Fa-f]{6}$/.test(variant.color.code)
+                              ? variant.color.code
+                              : "#000000"
+                          }
+                          onChange={(e) =>
+                            updateColorCode(variantIndex, e.target.value)
+                          }
+                          className="h-8 w-10 cursor-pointer rounded border-0 bg-transparent p-0"
+                        />
 
                         <input
                           type="text"
-                          value={
-                            variant.color.name
-                          }
+                          value={variant.color.code}
                           onChange={(e) =>
-                            updateColor(
-                              variantIndex,
-                              e.target.value,
-                            )
+                            updateColorCode(variantIndex, e.target.value)
                           }
-                          placeholder="Black"
-                          className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                          placeholder="#000000"
+                          maxLength={7}
+                          className="h-8 w-full bg-transparent text-sm uppercase text-neutral-300 outline-none placeholder:text-neutral-600"
                         />
                       </div>
-
-                      <div>
-                        <label className="mb-2 block text-sm text-neutral-300">
-                          Color Code
-                        </label>
-
-                        <div className="flex h-11 items-center gap-3 rounded-lg border border-neutral-800 bg-[#0d0f12] px-3">
-
-                          <input
-                            type="color"
-                            value={
-                              /^#[0-9A-Fa-f]{6}$/.test(
-                                variant.color.code,
-                              )
-                                ? variant.color
-                                    .code
-                                : "#000000"
-                            }
-                            onChange={(e) =>
-                              updateColorCode(
-                                variantIndex,
-                                e.target.value,
-                              )
-                            }
-                            className="h-8 w-10 cursor-pointer rounded border-0 bg-transparent p-0"
-                          />
-
-                          <input
-                            type="text"
-                            value={
-                              variant.color.code
-                            }
-                            onChange={(e) =>
-                              updateColorCode(
-                                variantIndex,
-                                e.target.value,
-                              )
-                            }
-                            placeholder="#000000"
-                            maxLength={7}
-                            className="h-8 w-full bg-transparent text-sm uppercase text-neutral-300 outline-none placeholder:text-neutral-600"
-                          />
-
-                        </div>
-                      </div>
-
                     </div>
-
-                    <div className="mt-5">
-
-                      <div className="mb-3 flex items-center justify-between">
-
-                        <label className="block text-sm text-neutral-300">
-                          Size & Stock
-                        </label>
-
-                        <span className="text-xs text-neutral-500">
-                          Variant Stock:{" "}
-                          <span className="text-white">
-                            {variant.sizes.reduce(
-                              (
-                                total,
-                                size,
-                              ) =>
-                                total +
-                                Number(
-                                  size.stock ||
-                                    0,
-                                ),
-                              0,
-                            )}
-                          </span>
-                        </span>
-
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-
-                        {variant.sizes.map(
-                          (
-                            sizeItem,
-                            sizeIndex,
-                          ) => (
-                            <div
-                              key={
-                                sizeItem.size
-                              }
-                              className="rounded-lg border border-neutral-800 bg-[#0d0f12] p-3"
-                            >
-
-                              <div className="mb-2 flex items-center justify-between">
-
-                                <span className="text-sm font-medium">
-                                  {
-                                    sizeItem.size
-                                  }
-                                </span>
-
-                                <span className="text-[10px] uppercase tracking-wider text-neutral-600">
-                                  Stock
-                                </span>
-
-                              </div>
-
-                              <div className="flex items-center gap-1">
-
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    updateStock(
-                                      variantIndex,
-                                      sizeIndex,
-                                      sizeItem.stock -
-                                        1,
-                                    )
-                                  }
-                                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
-                                >
-                                  <FiMinus
-                                    size={13}
-                                  />
-                                </button>
-
-                                <input
-                                  type="number"
-                                  min="0"
-                                  value={
-                                    sizeItem.stock
-                                  }
-                                  onChange={(e) =>
-                                    updateStock(
-                                      variantIndex,
-                                      sizeIndex,
-                                      e.target.value,
-                                    )
-                                  }
-                                  className="h-8 min-w-0 w-full rounded-md border border-neutral-800 bg-[#111419] text-center text-xs outline-none focus:border-neutral-600"
-                                />
-
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    updateStock(
-                                      variantIndex,
-                                      sizeIndex,
-                                      sizeItem.stock +
-                                        1,
-                                    )
-                                  }
-                                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
-                                >
-                                  <FiPlus
-                                    size={13}
-                                  />
-                                </button>
-
-                              </div>
-
-                            </div>
-                          ),
-                        )}
-
-                      </div>
-                    </div>
-
                   </div>
-                ),
-              )}
 
+                  <div className="mt-5">
+                    <div className="mb-3 flex items-center justify-between">
+                      <label className="block text-sm text-neutral-300">
+                        Size & Stock
+                      </label>
+
+                      <span className="text-xs text-neutral-500">
+                        Variant Stock:{" "}
+                        <span className="text-white">
+                          {variant.sizes.reduce(
+                            (total, size) => total + Number(size.stock || 0),
+                            0,
+                          )}
+                        </span>
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                      {variant.sizes.map((sizeItem, sizeIndex) => (
+                        <div
+                          key={sizeItem.size}
+                          className="rounded-lg border border-neutral-800 bg-[#0d0f12] p-3"
+                        >
+                          <div className="mb-2 flex items-center justify-between">
+                            <span className="text-sm font-medium">
+                              {sizeItem.size}
+                            </span>
+
+                            <span className="text-[10px] uppercase tracking-wider text-neutral-600">
+                              Stock
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateStock(
+                                  variantIndex,
+                                  sizeIndex,
+                                  sizeItem.stock - 1,
+                                )
+                              }
+                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
+                            >
+                              <FiMinus size={13} />
+                            </button>
+
+                            <input
+                              type="number"
+                              min="0"
+                              value={sizeItem.stock}
+                              onChange={(e) =>
+                                updateStock(
+                                  variantIndex,
+                                  sizeIndex,
+                                  e.target.value,
+                                )
+                              }
+                              className="h-8 min-w-0 w-full rounded-md border border-neutral-800 bg-[#111419] text-center text-xs outline-none focus:border-neutral-600"
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateStock(
+                                  variantIndex,
+                                  sizeIndex,
+                                  sizeItem.stock + 1,
+                                )
+                              }
+                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
+                            >
+                              <FiPlus size={13} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className="mt-5 flex items-center justify-between rounded-xl border border-neutral-800 bg-[#111419] px-5 py-4">
-
               <div>
-                <p className="text-sm font-medium">
-                  Total Product Stock
-                </p>
+                <p className="text-sm font-medium">Total Product Stock</p>
 
                 <p className="mt-1 text-xs text-neutral-500">
-                  Combined stock across all
-                  colors and sizes
+                  Combined stock across all colors and sizes
                 </p>
               </div>
 
-              <span className="text-2xl font-semibold">
-                {getTotalStock()}
-              </span>
-
+              <span className="text-2xl font-semibold">{getTotalStock()}</span>
             </div>
           </section>
 
           <section className="border-t border-neutral-800 pt-8">
-
             <div className="mb-5">
-              <h3 className="text-base font-medium">
-                Product Images
-              </h3>
+              <h3 className="text-base font-medium">Product Images</h3>
 
               <p className="mt-1 text-xs text-neutral-500">
-                Upload high-quality images of
-                your product
+                Upload high-quality images of your product
               </p>
             </div>
 
             <label className="flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-neutral-700 bg-[#111419] transition hover:border-neutral-500 hover:bg-[#14171c]">
-
               <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-neutral-800 bg-[#0d0f12]">
-                <FiUpload
-                  size={20}
-                  className="text-neutral-400"
-                />
+                <FiUpload size={20} className="text-neutral-400" />
               </div>
 
-              <p className="text-sm text-neutral-300">
-                Click to upload images
-              </p>
+              <p className="text-sm text-neutral-300">Click to upload images</p>
 
               <p className="mt-1 text-xs text-neutral-600">
                 PNG, JPG, JPEG or WEBP
@@ -1244,87 +986,63 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
                 onChange={handleImageChange}
                 className="hidden"
               />
-
             </label>
 
             {productImage.length > 0 && (
               <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {productImage.map((image, index) => (
+                  <div
+                    key={`${image.name}-${index}`}
+                    className="group relative overflow-hidden rounded-lg border border-neutral-800 bg-[#111419]"
+                  >
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt={image.name}
+                      className="aspect-square w-full object-cover"
+                    />
 
-                {productImage.map(
-                  (image, index) => (
-                    <div
-                      key={`${image.name}-${index}`}
-                      className="group relative overflow-hidden rounded-lg border border-neutral-800 bg-[#111419]"
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-md bg-black/80 text-neutral-300 opacity-0 transition group-hover:opacity-100 hover:text-white"
                     >
+                      <FiTrash2 size={15} />
+                    </button>
 
-                      <img
-                        src={URL.createObjectURL(
-                          image,
-                        )}
-                        alt={image.name}
-                        className="aspect-square w-full object-cover"
-                      />
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          removeImage(index)
-                        }
-                        className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-md bg-black/80 text-neutral-300 opacity-0 transition group-hover:opacity-100 hover:text-white"
-                      >
-                        <FiTrash2
-                          size={15}
-                        />
-                      </button>
-
-                      <div className="absolute bottom-0 left-0 right-0 truncate bg-black/70 px-2 py-2 text-[10px] text-neutral-300">
-                        {image.name}
-                      </div>
-
+                    <div className="absolute bottom-0 left-0 right-0 truncate bg-black/70 px-2 py-2 text-[10px] text-neutral-300">
+                      {image.name}
                     </div>
-                  ),
-                )}
-
+                  </div>
+                ))}
               </div>
             )}
           </section>
 
           <section className="border-t border-neutral-800 pt-8">
-
             <div className="mb-5">
-              <h3 className="text-base font-medium">
-                Product Status
-              </h3>
+              <h3 className="text-base font-medium">Product Status</h3>
             </div>
 
             <div className="flex flex-wrap gap-3">
-
-              {["Active", "Inactive"].map(
-                (item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() =>
-                      setStatus(item)
-                    }
-                    className={`rounded-lg border px-5 py-2.5 text-sm transition ${
-                      status === item
-                        ? "border-white bg-white text-black"
-                        : "border-neutral-800 bg-[#111419] text-neutral-400 hover:border-neutral-600 hover:text-white"
-                    }`}
-                  >
-                    {item}
-                  </button>
-                ),
-              )}
-
+              {["Active", "Inactive"].map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setStatus(item)}
+                  className={`rounded-lg border px-5 py-2.5 text-sm transition ${
+                    status === item
+                      ? "border-white bg-white text-black"
+                      : "border-neutral-800 bg-[#111419] text-neutral-400 hover:border-neutral-600 hover:text-white"
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
             </div>
           </section>
-
         </div>
 
         <div className="sticky bottom-0 flex items-center justify-end gap-3 border-t border-neutral-800 bg-[#0d0f12] px-6 py-5">
-
           <button
             type="button"
             onClick={onClose}
@@ -1340,13 +1058,9 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
             disabled={loading}
             className="rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading
-              ? "Creating..."
-              : "Add Product"}
+            {loading ? "Creating..." : "Add Product"}
           </button>
-
         </div>
-
       </div>
     </div>
   );

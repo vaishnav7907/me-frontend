@@ -1,0 +1,546 @@
+import axios from "axios";
+import React from "react";
+import {
+  FiX,
+  FiUpload,
+  FiTrash2,
+  FiPlus,
+  FiMinus,
+  FiSearch,
+  FiCheck,
+} from "react-icons/fi";
+import { UseMe } from "../../../../context/Meprovider";
+const ProductUpdateOverDisplay = ({ closeUpdate }) => {
+  const {
+    productId,
+    productName,
+    setProductName,
+    productDescription,
+    setProductDescription,
+    productCategory,
+    setProductCategory,
+    productBrandName,
+    setProductBrandName,
+    productPrice,
+    setProductPrice,
+    productRealPrice,
+    setProductRealPrice,
+    productImage,
+    setProductImage,
+    sku,
+    setSku,
+    status,
+    setStatus,
+    discount,
+    setDiscount,
+    brands,
+    setBrands,
+  } = UseMe();
+  const updateProducts = async () => {
+    try {
+      const formData = new FormData();
+
+      formData.append("name", productName);
+      formData.append("description", productDescription);
+      formData.append("category", productCategory);
+      formData.append("price", productPrice);
+      formData.append("realPrice", productRealPrice);
+      formData.append("discount", discount);
+      formData.append("brand", productBrandName);
+      formData.append("sku", sku);
+      formData.append("status", status);
+
+      formData.append("variants", JSON.stringify(variants));
+
+      productImage.forEach((image) => {
+        if (image instanceof File) {
+          formData.append("images", image);
+        }
+      });
+
+      const updateProductApi = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/Me/updateProduct/${productId}`,
+        formData,
+      );
+
+      console.log(updateProductApi.data);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+      <div className="max-h-[94vh] w-full max-w-6xl overflow-y-auto rounded-2xl border border-neutral-800 bg-[#0d0f12] text-white shadow-2xl">
+        <div className="sticky top-0 z-20 flex items-center justify-between border-b border-neutral-800 bg-[#0d0f12] px-6 py-5">
+          <div>
+            <h2 className="text-xl font-semibold">Add New Product</h2>
+
+            <p className="mt-1 text-sm text-neutral-500">
+              Create and manage your product details
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white disabled:opacity-50"
+            onClick={closeUpdate}
+          >
+            <FiX size={19} />
+          </button>
+        </div>
+
+        <div className="space-y-4 p-6">
+          <section>
+            <div className="mb-5">
+              <h3 className="text-base font-medium">Basic Information</h3>
+
+              <p className="mt-1 text-xs text-neutral-500">
+                Add the main information about your product
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div className="md:col-span-2">
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Product Name
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="Enter product name"
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Description
+                </label>
+
+                <textarea
+                  placeholder="Enter product description"
+                  rows={5}
+                  className="w-full resize-none rounded-lg border border-neutral-800 bg-[#12151a] px-4 py-3 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Category
+                </label>
+
+                <select className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none focus:border-neutral-500">
+                  <option value="">Select category</option>
+
+                  <option value="Shirts">Shirts</option>
+
+                  <option value="Pants">Pants</option>
+
+                  <option value="Jackets">Jackets</option>
+
+                  <option value="Innerwear">Innerwear</option>
+
+                  <option value="Shorts">Shorts</option>
+
+                  <option value="T-Shirts">T-Shirts</option>
+                </select>
+              </div>
+
+              <div className="relative">
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Brand
+                </label>
+
+                <div className="relative">
+                  <FiSearch
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600"
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="Search brand"
+                    className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] pl-10 pr-10 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                  />
+
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-white"
+                  >
+                    <FiX size={16} />
+                  </button>
+                </div>
+
+                <div className="absolute left-0 right-0 top-[76px] z-40 overflow-hidden rounded-xl border border-neutral-800 bg-[#111419] shadow-2xl">
+                  <div className="px-4 py-4 text-sm text-neutral-500">
+                    Loading brands...
+                  </div>
+
+                  <div className="max-h-60 overflow-y-auto">
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-neutral-800"
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-[#0d0f12]">
+                        <img className="h-full w-full object-contain" />
+
+                        <span className="text-xs text-neutral-600">
+                          brandName
+                        </span>
+                      </div>
+
+                      <div className="flex-1">
+                        <p className="text-sm text-white">brandName</p>
+
+                        <p className="mt-0.5 truncate text-xs text-neutral-600">
+                          brandSlogan
+                        </p>
+                      </div>
+
+                      <FiCheck size={16} className={"text-white"} />
+                    </button>
+                  </div>
+
+                  <div className="px-4 py-4">
+                    <p className="text-sm text-neutral-400">productBrandName</p>
+
+                    <p className="mt-1 text-xs text-neutral-600">
+                      Brand not found
+                    </p>
+
+                    <p className="mt-2 text-xs text-neutral-700">
+                      Create this brand from the Brand section first.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 flex items-center justify-end">
+              <div className="flex w-full items-center justify-between rounded-xl border border-green-500/20 bg-green-500/[0.04] px-4 py-3 md:w-auto md:min-w-[300px]">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-white">
+                    <img className="h-full w-full object-contain p-1" />
+
+                    <span className="text-sm text-neutral-500">brandName</span>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-white">
+                      selectedBrand.brandName
+                    </p>
+
+                    <p className="mt-0.5 max-w-[180px] truncate text-xs text-neutral-500">
+                      selectedBrand.brandSlogan
+                    </p>
+
+                    <p className="mt-1 text-xs text-green-500">
+                      Existing Brand
+                    </p>
+                  </div>
+                </div>
+
+                <FiCheck size={18} className="ml-4 text-green-500" />
+              </div>
+
+              <div className="flex w-full items-center justify-between rounded-xl border border-red-500/10 bg-red-500/[0.03] px-4 py-3 md:w-auto md:min-w-[300px]">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-dashed border-neutral-800 bg-[#0d0f12]">
+                    <span className="text-xs text-neutral-700">No</span>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-neutral-300">
+                      productBrandName
+                    </p>
+
+                    <p className="mt-1 text-xs text-red-400">Brand not found</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="border-t border-neutral-800 pt-8">
+            <div className="mb-5">
+              <h3 className="text-base font-medium">Pricing & Inventory</h3>
+
+              <p className="mt-1 text-xs text-neutral-500">
+                Set pricing and inventory information
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
+              <div>
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Selling Price
+                </label>
+
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="0.00"
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Real Price
+                </label>
+
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="0.00"
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Discount
+                </label>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    readOnly
+                    placeholder="0"
+                    className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 pr-10 text-sm outline-none placeholder:text-neutral-600"
+                  />
+
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-neutral-500">
+                    %
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm text-neutral-300">
+                  SKU
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="ME-SHIRT-001"
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm uppercase outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="border-t border-neutral-800 pt-8">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-medium">Product Variants</h3>
+
+                <p className="mt-1 text-xs text-neutral-500">
+                  Add colors and stock for each size
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="flex items-center gap-2 rounded-lg border border-neutral-700 px-3 py-2 text-sm transition hover:border-neutral-500 hover:bg-neutral-900"
+              >
+                <FiPlus size={16} />
+                Add Variant
+              </button>
+            </div>
+
+            <div className="space-y-5">
+              <div className="rounded-xl border border-neutral-800 bg-[#111419] p-5">
+                <div className="mb-5 flex items-center justify-between">
+                  <span className="text-sm font-medium">Variant</span>
+
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 text-xs text-neutral-500 transition hover:text-white"
+                  >
+                    <FiTrash2 size={15} />
+                    Remove
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm text-neutral-300">
+                      Color Name
+                    </label>
+
+                    <input
+                      type="text"
+                      placeholder="Black"
+                      className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm text-neutral-300">
+                      Color Code
+                    </label>
+
+                    <div className="flex h-11 items-center gap-3 rounded-lg border border-neutral-800 bg-[#0d0f12] px-3">
+                      <input
+                        type="color"
+                        className="h-8 w-10 cursor-pointer rounded border-0 bg-transparent p-0"
+                      />
+
+                      <input
+                        type="text"
+                        placeholder="#000000"
+                        maxLength={7}
+                        className="h-8 w-full bg-transparent text-sm uppercase text-neutral-300 outline-none placeholder:text-neutral-600"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <div className="mb-3 flex items-center justify-between">
+                    <label className="block text-sm text-neutral-300">
+                      Size & Stock
+                    </label>
+
+                    <span className="text-xs text-neutral-500">
+                      Variant Stock
+                      <span className="text-white">333</span>
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                    <div className="rounded-lg border border-neutral-800 bg-[#0d0f12] p-3">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-sm font-medium">m</span>
+
+                        <span className="text-[10px] uppercase tracking-wider text-neutral-600">
+                          Stock
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
+                        >
+                          <FiMinus size={13} />
+                        </button>
+
+                        <input
+                          type="number"
+                          min="0"
+                          className="h-8 min-w-0 w-full rounded-md border border-neutral-800 bg-[#111419] text-center text-xs outline-none focus:border-neutral-600"
+                        />
+
+                        <button
+                          type="button"
+                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
+                        >
+                          <FiPlus size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 flex items-center justify-between rounded-xl border border-neutral-800 bg-[#111419] px-5 py-4">
+              <div>
+                <p className="text-sm font-medium">Total Product Stock</p>
+
+                <p className="mt-1 text-xs text-neutral-500">
+                  Combined stock across all colors and sizes
+                </p>
+              </div>
+
+              <span className="text-2xl font-semibold">322</span>
+            </div>
+          </section>
+
+          <section className="border-t border-neutral-800 pt-8">
+            <div className="mb-5">
+              <h3 className="text-base font-medium">Product Images</h3>
+
+              <p className="mt-1 text-xs text-neutral-500">
+                Upload high-quality images of your product
+              </p>
+            </div>
+
+            <label className="flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-neutral-700 bg-[#111419] transition hover:border-neutral-500 hover:bg-[#14171c]">
+              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-neutral-800 bg-[#0d0f12]">
+                <FiUpload size={20} className="text-neutral-400" />
+              </div>
+
+              <p className="text-sm text-neutral-300">Click to upload images</p>
+
+              <p className="mt-1 text-xs text-neutral-600">
+                PNG, JPG, JPEG or WEBP
+              </p>
+
+              <input
+                type="file"
+                multiple
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                className="hidden"
+              />
+            </label>
+
+            <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              <div className="group relative overflow-hidden rounded-lg border border-neutral-800 bg-[#111419]">
+                <img className="aspect-square w-full object-cover" />
+
+                <button
+                  type="button"
+                  className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-md bg-black/80 text-neutral-300 opacity-0 transition group-hover:opacity-100 hover:text-white"
+                >
+                  <FiTrash2 size={15} />
+                </button>
+
+                <div className="absolute bottom-0 left-0 right-0 truncate bg-black/70 px-2 py-2 text-[10px] text-neutral-300">
+                  image name
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="border-t border-neutral-800 pt-8">
+            <div className="mb-5">
+              <h3 className="text-base font-medium">Product Status</h3>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                className={`rounded-lg border px-5 py-2.5 text-sm transition`}
+              >
+                active
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div className="sticky bottom-0 flex items-center justify-end gap-3 border-t border-neutral-800 bg-[#0d0f12] px-6 py-5">
+          <button
+            type="button"
+            className="rounded-lg border border-neutral-800 px-5 py-2.5 text-sm text-neutral-400 transition hover:border-neutral-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={closeUpdate}
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            className="rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Add Product
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProductUpdateOverDisplay;

@@ -1,38 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { FaEye } from "react-icons/fa";
 import { CiEdit } from "react-icons/ci";
-import {
-  FiPackage,
-  FiShoppingBag,
-  FiTrendingUp,
-} from "react-icons/fi";
+import { FiPackage, FiShoppingBag, FiTrendingUp } from "react-icons/fi";
 import axios from "axios";
+import { UseMe } from "../../../../context/Meprovider";
 
 const ProductGrid = () => {
-  const [allproducts, setAllProducts] = useState([]);
+  const { allproducts, setAllProducts, productId, setProductId } = UseMe();
+
+  const { setProductUpdateModal } = UseMe();
 
   const getAllProducts = async () => {
     try {
       const getProductsApi = await axios.get(
-        `${import.meta.env.VITE_API_URL}/Me/getProducts`
+        `${import.meta.env.VITE_API_URL}/Me/getProducts`,
       );
 
       setAllProducts(getProductsApi.data.products || []);
 
-      console.log(
-        "get all products",
-        getProductsApi.data.products
-      );
+      console.log("get all products", getProductsApi.data.products);
 
       console.log(
         "IMAGE:",
-        getProductsApi.data.products?.[0]?.variants?.[0]?.images?.[0]
+        getProductsApi.data.products?.[0]?.variants?.[0]?.images?.[0],
       );
 
-      console.log(
-        "BRAND:",
-        getProductsApi.data.products?.[0]?.brand
-      );
+      console.log("BRAND:", getProductsApi.data.products?.[0]?.brand);
     } catch (error) {
       console.log("error in get products", error);
       console.log("Server response:", error.response?.data);
@@ -49,12 +42,9 @@ const ProductGrid = () => {
     return product.variants.reduce((total, variant) => {
       if (!variant.sizes?.length) return total;
 
-      const variantStock = variant.sizes.reduce(
-        (sizeTotal, size) => {
-          return sizeTotal + Number(size.stock || 0);
-        },
-        0
-      );
+      const variantStock = variant.sizes.reduce((sizeTotal, size) => {
+        return sizeTotal + Number(size.stock || 0);
+      }, 0);
 
       return total + variantStock;
     }, 0);
@@ -80,25 +70,20 @@ const ProductGrid = () => {
 
           const productStatus = getProductStatus(totalStock);
 
-          const productImage =
-            productData.variants?.[0]?.images?.[0];
+          const productImage = productData.variants?.[0]?.images?.[0];
 
-          const totalVariants =
-            productData.variants?.length || 0;
+          const totalVariants = productData.variants?.length || 0;
 
           const totalColors =
-            productData.variants?.filter(
-              (variant) => variant.color?.name
-            ).length || 0;
+            productData.variants?.filter((variant) => variant.color?.name)
+              .length || 0;
 
           const sold = Number(productData.sold || 0);
 
           const revenue = Number(productData.revenue || 0);
 
           const inventoryWidth =
-            totalStock === 0
-              ? 0
-              : Math.min(totalStock, 100);
+            totalStock === 0 ? 0 : Math.min(totalStock, 100);
 
           return (
             <div
@@ -167,30 +152,29 @@ const ProductGrid = () => {
               <div className="p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
+                    {productData.brand && (
+                      <div className="mb-2 flex items-center gap-2">
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md border border-white/[0.08] bg-white">
+                          {productData.brand.brandIcon ? (
+                            <img
+                              src={productData.brand.brandIcon}
+                              alt={productData.brand.brandName}
+                              className="h-full w-full object-contain p-1"
+                            />
+                          ) : (
+                            <span className="text-[10px] font-medium text-black">
+                              {productData.brand.brandName
+                                ?.charAt(0)
+                                ?.toUpperCase()}
+                            </span>
+                          )}
+                        </div>
 
-                   {productData.brand && (
-  <div className="mb-2 flex items-center gap-2">
-    <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md border border-white/[0.08] bg-white">
-      {productData.brand.brandIcon ? (
-        <img
-          src={productData.brand.brandIcon}
-          alt={productData.brand.brandName}
-          className="h-full w-full object-contain p-1"
-        />
-      ) : (
-        <span className="text-[10px] font-medium text-black">
-          {productData.brand.brandName
-            ?.charAt(0)
-            ?.toUpperCase()}
-        </span>
-      )}
-    </div>
-
-    <p className="truncate text-[10px] font-medium uppercase tracking-[0.16em] text-[#8b9198]">
-      {productData.brand.brandName}
-    </p>
-  </div>
-)}
+                        <p className="truncate text-[10px] font-medium uppercase tracking-[0.16em] text-[#8b9198]">
+                          {productData.brand.brandName}
+                        </p>
+                      </div>
+                    )}
 
                     <h4 className="truncate text-sm font-medium text-[#e1e3e5]">
                       {productData.name}
@@ -203,18 +187,12 @@ const ProductGrid = () => {
 
                   <div className="shrink-0 text-right">
                     <p className="whitespace-nowrap text-sm font-semibold text-white">
-                      ₹
-                      {Number(
-                        productData.price || 0
-                      ).toLocaleString("en-IN")}
+                      ₹{Number(productData.price || 0).toLocaleString("en-IN")}
                     </p>
 
                     {productData.realPrice && (
                       <p className="mt-1 whitespace-nowrap text-[9px] text-[#555b63] line-through">
-                        ₹
-                        {Number(
-                          productData.realPrice
-                        ).toLocaleString("en-IN")}
+                        ₹{Number(productData.realPrice).toLocaleString("en-IN")}
                       </p>
                     )}
                   </div>
@@ -368,6 +346,10 @@ const ProductGrid = () => {
                       hover:bg-white
                       hover:text-black
                     "
+                    onClick={() => {
+                      setProductId(productData._id);
+                      setProductUpdateModal(true);
+                    }}
                   >
                     <CiEdit className="text-[14px]" />
 
