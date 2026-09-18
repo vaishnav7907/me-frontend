@@ -4,7 +4,10 @@ import { BsBox } from "react-icons/bs";
 import { PiDotsThreeVerticalBold } from "react-icons/pi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineModeEditOutline } from "react-icons/md";
+import { UseMe } from "../../../../context/Meprovider";
 const BrandGrid = () => {
+
+  const{setBrandId}=UseMe()
   const [getBrands, setGetBrands] = useState([]);
   const getAllBrands = async () => {
     try {
@@ -71,6 +74,8 @@ const BrandGrid = () => {
                 <button
                   type="button"
                   title="Edit brand"
+
+                  onClick={()=>setBrandId(brand._id)}
                   className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition hover:bg-white/[0.05] hover:text-white"
                 >
                   <MdOutlineModeEditOutline size={17} />

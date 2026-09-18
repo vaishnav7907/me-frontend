@@ -38,6 +38,10 @@ export const MeProvider = ({ children }) => {
   const [productUpdateModal, setProductUpdateModal] = useState(false);
   // latest arrivals
 
+
+ const[brandId,setBrandId]=useState("")
+  
+
   return (
     <MeContext.Provider
       value={{
@@ -95,6 +99,8 @@ export const MeProvider = ({ children }) => {
 
         productUpdateModal,
         setProductUpdateModal,
+
+        brandId,setBrandId
       }}
     >
       {children}
