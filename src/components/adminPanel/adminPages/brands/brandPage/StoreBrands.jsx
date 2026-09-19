@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { IoAdd } from "react-icons/io5";
 import BrandList from "../brandlist/BrandList";
 import BrandOverDisplay from "../brandOverDisplay/BrandOverDisplay";
+import UpdateBrandOverDisplay from "../updateBrandOverDisplay/UpdateBrandOverDisplay";
+import { UseMe } from "../../../../context/Meprovider";
 const StoreBrands = () => {
+
+  const{updateBrandOpen,setUpdateBrandOpen}=UseMe()  
+  const [addBrandBtn,setAddBrandBtn]=useState(false)
   const brands = [
     {
       id: 1,
@@ -62,7 +67,7 @@ const StoreBrands = () => {
     },
   ];
 
-  const [addBrandBtn,setAddBrandBtn]=useState(false)
+  
   return (
     <div className="min-h-screen">
       <div className="py-7 px-7">
@@ -116,6 +121,8 @@ const StoreBrands = () => {
       </div>
 
       {addBrandBtn && (<BrandOverDisplay  onclose={()=>setAddBrandBtn(false)}/>)}
+
+      {updateBrandOpen && (<UpdateBrandOverDisplay  oncloseUpdateBrand={()=>setUpdateBrandOpen(false)}/>)}
     </div>
   );
 };

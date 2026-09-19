@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { FiTrash2 } from "react-icons/fi";
 import { FaEye } from "react-icons/fa";
 import { CiEdit } from "react-icons/ci";
 import { FiPackage, FiShoppingBag, FiTrendingUp } from "react-icons/fi";
@@ -6,9 +7,17 @@ import axios from "axios";
 import { UseMe } from "../../../../context/Meprovider";
 
 const ProductGrid = () => {
-  const { allproducts, setAllProducts, productId, setProductId } = UseMe();
-
-  const { setProductUpdateModal } = UseMe();
+  const {
+    allproducts,
+    setAllProducts,
+    productId,
+    setProductId,
+    setProductUpdateModal,
+    productDltModal,
+    setProductDltModal,
+     productDeleteName, setProductDeleteName,
+     productDeleteBrand, setProductDeleteBrand
+  } = UseMe();
 
   const getAllProducts = async () => {
     try {
@@ -22,7 +31,7 @@ const ProductGrid = () => {
 
       console.log(
         "IMAGE:",
-        getProductsApi.data.products?.[0]?.variants?.[0]?.images?.[0],
+        getProductsApi.data.products?.[0]?.variants?.[0]?.images?.[0]?.url,
       );
 
       console.log("BRAND:", getProductsApi.data.products?.[0]?.brand);
@@ -70,7 +79,7 @@ const ProductGrid = () => {
 
           const productStatus = getProductStatus(totalStock);
 
-          const productImage = productData.variants?.[0]?.images?.[0];
+          const productImage = productData.variants?.[0]?.images?.[0]?.url;
 
           const totalVariants = productData.variants?.length || 0;
 
@@ -311,7 +320,7 @@ const ProductGrid = () => {
                   </div>
                 </div>
 
-                <div className="mt-5 grid grid-cols-2 gap-2">
+                <div className="mt-5 grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     className="
@@ -354,6 +363,21 @@ const ProductGrid = () => {
                     <CiEdit className="text-[14px]" />
 
                     <p>Edit</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProductDeleteName(productData.name);
+                      setProductDeleteBrand(productData.brand);
+                      setProductId(productData._id);
+                      setProductDltModal(true);
+                    }}
+                    className="flex h-9 items-center justify-center gap-2  rounded-lg  bg-[#181b1f]  text-[10px] font-medium   text-[#aeb2b7]  transition-all duration-200  hover:bg-red-500 hover:text-white "
+                  >
+                    <FiTrash2 className="text-[12px]" />
+
+                    <p>Delete</p>
                   </button>
                 </div>
               </div>

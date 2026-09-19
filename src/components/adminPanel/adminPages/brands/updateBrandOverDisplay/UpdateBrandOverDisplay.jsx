@@ -2,17 +2,78 @@ import axios from "axios";
 import React, { useState } from "react";
 import { FiX, FiUpload, FiTrash2 } from "react-icons/fi";
 import { UseMe } from "../../../../context/Meprovider";
-const UpdateBrandOverDisplay = () => {
+const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
   const [brandName, setBrandName] = useState("");
   const [brandSlogan, setBrandSlogan] = useState("");
   const [status, setStatus] = useState("Active");
+  const [brandIcon, setBrandIcon] = useState(null);
+  const [preview, setPreview] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { brandId } = UseMe();
 
-  const{brandId}=UseMe()
-  const updateBrand = async (req, res) => {
+  const onChangeImage = (e) => {
+    const files = e.target.files[0];
+    if (!files) {
+      return;
+    }
+    setBrandIcon(files);
+    setPreview(URL.createObjectURL(files));
+  };
+
+  const removeImage = () => {
+    setBrandIcon(null);
+    setPreview("");
+  };
+
+  const updateBrand = async () => {
     try {
+      setLoading(true);
 
-      const updtBrandApi= await axios.patch( `${import.meta.env.VITE_API_URL}/Me/updateBrands/${brandId}`)
-    } catch (error) {}
+      const adminToken = localStorage.getItem("token");
+
+      const formData = new FormData();
+
+      formData.append("brandName", brandName);
+      formData.append("brandSlogan", brandSlogan);
+      formData.append("status", status);
+
+      if (brandIcon) {
+        formData.append("brandIcon", brandIcon);
+      }
+
+      const updtBrandApi = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/Me/updateBrands/${brandId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        },
+      );
+
+      console.log("updated brands details", updtBrandApi.data);
+
+      if (updtBrandApi.data.success) {
+        alert("Brand updated successfully");
+
+        setBrandName("");
+        setBrandSlogan("");
+        setStatus("Active");
+        setBrandIcon(null);
+        setPreview("");
+
+        oncloseUpdateBrand();
+      }
+    } catch (error) {
+      console.log(error);
+
+      alert(
+        error.response?.data?.message ||
+          "Something went wrong while updating brand",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,6 +91,7 @@ const UpdateBrandOverDisplay = () => {
           <button
             type="button"
             className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
+            onClick={oncloseUpdateBrand}
           >
             <FiX size={19} />
           </button>
@@ -55,9 +117,8 @@ const UpdateBrandOverDisplay = () => {
                   <input
                     type="text"
                     placeholder="Enter brand name"
-
                     value={brandName}
-                    onChange={(e)=>setBrandName(e.target.value)}
+                    onChange={(e) => setBrandName(e.target.value)}
                     className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                   />
                 </div>
@@ -70,7 +131,7 @@ const UpdateBrandOverDisplay = () => {
                   <textarea
                     placeholder="Enter brand slogan"
                     value={brandSlogan}
-                    onChange={(e)=>setBrandSlogan(e.target.value)}
+                    onChange={(e) => setBrandSlogan(e.target.value)}
                     rows={4}
                     className="w-full resize-none rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 py-3 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                   />
@@ -80,11 +141,11 @@ const UpdateBrandOverDisplay = () => {
                     <button
                       key={item}
                       type="button"
-                      //  onClick={() => setStatuss(item)}
+                      onClick={() => setStatus(item)}
                       className={`rounded-lg border px-5 py-2.5 text-sm transition ${
-                        //    statuss === item
-                        "border-white bg-white text-black"
-                        //  : "border-neutral-800 bg-[#111419] text-neutral-400 hover:border-neutral-600 hover:text-white"
+                        status === item
+                          ? "border-white bg-white text-black"
+                          : "border-neutral-800 bg-[#111419] text-neutral-400 hover:border-neutral-600 hover:text-white"
                       }`}
                     >
                       {item}
@@ -122,49 +183,64 @@ const UpdateBrandOverDisplay = () => {
 
                 <input
                   type="file"
+                  onChange={onChangeImage}
                   accept="image/png,image/jpeg,image/jpg,image/webp"
                   className="hidden"
                 />
               </label>
 
-              <div className="relative flex min-h-[230px] items-center justify-center rounded-xl border border-neutral-800 bg-[#0d0f12] p-6">
-                <img
-                  alt="Brand Preview"
-                  className="max-h-[200px] max-w-full object-contain"
-                />
+              {brandIcon && (
+                <div className="relative flex min-h-[230px] items-center justify-center rounded-xl border border-neutral-800 bg-[#0d0f12] p-6 mt-5">
+                  <img
+                    alt="Brand Preview"
+                    src={preview}
+                    className="max-h-[200px] max-w-full object-contain"
+                  />
 
-                <button
-                  type="button"
-                  className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 transition hover:bg-red-500/20"
-                >
-                  <FiTrash2 size={17} />
-                </button>
-              </div>
-
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 transition hover:bg-red-500/20"
+                  >
+                    <FiTrash2 size={17} />
+                  </button>
+                </div>
+              )}
               <div className="mt-5">
                 <p className="mb-3 text-sm font-medium text-white">Preview</p>
 
                 <div className="flex items-center rounded-xl border border-green-500/15 bg-green-500/[0.04] p-4">
                   <div className="flex items-center gap-4">
                     <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-800 bg-white">
-                      <img
-                        alt="Brand"
-                        className="h-full w-full object-contain p-2"
-                      />
-
-                      <span className="text-xs text-neutral-400">Logo</span>
+                      {preview ? (
+                        <img
+                          alt="Brand"
+                          src={preview}
+                          className="h-full w-full object-contain p-2"
+                        />
+                      ) : (
+                        <span className="text-xs text-neutral-400">Logo</span>
+                      )}
                     </div>
 
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-white">
-                        brandName
+                        <p>{brandName || "Brand Name"}</p>
                       </p>
 
                       <p className="mt-1 truncate text-xs text-neutral-500">
-                        brandSlogan
+                        {brandSlogan || "brand Slogan"}
                       </p>
 
-                      <p className="mt-1 text-xs text-green-500">New Brand</p>
+                      <p
+                        className={`mt-1 text-xs ${
+                          status === "Active"
+                            ? "text-green-500"
+                            : "text-red-400"
+                        }`}
+                      >
+                        {status}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -182,15 +258,25 @@ const UpdateBrandOverDisplay = () => {
             <button
               type="button"
               className="rounded-lg border border-neutral-800 px-5 py-2.5 text-sm text-neutral-400 transition hover:border-neutral-600 hover:text-white"
+              onClick={oncloseUpdateBrand}
             >
               Cancel
             </button>
 
             <button
               type="button"
-              className="rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
+              onClick={updateBrand}
+              disabled={loading}
+              className="flex min-w-[130px] items-center justify-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Create Brand
+              {loading ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black" />
+                  Updating...
+                </>
+              ) : (
+                "Update Brand"
+              )}
             </button>
           </div>
         </div>

@@ -10,6 +10,8 @@ import ProductGrid from "../Grid/ProductGrid";
 import AddProductOverDisplay from "../productOverDisplay/AddProductOverDisplay";
 import axios from "axios";
 import ProductUpdateOverDisplay from "../productUpdateOverDisplay/ProductUpdateOverDisplay";
+
+import ProductDeleteModal from "../productDeleteModal/ProductDeleteModal";
 import { UseMe } from "../../../../context/Meprovider";
 const StoreProducts = () => {
   const categories = [
@@ -26,7 +28,8 @@ const StoreProducts = () => {
   const [activeStatus, setActiveStatus] = useState("All");
   const [search, setSearch] = useState("");
   const [showAddProduct, setShowAddProduct] = useState(false);
-  const{productUpdateModal,setProductUpdateModal}=UseMe()
+ 
+  const { productUpdateModal, setProductUpdateModal,productDltModal, setProductDltModal } = UseMe()
 
   const stats = [
     {
@@ -55,22 +58,23 @@ const StoreProducts = () => {
     },
   ];
 
-  const [getAllProducts,setGetAllProducts]=useState([])
-  const getProductsFn= async () =>{
+  const [getAllProducts, setGetAllProducts] = useState([]);
+  const getProductsFn = async () => {
     try {
-      const getProductsApi= await axios.get(`${import.meta.env.VITE_API_URL}/Me/getProducts`)
-      setGetAllProducts(getProductsApi.data)
-      console.log("getProducts",getProductsApi.data);
-      
+      const getProductsApi = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/getProducts`,
+      );
+      setGetAllProducts(getProductsApi.data);
+      console.log("getProducts", getProductsApi.data);
     } catch (error) {
       console.log("error in get products", error);
       console.log("Server response:", error.response?.data);
     }
-  }
+  };
 
-  useEffect(()=>{
-    getProductsFn
-  },[])
+  useEffect(() => {
+    getProductsFn;
+  }, []);
   return (
     <div className="min-h-screen bg-[#0B0D10] text-white">
       <div className="px-6 lg:px-8 pt-7">
@@ -215,7 +219,13 @@ const StoreProducts = () => {
         <AddProductOverDisplay onClose={() => setShowAddProduct(false)} />
       )}
 
-      {productUpdateModal && (<ProductUpdateOverDisplay closeUpdate={()=> setProductUpdateModal(false)}/>)}
+      {productUpdateModal && (
+        <ProductUpdateOverDisplay
+          closeUpdate={() => setProductUpdateModal(false)}
+        />
+      )}
+
+      {productDltModal && ( <ProductDeleteModal oncloseDeleteModal={()=>setProductDltModal(false)}/>)}
     </div>
   );
 };
