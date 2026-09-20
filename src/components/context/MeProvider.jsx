@@ -36,15 +36,17 @@ export const MeProvider = ({ children }) => {
 
   // update products modal
   const [productUpdateModal, setProductUpdateModal] = useState(false);
-   const [productDltModal, setProductDltModal] = useState(false);
+  const [productDltModal, setProductDltModal] = useState(false);
   const [productDeleteName, setProductDeleteName] = useState("");
   const [productDeleteBrand, setProductDeleteBrand] = useState(null);
   // latest arrivals
 
   const [brandId, setBrandId] = useState("");
   const [updateBrandOpen, setUpdateBrandOpen] = useState(false);
- 
 
+  const [brandDeleteModal, setBrandDeleteModal] = useState(false);
+  const [brandDeleteName,setBrandDeleteName]=useState("")
+  const[brandDeleteIcon,setBrandDeleteIcon]=useState(null)
   return (
     <MeContext.Provider
       value={{
@@ -112,9 +114,18 @@ export const MeProvider = ({ children }) => {
         productDltModal,
         setProductDltModal,
 
-        productDeleteName, setProductDeleteName,
+        productDeleteName,
+        setProductDeleteName,
 
-        productDeleteBrand, setProductDeleteBrand
+        productDeleteBrand,
+        setProductDeleteBrand,
+
+        brandDeleteModal,
+        setBrandDeleteModal,
+
+        brandDeleteName,setBrandDeleteName,
+
+        brandDeleteIcon,setBrandDeleteIcon
       }}
     >
       {children}

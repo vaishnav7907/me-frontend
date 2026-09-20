@@ -64,7 +64,7 @@ const NewArrivalsList = () => {
     return {
       id: products._id,
       name: products.name,
-      image: products.variants?.[0]?.images?.[0] || "",
+      image: products.variants?.[0]?.images?.[0]?.url || "",
       brandName: products.brand?.brandName || "",
       brandIcon: products.brand?.brandIcon || "",
       sku:products.sku,

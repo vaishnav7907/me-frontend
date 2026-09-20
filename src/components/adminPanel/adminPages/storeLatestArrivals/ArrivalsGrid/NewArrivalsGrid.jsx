@@ -83,7 +83,7 @@ const NewArrivalsGrid = () => {
           const productStatus = getProductStatus(totalStock);
 
           const productImage =
-            productData.variants?.[0]?.images?.[0];
+            productData.variants?.[0]?.images?.[0]?.url;
 
           const totalColors =
             productData.variants?.filter(

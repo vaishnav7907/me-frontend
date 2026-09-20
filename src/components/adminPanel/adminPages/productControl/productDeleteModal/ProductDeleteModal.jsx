@@ -118,3 +118,4 @@ const ProductDeleteModal = ({ oncloseDeleteModal }) => {
 };
 
 export default ProductDeleteModal;
+

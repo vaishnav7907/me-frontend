@@ -28,7 +28,7 @@ const ProductList = () => {
 
       console.log(
         "IMAGE:",
-        products[0]?.variants?.[0]?.images?.[0],
+        products[0]?.variants?.[0]?.images?.[0]?.url,
       );
 
       console.log("BRAND:", products[0]?.brand);
@@ -101,7 +101,7 @@ const ProductList = () => {
       name: product.name || "Unnamed Product",
 
       image:
-        product.variants?.[0]?.images?.[0] || "",
+        product.variants?.[0]?.images?.[0]?.url|| "",
 
       brandName: product.brand?.brandName || "",
       brandIcon: product.brand?.brandIcon || "",

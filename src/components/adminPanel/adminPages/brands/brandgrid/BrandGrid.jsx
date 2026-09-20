@@ -6,7 +6,16 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { UseMe } from "../../../../context/Meprovider";
 const BrandGrid = () => {
-  const { setBrandId, setUpdateBrandOpen } = UseMe();
+  const {
+    setBrandId,
+    setUpdateBrandOpen,
+    brandDeleteModal,
+    setBrandDeleteModal,
+    brandDeleteName,
+    setBrandDeleteName,
+    brandDeleteIcon,
+    setBrandDeleteIcon,
+  } = UseMe();
   const [getBrands, setGetBrands] = useState([]);
   const getAllBrands = async () => {
     try {
@@ -35,7 +44,7 @@ const BrandGrid = () => {
               <div className="min-w-0">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#2b3036] bg-white">
                   <img
-                    src={brand.brandIcon}
+                    src={brand.brandIcon?.url}
                     alt={brand.brandName}
                     className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                   />
@@ -84,6 +93,12 @@ const BrandGrid = () => {
                 <button
                   type="button"
                   title="Delete brand"
+                  onClick={() => {
+                    setBrandDeleteName(brand.brandName);
+                    setBrandDeleteIcon(brand.brandIcon);
+                    setBrandId(brand._id);
+                    setBrandDeleteModal(true);
+                  }}
                   className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition hover:bg-red-500/10 hover:text-red-400"
                 >
                   <RiDeleteBin6Line size={17} />

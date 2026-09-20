@@ -37,7 +37,7 @@ const BrandList = () => {
       return {
         id: brand._id,
         name: brand.brandName,
-        logo: brand.brandIcon,
+        logo: brand.brandIcon?.url,
         products: brand.productCount,
         status: brand.status,
       };

@@ -4,10 +4,15 @@ import BrandList from "../brandlist/BrandList";
 import BrandOverDisplay from "../brandOverDisplay/BrandOverDisplay";
 import UpdateBrandOverDisplay from "../updateBrandOverDisplay/UpdateBrandOverDisplay";
 import { UseMe } from "../../../../context/Meprovider";
+import DeleteBrandModal from "../deleteBrandModal/DeleteBrandModal";
 const StoreBrands = () => {
-
-  const{updateBrandOpen,setUpdateBrandOpen}=UseMe()  
-  const [addBrandBtn,setAddBrandBtn]=useState(false)
+  const {
+    updateBrandOpen,
+    setUpdateBrandOpen,
+    brandDeleteModal,
+    setBrandDeleteModal,
+  } = UseMe();
+  const [addBrandBtn, setAddBrandBtn] = useState(false);
   const brands = [
     {
       id: 1,
@@ -67,7 +72,6 @@ const StoreBrands = () => {
     },
   ];
 
-  
   return (
     <div className="min-h-screen">
       <div className="py-7 px-7">
@@ -87,8 +91,9 @@ const StoreBrands = () => {
             <button
               className="flex items-center gap-2 h-9 px-2.5 bg-white font-semibold text-sm rounded-lg  transition
                           hover:bg-[#e8e8e8]"
-              onClick={()=>setAddBrandBtn(true)}>
-              <IoAdd className="text-black" size={20} /> <p>Add New Arrivals</p>
+              onClick={() => setAddBrandBtn(true)}
+            >
+              <IoAdd className="text-black" size={20} /> <p>Add Brands</p>
             </button>
           </div>
         </div>
@@ -116,13 +121,25 @@ const StoreBrands = () => {
         </div>
 
         <div className="mt-7">
-          <BrandList/>
+          <BrandList />
         </div>
       </div>
 
-      {addBrandBtn && (<BrandOverDisplay  onclose={()=>setAddBrandBtn(false)}/>)}
+      {addBrandBtn && (
+        <BrandOverDisplay onclose={() => setAddBrandBtn(false)} />
+      )}
 
-      {updateBrandOpen && (<UpdateBrandOverDisplay  oncloseUpdateBrand={()=>setUpdateBrandOpen(false)}/>)}
+      {updateBrandOpen && (
+        <UpdateBrandOverDisplay
+          oncloseUpdateBrand={() => setUpdateBrandOpen(false)}
+        />
+      )}
+
+      {brandDeleteModal && (
+        <DeleteBrandModal
+          oncloseDeleteBrandModal={() => setBrandDeleteModal(false)}
+        />
+      )}
     </div>
   );
 };
