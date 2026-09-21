@@ -1,18 +1,43 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoAdd } from "react-icons/io5";
 import { CiGrid41 } from "react-icons/ci";
 import { CiCircleList } from "react-icons/ci";
 import { MdOutlineArrowRightAlt } from "react-icons/md";
+import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { FiSearch, FiFilter } from "react-icons/fi";
 import NewArrivalsList from "../ArrivalsLIst/NewArrivalsList";
 import NewArrivalsGrid from "../ArrivalsGrid/NewArrivalsGrid";
 import CreateLatestOverDisplay from "../createLatestOverDisplay/CreateLatestOverDisplay";
+import axios from "axios";
 const StoreNewArrivals = () => {
   const [newArrivalsNavi, setNewArrivalsNavi] = useState(false);
-  const [category, setCategory] = useState("All");
+  const [categoryy, setCategoryy] = useState("All");
 
   const [createLatestArrivalsModal, setCreateLatestArrivalsModal] =
     useState(false);
+
+  const [getLatestArrivals, setGetLatestArrivals] = useState([]);
+
+  const getAllLatestArrivals = async () => {
+    try {
+      const getlatestArrivalsApi = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/latestArrivals`,
+      );
+
+      setGetLatestArrivals(getlatestArrivalsApi.data.latestArrivalsData);
+
+      console.log(
+        "get Latest Arrivals",
+        getlatestArrivalsApi.data.latestArrivalsData,
+      );
+    } catch (error) {
+      console.log("error in get latest Arrivals", error);
+    }
+  };
+
+  useEffect(() => {
+    getAllLatestArrivals();
+  }, []);
   return (
     <div className="min-h-screen">
       <div className="py-7 px-7">
@@ -97,8 +122,8 @@ const StoreNewArrivals = () => {
               <div className="flex items-center gap-3">
                 <div>
                   <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    value={categoryy}
+                    onChange={(e) => setCategoryy(e.target.value)}
                     className="h-10 rounded-lg border border-[#292d33] bg-[#151719] px-4 text-sm text-gray-300 outline-none"
                   >
                     <option value="">All</option>
@@ -130,48 +155,79 @@ const StoreNewArrivals = () => {
             </div>
           </div>
 
-          <div className="py-7">
-            {/* {!newArrivalsNavi ? <NewArrivalsList /> : <NewArrivalsGrid />} */}
-            <div className="group relative w-full max-w-sm overflow-hidden rounded-2xl bg-[#101112] shadow-2xl">
-              <div className="relative h-[430px] overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf"
-                  alt="Latest Shirts"
-                  className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                />
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />{" "}
-                {/* Category */}
-                <div className="absolute left-5 top-5">
-                  <span className="rounded-full border border-white/20 bg-black/40 px-4 py-2 text-[10px] font-medium uppercase tracking-[2px] text-white backdrop-blur-md">
-                    Shirts
-                  </span>
+          <div className="py-7 flex gap-3 flex-wrap">
+            {getLatestArrivals.map((latestArrivalsData) => (
+              <div
+                className="group relative w-full max-w-sm overflow-hidden rounded-2xl bg-[#101112] shadow-2xl"
+                key={latestArrivalsData._id}
+              >
+                <div className="relative h-[430px] overflow-hidden">
+                  <img
+                    src={latestArrivalsData.arrivalsCategoryImage?.url}
+                    alt={latestArrivalsData.name}
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+
+                  {/* Category */}
+                  <div className="absolute left-5 top-5">
+                    <span className="rounded-full border border-white/20 bg-black/40 px-4 py-2 text-[10px] font-medium uppercase tracking-[2px] text-white backdrop-blur-md">
+                      {latestArrivalsData.category}
+                    </span>
+                  </div>
+
+                  {/* Edit / Delete */}
+                  <div className="absolute right-5 top-5 flex items-center gap-2">
+                    <button
+                      type="button"
+                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-black/50 text-gray-300 backdrop-blur-md transition hover:bg-white hover:text-black"
+                      onClick={() => {
+                        console.log("Edit:", latestArrivalsData._id);
+                      }}
+                    >
+                      <FiEdit2 size={16} />
+                    </button>
+
+                    <button
+                      type="button"
+                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-black/50 text-gray-300 backdrop-blur-md transition hover:bg-red-500 hover:text-white"
+                      onClick={() => {
+                        console.log("Delete:", latestArrivalsData._id);
+                      }}
+                    >
+                      <FiTrash2 size={16} />
+                    </button>
+                  </div>
+
+                  {/* Image Content */}
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <p className="mb-2 text-[10px] uppercase tracking-[3px] text-white/60">
+                      {latestArrivalsData.name}
+                    </p>
+
+                    <h2 className="text-3xl font-medium tracking-tight text-white">
+                      {latestArrivalsData.category}
+                    </h2>
+                  </div>
                 </div>
-                {/* Image Content */}
-                <div className="absolute bottom-6 left-6 right-6">
-                  <p className="mb-2 text-[10px] uppercase tracking-[3px] text-white/60">
-                    Latest Arrival
+
+                {/* Content */}
+                <div className="p-6">
+                  <p className="text-sm leading-6 text-gray-400">
+                    {latestArrivalsData.description}
                   </p>
-                  <h2 className="text-3xl font-medium tracking-tight text-white">
-                    New Shirts
-                  </h2>
+
+                  <button className="mt-6 flex w-full items-center justify-between rounded-xl bg-[#191B1E] px-4 py-3.5 text-sm font-medium text-gray-200 transition-all duration-300 hover:bg-white hover:text-black">
+                    <span>Explore Collection</span>
+
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#25272A] text-lg transition-all duration-300 group-hover:bg-black group-hover:text-white">
+                      <MdOutlineArrowRightAlt />
+                    </span>
+                  </button>
                 </div>
               </div>
-              {/* Content */}
-              <div className="p-6">
-                <p className="text-sm leading-6 text-gray-400">
-                  Discover our latest collection of stylish men's shirts,
-                  designed for a clean and modern look.
-                </p>
-                {/* Action */}
-                <button className="mt-6 flex w-full items-center justify-between rounded-xl bg-[#191B1E] px-4 py-3.5 text-sm font-medium text-gray-200 transition-all duration-300 hover:bg-white hover:text-black">
-                  <span> Explore Collection </span>
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#25272A] text-lg transition-all duration-300 group-hover:bg-black group-hover:text-white">
-                    <MdOutlineArrowRightAlt />
-                  </span>
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
