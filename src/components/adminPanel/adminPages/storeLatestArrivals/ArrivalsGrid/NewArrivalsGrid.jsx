@@ -7,6 +7,7 @@ import axios from "axios";
 const NewArrivalsGrid = () => {
 
   
+  
   const [latestArrivals, setLatestArrivals] = useState([]);
 
   const getLatestArrivals = async () => {

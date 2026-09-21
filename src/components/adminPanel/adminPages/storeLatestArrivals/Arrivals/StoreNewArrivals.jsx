@@ -9,7 +9,22 @@ import NewArrivalsList from "../ArrivalsLIst/NewArrivalsList";
 import NewArrivalsGrid from "../ArrivalsGrid/NewArrivalsGrid";
 import CreateLatestOverDisplay from "../createLatestOverDisplay/CreateLatestOverDisplay";
 import axios from "axios";
+import UpdateLatestArrivals from "../updateLatestArrivals/UpdateLatestArrivals";
+import { UseMe } from "../../../../context/Meprovider";
+import DeleteLatestArrivalsModal from "../deleteLatestArrivalsModal/DeleteLatestArrivalsModal";
 const StoreNewArrivals = () => {
+  const {
+    updateLatestArrivalsModal,
+    setUpdateLatestArrivalsModal,
+    dltLatestArrivalsModal,
+    setDltLatestArrivalsModal,
+    latestArrivalsId,
+    setlatestArrivalsId,
+    setDltLatestArrivalsImage,
+    setDltLatestArrivalsDescription,
+    setDltLatestArrivalsCategory,
+    setDltLatestArrivalsName,
+  } = UseMe();
   const [newArrivalsNavi, setNewArrivalsNavi] = useState(false);
   const [categoryy, setCategoryy] = useState("All");
 
@@ -183,6 +198,8 @@ const StoreNewArrivals = () => {
                       type="button"
                       className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-black/50 text-gray-300 backdrop-blur-md transition hover:bg-white hover:text-black"
                       onClick={() => {
+                        setUpdateLatestArrivalsModal(true);
+                        setlatestArrivalsId(latestArrivalsData._id);
                         console.log("Edit:", latestArrivalsData._id);
                       }}
                     >
@@ -193,6 +210,18 @@ const StoreNewArrivals = () => {
                       type="button"
                       className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-black/50 text-gray-300 backdrop-blur-md transition hover:bg-red-500 hover:text-white"
                       onClick={() => {
+                        setDltLatestArrivalsModal(true);
+                        setDltLatestArrivalsName(latestArrivalsData.name);
+                        setDltLatestArrivalsCategory(
+                          latestArrivalsData.category,
+                        );
+                        setDltLatestArrivalsDescription(
+                          latestArrivalsData.description,
+                        );
+                        setDltLatestArrivalsImage(
+                          latestArrivalsData.arrivalsCategoryImage?.url,
+                        );
+                        setlatestArrivalsId(latestArrivalsData._id);
                         console.log("Delete:", latestArrivalsData._id);
                       }}
                     >
@@ -237,6 +266,20 @@ const StoreNewArrivals = () => {
           oncloseCreateLatestArrivals={() =>
             setCreateLatestArrivalsModal(false)
           }
+        />
+      )}
+
+      {updateLatestArrivalsModal && (
+        <UpdateLatestArrivals
+          oncloseUpdateLatestArrivals={() =>
+            setUpdateLatestArrivalsModal(false)
+          }
+        />
+      )}
+
+      {dltLatestArrivalsModal && (
+        <DeleteLatestArrivalsModal
+          oncloseDeleteLatestArrivals={() => setDltLatestArrivalsModal(false)}
         />
       )}
     </div>

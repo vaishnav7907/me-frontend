@@ -39,14 +39,29 @@ export const MeProvider = ({ children }) => {
   const [productDltModal, setProductDltModal] = useState(false);
   const [productDeleteName, setProductDeleteName] = useState("");
   const [productDeleteBrand, setProductDeleteBrand] = useState(null);
-  // latest arrivals
 
+  // brand
   const [brandId, setBrandId] = useState("");
   const [updateBrandOpen, setUpdateBrandOpen] = useState(false);
 
   const [brandDeleteModal, setBrandDeleteModal] = useState(false);
-  const [brandDeleteName,setBrandDeleteName]=useState("")
-  const[brandDeleteIcon,setBrandDeleteIcon]=useState(null)
+  const [brandDeleteName, setBrandDeleteName] = useState("");
+  const [brandDeleteIcon, setBrandDeleteIcon] = useState(null);
+
+  // latest arrivals
+  const [updateLatestArrivalsModal, setUpdateLatestArrivalsModal] =
+    useState(false);
+
+  const [dltLatestArrivalsModal, setDltLatestArrivalsModal] = useState(false);
+
+  const [dltLatestArrivalsName, setDltLatestArrivalsName] = useState("");
+  const [dltLatestArrivalsCategory, setDltLatestArrivalsCategory] =
+    useState("");
+  const [dltLatestArrivalsDescription, setDltLatestArrivalsDescription] =
+    useState("");
+  const [dltLatestArrivalsImage, setDltLatestArrivalsImage] = useState(null);
+
+  const [latestArrivalsId, setlatestArrivalsId] = useState("");
   return (
     <MeContext.Provider
       value={{
@@ -123,9 +138,32 @@ export const MeProvider = ({ children }) => {
         brandDeleteModal,
         setBrandDeleteModal,
 
-        brandDeleteName,setBrandDeleteName,
+        brandDeleteName,
+        setBrandDeleteName,
 
-        brandDeleteIcon,setBrandDeleteIcon
+        brandDeleteIcon,
+        setBrandDeleteIcon,
+
+        updateLatestArrivalsModal,
+        setUpdateLatestArrivalsModal,
+
+        dltLatestArrivalsModal,
+        setDltLatestArrivalsModal,
+
+        latestArrivalsId,
+        setlatestArrivalsId,
+
+        dltLatestArrivalsImage,
+        setDltLatestArrivalsImage,
+
+        dltLatestArrivalsDescription,
+        setDltLatestArrivalsDescription,
+
+        dltLatestArrivalsCategory,
+        setDltLatestArrivalsCategory,
+        
+        dltLatestArrivalsName,
+        setDltLatestArrivalsName,
       }}
     >
       {children}
