@@ -62,6 +62,9 @@ export const MeProvider = ({ children }) => {
   const [dltLatestArrivalsImage, setDltLatestArrivalsImage] = useState(null);
 
   const [latestArrivalsId, setlatestArrivalsId] = useState("");
+
+  // frontend
+  const [getProductCategory, setGetProductCategory] = useState("");
   return (
     <MeContext.Provider
       value={{
@@ -161,9 +164,12 @@ export const MeProvider = ({ children }) => {
 
         dltLatestArrivalsCategory,
         setDltLatestArrivalsCategory,
-        
+
         dltLatestArrivalsName,
         setDltLatestArrivalsName,
+
+        getProductCategory,
+        setGetProductCategory,
       }}
     >
       {children}
