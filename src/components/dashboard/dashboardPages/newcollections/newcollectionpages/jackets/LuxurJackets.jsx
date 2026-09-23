@@ -67,6 +67,17 @@ const LuxurJackets = () => {
       image: jacket2,
     },
   ];
+
+
+
+// const getAllJackets= async ()=>{
+//   try {
+//     const getAllJacketsApi= 
+//   } catch (error) {
+    
+//   }
+// }
+
   return (
     <section className="bg-black  text-white min-h-screen overflow-hidden ">
       <div className="p-10 ">

@@ -18,6 +18,7 @@ const BrandList = () => {
       );
 
       setGetBrands(getBrandsFn.data.brand);
+
       console.log("get all brands", getBrandsFn.data.brand);
     } catch (error) {
       console.log("error in get brands", error);
@@ -29,19 +30,23 @@ const BrandList = () => {
     getAllBrands();
   }, []);
 
-  const tableData = getBrands
-    .filter((brand) =>
-      brand.brandName.toLowerCase().includes(search.toLowerCase()),
-    )
-    .map((brand) => {
-      return {
-        id: brand._id,
-        name: brand.brandName,
-        logo: brand.brandIcon?.url,
-        products: brand.productCount,
-        status: brand.status,
-      };
-    });
+  const filteredBrands = getBrands.filter((brand) =>
+    brand.brandName
+      ?.toLowerCase()
+      .includes(search.toLowerCase()),
+  );
+
+  const tableData = filteredBrands.map((brand) => {
+    return {
+      id: brand._id,
+      name: brand.brandName,
+      logo: brand.brandIcon?.url,
+      brandImage: brand.brandImage?.url,
+      products: brand.productCount,
+      status: brand.status,
+      slogan: brand.brandSlogan,
+    };
+  });
 
   const columns = [
     {
@@ -152,23 +157,36 @@ const BrandList = () => {
                         key={tableCell.id}
                         className="px-5 py-4 align-middle"
                       >
+                        {tableCell.column.id === "checkbox" && (
+                          <div className="h-4 w-4 rounded border border-[#343a42]" />
+                        )}
+
                         {tableCell.column.id === "name" && (
                           <div className="flex items-center gap-3.5">
                             <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#30353c] bg-white shadow-sm">
-                              <img
-                                src={tableRow.original.logo}
-                                alt={tableRow.original.name}
-                                className="h-8 w-8 object-contain"
-                              />
+                              {tableRow.original.logo ? (
+                                <img
+                                  src={tableRow.original.logo}
+                                  alt={tableRow.original.name}
+                                  className="h-8 w-8 object-contain"
+                                />
+                              ) : (
+                                <span className="text-[9px] text-gray-400">
+                                  Logo
+                                </span>
+                              )}
                             </div>
 
                             <div className="min-w-0">
                               <p className="truncate text-sm font-medium text-gray-100 transition-colors group-hover:text-white">
                                 {value}
                               </p>
-                              <p className="mt-0.5 text-[10px] uppercase tracking-wider text-gray-600">
-                                Brand
-                              </p>
+
+                              {tableRow.original.slogan && (
+                                <p className="mt-0.5 max-w-[250px] truncate text-[10px] text-gray-600">
+                                  {tableRow.original.slogan}
+                                </p>
+                              )}
                             </div>
                           </div>
                         )}
@@ -245,9 +263,7 @@ const BrandList = () => {
       )}
 
       {viewMode === "grid" && (
-        <div>
-          <BrandGrid />
-        </div>
+        <BrandGrid brands={filteredBrands} />
       )}
     </div>
   );
