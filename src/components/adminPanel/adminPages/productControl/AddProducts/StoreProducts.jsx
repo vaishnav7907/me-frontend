@@ -64,8 +64,8 @@ const StoreProducts = () => {
       const getProductsApi = await axios.get(
         `${import.meta.env.VITE_API_URL}/Me/getProducts`,
       );
-      setGetAllProducts(getProductsApi.data);
-      console.log("getProducts", getProductsApi.data);
+      setGetAllProducts(getProductsApi.data.products);
+      console.log("getProducts", getProductsApi.data.products);
     } catch (error) {
       console.log("error in get products", error);
       console.log("Server response:", error.response?.data);

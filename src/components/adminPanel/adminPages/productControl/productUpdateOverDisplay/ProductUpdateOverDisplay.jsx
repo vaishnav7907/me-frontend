@@ -66,9 +66,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
   const removeVariant = (variantIndex) => {
     if (variants.length === 1) return;
 
-    setVariants((prev) =>
-      prev.filter((_, index) => index !== variantIndex),
-    );
+    setVariants((prev) => prev.filter((_, index) => index !== variantIndex));
   };
 
   const updateColor = (variantIndex, value) => {
@@ -130,8 +128,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
       (total, variant) =>
         total +
         variant.sizes.reduce(
-          (sizeTotal, size) =>
-            sizeTotal + Number(size.stock || 0),
+          (sizeTotal, size) => sizeTotal + Number(size.stock || 0),
           0,
         ),
       0,
@@ -149,10 +146,27 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
   };
 
   const removeImage = (imageIndex) => {
-    setProductImage((prev) =>
-      prev.filter((_, index) => index !== imageIndex),
-    );
+    setProductImage((prev) => prev.filter((_, index) => index !== imageIndex));
   };
+
+  const [details, setDetails] = useState([
+    {
+      key: "",
+      value: "",
+    },
+  ]);
+
+  const detailOptions = [
+    { key: "fit", label: "Fit" },
+    { key: "sleeve", label: "Sleeve" },
+    { key: "neck", label: "Neck" },
+    { key: "collar", label: "Collar" },
+    { key: "pattern", label: "Pattern" },
+    { key: "material", label: "Material" },
+    { key: "stretch", label: "Stretch" },
+    { key: "occasion", label: "Occasion" },
+    { key: "style", label: "Style" },
+  ];
 
   useEffect(() => {
     const getAllBrands = async () => {
@@ -207,8 +221,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
     const existingBrand = getBrands.find(
       (brand) =>
-        brand.brandName?.trim().toLowerCase() ===
-        value.trim().toLowerCase(),
+        brand.brandName?.trim().toLowerCase() === value.trim().toLowerCase(),
     );
 
     setSelectBrand(existingBrand || null);
@@ -235,12 +248,72 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
       return;
     }
 
-    const discountValue =
-      ((original - selling) / original) * 100;
+    const discountValue = ((original - selling) / original) * 100;
 
     setDiscount(Math.round(discountValue));
   };
 
+  const addDetails = () => {
+    setDetails((prev) => [
+      ...prev,
+      {
+        key: "",
+        value: "",
+      },
+    ]);
+  };
+
+  const removeDetails = (index) => {
+    if (details.length === 1) return;
+
+    setDetails((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const updateDetailKey = (index, value) => {
+    setDetails((prev) =>
+      prev.map((detail, i) =>
+        i === index
+          ? {
+              ...detail,
+              value,
+            }
+          : detail,
+      ),
+    );
+  };
+
+  const updateDetailValue = (index, value) => {
+    setDetails((prev) =>
+      prev.map((detail, i) =>
+        i === index
+          ? {
+              ...detail,
+              value,
+            }
+          : detail,
+      ),
+    );
+  };
+
+  const getAvailabelOptions = (currentIndex) => {
+    const selectKeys = details
+      .filter((_, index) => index === currentIndex)
+      .map((detail) => detail.key)
+      .filter(Boolean);
+
+    return detailOptions.filter((option) => selectKeys.includes(option.key));
+  };
+
+  const createDetailsObject = () => {
+    const formatedDetails = {};
+    details.forEach((detail) => {
+      if (detail.key && detail.value.trim()) {
+        formatedDetails[detail.key] = detail.value.trim();
+      }
+    });
+
+    return formatedDetails;
+  };
   const resetForm = () => {
     setProductName("");
     setProductDescription("");
@@ -257,9 +330,16 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
     setOpenBrand(false);
 
     setVariants([createEmptyVariant()]);
+    setDetails([
+      {
+        key: "",
+        value: "",
+      },
+    ]);
   };
 
-  const updateProducts = async () => {
+  const updateProducts = async (e) => {
+    e.preventDefault();
     try {
       if (!productId) {
         alert("Product ID is missing");
@@ -296,6 +376,15 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
         return;
       }
 
+      const incompleteDetails = details.some(
+        (detail) => !detail.key || !detail.value.trim(),
+      );
+
+      if (incompleteDetails) {
+        alert("Please complete every product detail");
+        return;
+      }
+
       const cleanedVariants = variants.map((variant) => ({
         color: {
           name: variant.color.name,
@@ -317,25 +406,16 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
       const formData = new FormData();
 
       formData.append("name", productName.trim());
-      formData.append(
-        "description",
-        productDescription.trim(),
-      );
+      formData.append("description", productDescription.trim());
       formData.append("category", productCategory);
       formData.append("price", Number(productPrice));
-      formData.append(
-        "realPrice",
-        Number(productRealPrice),
-      );
+      formData.append("realPrice", Number(productRealPrice));
       formData.append("discount", Number(discount) || 0);
       formData.append("brand", selectBrand._id);
       formData.append("sku", sku.trim().toUpperCase());
       formData.append("status", status);
 
-      formData.append(
-        "variants",
-        JSON.stringify(cleanedVariants),
-      );
+      formData.append("variants", JSON.stringify(cleanedVariants));
 
       productImage.forEach((image) => {
         if (image instanceof File) {
@@ -345,10 +425,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
       console.log("PRODUCT ID:", productId);
       console.log("BRAND ID:", selectBrand._id);
-      console.log(
-        "CLEANED VARIANTS:",
-        cleanedVariants,
-      );
+      console.log("CLEANED VARIANTS:", cleanedVariants);
 
       const adminToken = localStorage.getItem("token");
 
@@ -371,15 +448,9 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
         closeUpdate();
       }
     } catch (error) {
-      console.log(
-        "UPDATE ERROR:",
-        error.response?.data || error.message,
-      );
+      console.log("UPDATE ERROR:", error.response?.data || error.message);
 
-      alert(
-        error.response?.data?.message ||
-          "Product update failed",
-      );
+      alert(error.response?.data?.message || "Product update failed");
     }
   };
 
@@ -388,9 +459,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
       <div className="max-h-[94vh] w-full max-w-6xl overflow-y-auto rounded-2xl border border-neutral-800 bg-[#0d0f12] text-white shadow-2xl">
         <div className="sticky top-0 z-20 flex items-center justify-between border-b border-neutral-800 bg-[#0d0f12] px-6 py-5">
           <div>
-            <h2 className="text-xl font-semibold">
-              Update Product
-            </h2>
+            <h2 className="text-xl font-semibold">Update Product</h2>
 
             <p className="mt-1 text-sm text-neutral-500">
               Update your product details
@@ -409,9 +478,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
         <div className="space-y-4 p-6">
           <section>
             <div className="mb-5">
-              <h3 className="text-base font-medium">
-                Basic Information
-              </h3>
+              <h3 className="text-base font-medium">Basic Information</h3>
 
               <p className="mt-1 text-xs text-neutral-500">
                 Update the main information about your product
@@ -427,9 +494,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                 <input
                   type="text"
                   value={productName}
-                  onChange={(e) =>
-                    setProductName(e.target.value)
-                  }
+                  onChange={(e) => setProductName(e.target.value)}
                   placeholder="Enter product name"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                 />
@@ -442,9 +507,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
                 <textarea
                   value={productDescription}
-                  onChange={(e) =>
-                    setProductDescription(e.target.value)
-                  }
+                  onChange={(e) => setProductDescription(e.target.value)}
                   placeholder="Enter product description"
                   rows={5}
                   className="w-full resize-none rounded-lg border border-neutral-800 bg-[#12151a] px-4 py-3 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
@@ -458,18 +521,14 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
                 <select
                   value={productCategory}
-                  onChange={(e) =>
-                    setProductCategory(e.target.value)
-                  }
+                  onChange={(e) => setProductCategory(e.target.value)}
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none focus:border-neutral-500"
                 >
                   <option value="">Select category</option>
                   <option value="Shirts">Shirts</option>
                   <option value="Pants">Pants</option>
                   <option value="Jackets">Jackets</option>
-                  <option value="Innerwear">
-                    Innerwear
-                  </option>
+                  <option value="Innerwear">Innerwear</option>
                   <option value="Shorts">Shorts</option>
                   <option value="T-Shirts">T-Shirts</option>
                 </select>
@@ -518,9 +577,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                           <button
                             type="button"
                             key={brand._id}
-                            onClick={() =>
-                              handleSelectedBrand(brand)
-                            }
+                            onClick={() => handleSelectedBrand(brand)}
                             className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-neutral-800"
                           >
                             <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-[#0d0f12]">
@@ -532,9 +589,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                                 />
                               ) : (
                                 <span className="text-xs text-neutral-600">
-                                  {brand.brandName
-                                    ?.charAt(0)
-                                    ?.toUpperCase()}
+                                  {brand.brandName?.charAt(0)?.toUpperCase()}
                                 </span>
                               )}
                             </div>
@@ -554,8 +609,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                             <FiCheck
                               size={16}
                               className={
-                                selectBrand?._id ===
-                                brand._id
+                                selectBrand?._id === brand._id
                                   ? "text-white"
                                   : "text-transparent"
                               }
@@ -574,8 +628,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                         </p>
 
                         <p className="mt-2 text-xs text-neutral-700">
-                          Create this brand from the Brand
-                          section first.
+                          Create this brand from the Brand section first.
                         </p>
                       </div>
                     )}
@@ -598,9 +651,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                           />
                         ) : (
                           <span className="text-sm text-neutral-500">
-                            {selectBrand.brandName
-                              ?.charAt(0)
-                              ?.toUpperCase()}
+                            {selectBrand.brandName?.charAt(0)?.toUpperCase()}
                           </span>
                         )}
                       </div>
@@ -620,18 +671,13 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                       </div>
                     </div>
 
-                    <FiCheck
-                      size={18}
-                      className="ml-4 text-green-500"
-                    />
+                    <FiCheck size={18} className="ml-4 text-green-500" />
                   </div>
                 ) : (
                   <div className="flex w-full items-center justify-between rounded-xl border border-red-500/10 bg-red-500/[0.03] px-4 py-3 md:w-auto md:min-w-[300px]">
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-dashed border-neutral-800 bg-[#0d0f12]">
-                        <span className="text-xs text-neutral-700">
-                          No
-                        </span>
+                        <span className="text-xs text-neutral-700">No</span>
                       </div>
 
                       <div>
@@ -652,9 +698,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
           <section className="border-t border-neutral-800 pt-8">
             <div className="mb-5">
-              <h3 className="text-base font-medium">
-                Pricing & Inventory
-              </h3>
+              <h3 className="text-base font-medium">Pricing & Inventory</h3>
 
               <p className="mt-1 text-xs text-neutral-500">
                 Update pricing and inventory information
@@ -675,10 +719,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                     const value = e.target.value;
 
                     setProductPrice(value);
-                    calculateDiscount(
-                      productRealPrice,
-                      value,
-                    );
+                    calculateDiscount(productRealPrice, value);
                   }}
                   placeholder="0.00"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
@@ -698,10 +739,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                     const value = e.target.value;
 
                     setProductRealPrice(value);
-                    calculateDiscount(
-                      value,
-                      productPrice,
-                    );
+                    calculateDiscount(value, productPrice);
                   }}
                   placeholder="0.00"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
@@ -736,9 +774,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                 <input
                   type="text"
                   value={sku}
-                  onChange={(e) =>
-                    setSku(e.target.value)
-                  }
+                  onChange={(e) => setSku(e.target.value)}
                   placeholder="ME-SHIRT-001"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm uppercase outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                 />
@@ -749,9 +785,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
           <section className="border-t border-neutral-800 pt-8">
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-medium">
-                  Product Variants
-                </h3>
+                <h3 className="text-base font-medium">Product Variants</h3>
 
                 <p className="mt-1 text-xs text-neutral-500">
                   Add colors and stock for each size
@@ -782,9 +816,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                     {variants.length > 1 && (
                       <button
                         type="button"
-                        onClick={() =>
-                          removeVariant(variantIndex)
-                        }
+                        onClick={() => removeVariant(variantIndex)}
                         className="flex items-center gap-2 text-xs text-neutral-500 transition hover:text-white"
                       >
                         <FiTrash2 size={15} />
@@ -803,10 +835,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                         type="text"
                         value={variant.color.name}
                         onChange={(e) =>
-                          updateColor(
-                            variantIndex,
-                            e.target.value,
-                          )
+                          updateColor(variantIndex, e.target.value)
                         }
                         placeholder="Black"
                         className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
@@ -822,17 +851,12 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                         <input
                           type="color"
                           value={
-                            /^#[0-9A-Fa-f]{6}$/.test(
-                              variant.color.code,
-                            )
+                            /^#[0-9A-Fa-f]{6}$/.test(variant.color.code)
                               ? variant.color.code
                               : "#000000"
                           }
                           onChange={(e) =>
-                            updateColorCode(
-                              variantIndex,
-                              e.target.value,
-                            )
+                            updateColorCode(variantIndex, e.target.value)
                           }
                           className="h-8 w-10 cursor-pointer rounded border-0 bg-transparent p-0"
                         />
@@ -841,10 +865,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                           type="text"
                           value={variant.color.code}
                           onChange={(e) =>
-                            updateColorCode(
-                              variantIndex,
-                              e.target.value,
-                            )
+                            updateColorCode(variantIndex, e.target.value)
                           }
                           placeholder="#000000"
                           maxLength={7}
@@ -864,9 +885,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                         Variant Stock:{" "}
                         <span className="text-white">
                           {variant.sizes.reduce(
-                            (total, size) =>
-                              total +
-                              Number(size.stock || 0),
+                            (total, size) => total + Number(size.stock || 0),
                             0,
                           )}
                         </span>
@@ -874,68 +893,66 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-                      {variant.sizes.map(
-                        (sizeItem, sizeIndex) => (
-                          <div
-                            key={sizeItem.size}
-                            className="rounded-lg border border-neutral-800 bg-[#0d0f12] p-3"
-                          >
-                            <div className="mb-2 flex items-center justify-between">
-                              <span className="text-sm font-medium">
-                                {sizeItem.size}
-                              </span>
+                      {variant.sizes.map((sizeItem, sizeIndex) => (
+                        <div
+                          key={sizeItem.size}
+                          className="rounded-lg border border-neutral-800 bg-[#0d0f12] p-3"
+                        >
+                          <div className="mb-2 flex items-center justify-between">
+                            <span className="text-sm font-medium">
+                              {sizeItem.size}
+                            </span>
 
-                              <span className="text-[10px] uppercase tracking-wider text-neutral-600">
-                                Stock
-                              </span>
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  updateStock(
-                                    variantIndex,
-                                    sizeIndex,
-                                    sizeItem.stock - 1,
-                                  )
-                                }
-                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
-                              >
-                                <FiMinus size={13} />
-                              </button>
-
-                              <input
-                                type="number"
-                                min="0"
-                                value={sizeItem.stock}
-                                onChange={(e) =>
-                                  updateStock(
-                                    variantIndex,
-                                    sizeIndex,
-                                    e.target.value,
-                                  )
-                                }
-                                className="h-8 min-w-0 w-full rounded-md border border-neutral-800 bg-[#111419] text-center text-xs outline-none focus:border-neutral-600"
-                              />
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  updateStock(
-                                    variantIndex,
-                                    sizeIndex,
-                                    sizeItem.stock + 1,
-                                  )
-                                }
-                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
-                              >
-                                <FiPlus size={13} />
-                              </button>
-                            </div>
+                            <span className="text-[10px] uppercase tracking-wider text-neutral-600">
+                              Stock
+                            </span>
                           </div>
-                        ),
-                      )}
+
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateStock(
+                                  variantIndex,
+                                  sizeIndex,
+                                  sizeItem.stock - 1,
+                                )
+                              }
+                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
+                            >
+                              <FiMinus size={13} />
+                            </button>
+
+                            <input
+                              type="number"
+                              min="0"
+                              value={sizeItem.stock}
+                              onChange={(e) =>
+                                updateStock(
+                                  variantIndex,
+                                  sizeIndex,
+                                  e.target.value,
+                                )
+                              }
+                              className="h-8 min-w-0 w-full rounded-md border border-neutral-800 bg-[#111419] text-center text-xs outline-none focus:border-neutral-600"
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateStock(
+                                  variantIndex,
+                                  sizeIndex,
+                                  sizeItem.stock + 1,
+                                )
+                              }
+                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
+                            >
+                              <FiPlus size={13} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -944,26 +961,146 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
             <div className="mt-5 flex items-center justify-between rounded-xl border border-neutral-800 bg-[#111419] px-5 py-4">
               <div>
-                <p className="text-sm font-medium">
-                  Total Product Stock
-                </p>
+                <p className="text-sm font-medium">Total Product Stock</p>
 
                 <p className="mt-1 text-xs text-neutral-500">
                   Combined stock across all colors and sizes
                 </p>
               </div>
 
-              <span className="text-2xl font-semibold">
-                {getTotalStock()}
-              </span>
+              <span className="text-2xl font-semibold">{getTotalStock()}</span>
+            </div>
+          </section>
+
+          <section className="border-t border-neutral-800 pt-8">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-medium">Product Details</h3>
+
+                <p className="mt-1 text-xs text-neutral-500">
+                  Select a detail and then select its value
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={addDetail}
+                disabled={getUsedDetailKeys().length >= detailOptions.length}
+                className="flex items-center gap-2 rounded-lg border border-neutral-700 px-3 py-2 text-sm transition hover:border-neutral-500 hover:bg-neutral-900 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <FiPlus size={16} />
+                Add Detail
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {details.map((detail, index) => {
+                const selectedDetail = getSelectedDetail(detail.key);
+
+                const usedKeys = getUsedDetailKeys();
+
+                return (
+                  <div
+                    key={index}
+                    className="grid grid-cols-1 gap-4 rounded-xl border border-neutral-800 bg-[#111419] p-4 md:grid-cols-[1fr_2fr_auto]"
+                  >
+                    <div>
+                      <label className="mb-2 block text-sm text-neutral-300">
+                        Detail Name
+                      </label>
+
+                      <select
+                        value={detail.key}
+                        onChange={(e) => updateDetailKey(index, e.target.value)}
+                        className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none focus:border-neutral-500"
+                      >
+                        <option value="">Select detail</option>
+
+                        {detailOptions.map((option) => (
+                          <option
+                            key={option.key}
+                            value={option.key}
+                            disabled={
+                              usedKeys.includes(option.key) &&
+                              option.key !== detail.key
+                            }
+                          >
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-neutral-300">
+                        Detail Value
+                      </label>
+
+                      {selectedDetail && selectedDetail.options.length > 0 ? (
+                        <select
+                          value={detail.value}
+                          onChange={(e) =>
+                            updateDetailValue(index, e.target.value)
+                          }
+                          disabled={!detail.key}
+                          className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none focus:border-neutral-500 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <option value="">
+                            Select {selectedDetail.label.toLowerCase()}
+                          </option>
+
+                          {selectedDetail.options.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          value={detail.value}
+                          onChange={(e) =>
+                            updateDetailValue(index, e.target.value)
+                          }
+                          disabled={!detail.key}
+                          placeholder={
+                            detail.key
+                              ? "Enter detail value"
+                              : "Select detail first"
+                          }
+                          className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500 disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                      )}
+                    </div>
+
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={() => removeDetail(index)}
+                        disabled={details.length === 1}
+                        className="flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-neutral-800 px-4 text-sm text-neutral-400 transition hover:border-red-500/40 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30 md:w-11 md:px-0"
+                      >
+                        <FiTrash2 size={15} />
+
+                        <span className="md:hidden">Remove</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-4 rounded-lg border border-neutral-800 bg-[#111419] px-4 py-3">
+              <p className="text-xs text-neutral-500">
+                Example: Fit → Regular Fit, Sleeve → Half Sleeve, Material →
+                Cotton, Pattern → Solid.
+              </p>
             </div>
           </section>
 
           <section className="border-t border-neutral-800 pt-8">
             <div className="mb-5">
-              <h3 className="text-base font-medium">
-                Product Images
-              </h3>
+              <h3 className="text-base font-medium">Product Images</h3>
 
               <p className="mt-1 text-xs text-neutral-500">
                 Upload new product images
@@ -972,15 +1109,10 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
             <label className="flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-neutral-700 bg-[#111419] transition hover:border-neutral-500 hover:bg-[#14171c]">
               <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-neutral-800 bg-[#0d0f12]">
-                <FiUpload
-                  size={20}
-                  className="text-neutral-400"
-                />
+                <FiUpload size={20} className="text-neutral-400" />
               </div>
 
-              <p className="text-sm text-neutral-300">
-                Click to upload images
-              </p>
+              <p className="text-sm text-neutral-300">Click to upload images</p>
 
               <p className="mt-1 text-xs text-neutral-600">
                 PNG, JPG, JPEG or WEBP
@@ -999,9 +1131,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
               <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {productImage.map((image, index) => {
                   const imageUrl =
-                    image instanceof File
-                      ? URL.createObjectURL(image)
-                      : image;
+                    image instanceof File ? URL.createObjectURL(image) : image;
 
                   return (
                     <div
@@ -1016,18 +1146,14 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
                       <button
                         type="button"
-                        onClick={() =>
-                          removeImage(index)
-                        }
+                        onClick={() => removeImage(index)}
                         className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-md bg-black/80 text-neutral-300 opacity-0 transition group-hover:opacity-100 hover:text-white"
                       >
                         <FiTrash2 size={15} />
                       </button>
 
                       <div className="absolute bottom-0 left-0 right-0 truncate bg-black/70 px-2 py-2 text-[10px] text-neutral-300">
-                        {image instanceof File
-                          ? image.name
-                          : "Existing image"}
+                        {image instanceof File ? image.name : "Existing image"}
                       </div>
                     </div>
                   );
@@ -1038,9 +1164,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
           <section className="border-t border-neutral-800 pt-8">
             <div className="mb-5">
-              <h3 className="text-base font-medium">
-                Product Status
-              </h3>
+              <h3 className="text-base font-medium">Product Status</h3>
             </div>
 
             <div className="flex flex-wrap gap-3">

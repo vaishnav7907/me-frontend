@@ -15,8 +15,10 @@ const ProductGrid = () => {
     setProductUpdateModal,
     productDltModal,
     setProductDltModal,
-     productDeleteName, setProductDeleteName,
-     productDeleteBrand, setProductDeleteBrand
+    productDeleteName,
+    setProductDeleteName,
+    productDeleteBrand,
+    setProductDeleteBrand,
   } = UseMe();
 
   const getAllProducts = async () => {
@@ -164,9 +166,9 @@ const ProductGrid = () => {
                     {productData.brand && (
                       <div className="mb-2 flex items-center gap-2">
                         <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md border border-white/[0.08] bg-white">
-                          {productData.brand.brandIcon ? (
+                          {productData.brand.brandIcon?.url ? (
                             <img
-                              src={productData.brand.brandIcon}
+                              src={productData.brand.brandIcon.url}
                               alt={productData.brand.brandName}
                               className="h-full w-full object-contain p-1"
                             />

@@ -296,7 +296,10 @@ const PremiumShirts = () => {
                           {shirtData.discount}% Off
                         </span>
                       )}
-                      <button className="opacity-0 group-hover:opacity-100 duration-500 border-b border-white ml-auto">
+                      <button
+                        className="opacity-0 group-hover:opacity-100 duration-500 border-b border-white ml-auto"
+                        onClick={() => navigate("/productInfo")}
+                      >
                         View
                       </button>
                     </div>
@@ -339,7 +342,6 @@ const PremiumShirts = () => {
           </div>
 
           <div className="flex gap-6 overflow-x-auto pt-6 pb-6 snap-x snap-mandatory scrollbar-thin">
-            {" "}
             {latestArrivalsShirts.map((data, index) => (
               <motion.div
                 key={data._id}

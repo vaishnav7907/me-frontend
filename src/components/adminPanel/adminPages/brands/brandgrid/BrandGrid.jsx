@@ -23,7 +23,7 @@ const BrandGrid = () => {
         `${import.meta.env.VITE_API_URL}/Me/getBrand`,
       );
 
-      setGetBrands(getBrandsFn.data.brand);
+      setGetBrands(getBrandsFn.data.brand || []);
 
       console.log("get all brands", getBrandsFn.data.brand);
     } catch (error) {
@@ -148,7 +148,7 @@ const BrandGrid = () => {
                   title="Delete brand"
                   onClick={() => {
                     setBrandDeleteName(brand.brandName);
-                    setBrandDeleteIcon(brand.brandIcon);
+                    setBrandDeleteIcon(brand.brandIcon?.url);
                     setBrandId(brand._id);
                     setBrandDeleteModal(true);
                   }}
