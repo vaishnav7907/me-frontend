@@ -56,7 +56,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
   const [getBrands, setGetBrands] = useState([]);
   const [selectBrand, setSelectBrand] = useState(null);
   const [brandsLoading, setBrandsLoading] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const [variants, setVariants] = useState([createEmptyVariant()]);
 
   const addVariant = () => {
@@ -149,25 +149,6 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
     setProductImage((prev) => prev.filter((_, index) => index !== imageIndex));
   };
 
-  const [details, setDetails] = useState([
-    {
-      key: "",
-      value: "",
-    },
-  ]);
-
-  const detailOptions = [
-    { key: "fit", label: "Fit" },
-    { key: "sleeve", label: "Sleeve" },
-    { key: "neck", label: "Neck" },
-    { key: "collar", label: "Collar" },
-    { key: "pattern", label: "Pattern" },
-    { key: "material", label: "Material" },
-    { key: "stretch", label: "Stretch" },
-    { key: "occasion", label: "Occasion" },
-    { key: "style", label: "Style" },
-  ];
-
   useEffect(() => {
     const getAllBrands = async () => {
       try {
@@ -253,6 +234,14 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
     setDiscount(Math.round(discountValue));
   };
 
+  // add details section key value details
+  const [details, setDetails] = useState([
+    {
+      key: "",
+      value: "",
+    },
+  ]);
+
   const addDetails = () => {
     setDetails((prev) => [
       ...prev,
@@ -275,45 +264,18 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
         i === index
           ? {
               ...detail,
-              value,
+              key: value,
             }
           : detail,
       ),
     );
   };
-
   const updateDetailValue = (index, value) => {
     setDetails((prev) =>
-      prev.map((detail, i) =>
-        i === index
-          ? {
-              ...detail,
-              value,
-            }
-          : detail,
-      ),
+      prev.map((detail, i) => (i === index ? { ...detail, value } : detail)),
     );
   };
 
-  const getAvailabelOptions = (currentIndex) => {
-    const selectKeys = details
-      .filter((_, index) => index === currentIndex)
-      .map((detail) => detail.key)
-      .filter(Boolean);
-
-    return detailOptions.filter((option) => selectKeys.includes(option.key));
-  };
-
-  const createDetailsObject = () => {
-    const formatedDetails = {};
-    details.forEach((detail) => {
-      if (detail.key && detail.value.trim()) {
-        formatedDetails[detail.key] = detail.value.trim();
-      }
-    });
-
-    return formatedDetails;
-  };
   const resetForm = () => {
     setProductName("");
     setProductDescription("");
@@ -340,68 +302,84 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
   const updateProducts = async (e) => {
     e.preventDefault();
+    if (!productId) {
+      alert("Product ID is missing");
+      return;
+    }
+
+    if (!selectBrand?._id) {
+      alert("Please select a valid brand");
+      return;
+    }
+
+    if (!productName.trim()) {
+      alert("Product name is required");
+      return;
+    }
+
+    if (!productDescription.trim()) {
+      alert("Product description is required");
+      return;
+    }
+
+    if (!productCategory) {
+      alert("Please select a category");
+      return;
+    }
+
+    if (!productPrice || !productRealPrice) {
+      alert("Price is required");
+      return;
+    }
+
+    if (!sku.trim()) {
+      alert("SKU is required");
+      return;
+    }
+
+    const incompleteDetails = details.some(
+      (detail) =>
+        (detail.key.trim() && !detail.value.trim()) ||
+        (!detail.key.trim() && detail.value.trim()),
+    );
+    if (incompleteDetails) {
+      alert("Please complete every product detail");
+      return;
+    }
+
+    const detailKeys = details
+      .map((detail) => detail.key.trim().toLowerCase())
+      .filter(Boolean);
+    const duplicateDetails = detailKeys.length !== new Set(detailKeys).size;
+    if (duplicateDetails) {
+      alert("You cannot use the same detail key more than once");
+      return;
+    }
+
+    const cleanedVariants = variants.map((variant) => ({
+      color: {
+        name: variant.color.name,
+        code: variant.color.code,
+      },
+      sizes: variant.sizes.map((size) => ({
+        size: size.size,
+        stock: Number(size.stock) || 0,
+      })),
+      images: (variant.images || []).map((image) => {
+        if (typeof image === "string") {
+          return image;
+        }
+
+        return image.url;
+      }),
+    }));
     try {
-      if (!productId) {
-        alert("Product ID is missing");
-        return;
-      }
-
-      if (!selectBrand?._id) {
-        alert("Please select a valid brand");
-        return;
-      }
-
-      if (!productName.trim()) {
-        alert("Product name is required");
-        return;
-      }
-
-      if (!productDescription.trim()) {
-        alert("Product description is required");
-        return;
-      }
-
-      if (!productCategory) {
-        alert("Please select a category");
-        return;
-      }
-
-      if (!productPrice || !productRealPrice) {
-        alert("Price is required");
-        return;
-      }
-
-      if (!sku.trim()) {
-        alert("SKU is required");
-        return;
-      }
-
-      const incompleteDetails = details.some(
-        (detail) => !detail.key || !detail.value.trim(),
-      );
-
-      if (incompleteDetails) {
-        alert("Please complete every product detail");
-        return;
-      }
-
-      const cleanedVariants = variants.map((variant) => ({
-        color: {
-          name: variant.color.name,
-          code: variant.color.code,
-        },
-        sizes: variant.sizes.map((size) => ({
-          size: size.size,
-          stock: Number(size.stock) || 0,
-        })),
-        images: (variant.images || []).map((image) => {
-          if (typeof image === "string") {
-            return image;
-          }
-
-          return image.url;
-        }),
-      }));
+      const detailsObject = details.reduce((result, item) => {
+        if (item.key && item.value) {
+          result[item.key] = item.value;
+        }
+        return result;
+      }, {});
 
       const formData = new FormData();
 
@@ -414,7 +392,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
       formData.append("brand", selectBrand._id);
       formData.append("sku", sku.trim().toUpperCase());
       formData.append("status", status);
-
+      formData.append("details", JSON.stringify(detailsObject));
       formData.append("variants", JSON.stringify(cleanedVariants));
 
       productImage.forEach((image) => {
@@ -428,7 +406,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
       console.log("CLEANED VARIANTS:", cleanedVariants);
 
       const adminToken = localStorage.getItem("token");
-
+      setLoading(true);
       const response = await axios.patch(
         `${import.meta.env.VITE_API_URL}/Me/updateProduct/${productId}`,
         formData,
@@ -451,6 +429,8 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
       console.log("UPDATE ERROR:", error.response?.data || error.message);
 
       alert(error.response?.data?.message || "Product update failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -976,124 +956,66 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
             <div className="mb-5 flex items-center justify-between">
               <div>
                 <h3 className="text-base font-medium">Product Details</h3>
-
                 <p className="mt-1 text-xs text-neutral-500">
-                  Select a detail and then select its value
+                  Add custom product information using key and value
                 </p>
               </div>
-
               <button
                 type="button"
-                onClick={addDetail}
-                disabled={getUsedDetailKeys().length >= detailOptions.length}
-                className="flex items-center gap-2 rounded-lg border border-neutral-700 px-3 py-2 text-sm transition hover:border-neutral-500 hover:bg-neutral-900 disabled:cursor-not-allowed disabled:opacity-40"
+                onClick={addDetails}
+                className="flex items-center gap-2 rounded-lg border border-neutral-700 px-3 py-2 text-sm transition hover:border-neutral-500 hover:bg-neutral-900"
               >
-                <FiPlus size={16} />
-                Add Detail
+                <FiPlus size={16} /> Add Details
               </button>
             </div>
-
             <div className="space-y-3">
-              {details.map((detail, index) => {
-                const selectedDetail = getSelectedDetail(detail.key);
-
-                const usedKeys = getUsedDetailKeys();
-
-                return (
-                  <div
-                    key={index}
-                    className="grid grid-cols-1 gap-4 rounded-xl border border-neutral-800 bg-[#111419] p-4 md:grid-cols-[1fr_2fr_auto]"
-                  >
-                    <div>
-                      <label className="mb-2 block text-sm text-neutral-300">
-                        Detail Name
-                      </label>
-
-                      <select
-                        value={detail.key}
-                        onChange={(e) => updateDetailKey(index, e.target.value)}
-                        className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none focus:border-neutral-500"
-                      >
-                        <option value="">Select detail</option>
-
-                        {detailOptions.map((option) => (
-                          <option
-                            key={option.key}
-                            value={option.key}
-                            disabled={
-                              usedKeys.includes(option.key) &&
-                              option.key !== detail.key
-                            }
-                          >
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="mb-2 block text-sm text-neutral-300">
-                        Detail Value
-                      </label>
-
-                      {selectedDetail && selectedDetail.options.length > 0 ? (
-                        <select
-                          value={detail.value}
-                          onChange={(e) =>
-                            updateDetailValue(index, e.target.value)
-                          }
-                          disabled={!detail.key}
-                          className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none focus:border-neutral-500 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          <option value="">
-                            Select {selectedDetail.label.toLowerCase()}
-                          </option>
-
-                          {selectedDetail.options.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <input
-                          type="text"
-                          value={detail.value}
-                          onChange={(e) =>
-                            updateDetailValue(index, e.target.value)
-                          }
-                          disabled={!detail.key}
-                          placeholder={
-                            detail.key
-                              ? "Enter detail value"
-                              : "Select detail first"
-                          }
-                          className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500 disabled:cursor-not-allowed disabled:opacity-50"
-                        />
-                      )}
-                    </div>
-
-                    <div className="flex items-end">
-                      <button
-                        type="button"
-                        onClick={() => removeDetail(index)}
-                        disabled={details.length === 1}
-                        className="flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-neutral-800 px-4 text-sm text-neutral-400 transition hover:border-red-500/40 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30 md:w-11 md:px-0"
-                      >
-                        <FiTrash2 size={15} />
-
-                        <span className="md:hidden">Remove</span>
-                      </button>
-                    </div>
+              {details.map((detail, index) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-1 gap-4 rounded-xl border border-neutral-800 bg-[#111419] p-4 md:grid-cols-[1fr_2fr_auto]"
+                >
+                  <div>
+                    <label className="mb-2 block text-sm text-neutral-300">
+                      Key
+                    </label>
+                    <input
+                      type="text"
+                      value={detail.key}
+                      onChange={(e) => updateDetailKey(index, e.target.value)}
+                      placeholder="Example: Fit"
+                      className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                    />
                   </div>
-                );
-              })}
+                  <div>
+                    <label className="mb-2 block text-sm text-neutral-300">
+                      Value
+                    </label>
+                    <input
+                      type="text"
+                      value={detail.value}
+                      onChange={(e) => updateDetailValue(index, e.target.value)}
+                      placeholder="Example: Regular Fit"
+                      className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      onClick={() => removeDetails(index)}
+                      disabled={details.length === 1}
+                      className="flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-neutral-800 px-4 text-sm text-neutral-400 transition hover:border-red-500/40 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30 md:w-11 md:px-0"
+                    >
+                      <FiTrash2 size={15} />
+                      <span className="md:hidden"> Remove </span>
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-
             <div className="mt-4 rounded-lg border border-neutral-800 bg-[#111419] px-4 py-3">
               <p className="text-xs text-neutral-500">
-                Example: Fit → Regular Fit, Sleeve → Half Sleeve, Material →
-                Cotton, Pattern → Solid.
+                Example: Fit → Regular Fit, Material → Cotton, Pattern → Solid,
+                Wash Care → Machine Wash.
               </p>
             </div>
           </section>
@@ -1198,9 +1120,10 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
           <button
             type="button"
             onClick={updateProducts}
-            className="rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition hover:bg-neutral-200"
+            disabled={loading}
+            className="rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Update Product
+            {loading ? "Creating..." : "Add Product"}
           </button>
         </div>
       </div>
