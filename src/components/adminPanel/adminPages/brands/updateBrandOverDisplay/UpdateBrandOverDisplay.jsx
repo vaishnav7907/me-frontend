@@ -13,9 +13,14 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
 
   const [brandImage, setBrandImage] = useState(null);
   const [brandImagePreview, setBrandImagePreview] = useState("");
-
+const [removeBrandIcon, setRemoveBrandIcon] = useState(false);
+const [removeBrandBackground, setRemoveBrandBackground] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingBrand, setLoadingBrand] = useState(true);
+
+  const [originalBrandName, setOriginalBrandName] = useState("");
+  const [originalBrandSlogan, setOriginalBrandSlogan] = useState("");
+  const [originalStatus, setOriginalStatus] = useState("");
 
   const { brandId } = UseMe();
 
@@ -32,6 +37,10 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
       setBrandName(brand.brandName || "");
       setBrandSlogan(brand.brandSlogan || "");
       setStatus(brand.status || "Active");
+
+      setOriginalBrandName(brand.brandName || "");
+      setOriginalBrandSlogan(brand.brandSlogan || "");
+      setOriginalStatus(brand.status || "Active");
 
       setPreview(brand.brandIcon?.url || "");
       setBrandImagePreview(brand.brandImage?.url || "");
@@ -60,11 +69,13 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
 
     setBrandIcon(file);
     setPreview(URL.createObjectURL(file));
+    setRemoveBrandIcon(false)
   };
 
   const removeImage = () => {
     setBrandIcon(null);
     setPreview("");
+     setRemoveBrandIcon(true);
   };
 
   const onChangeBrandImage = (e) => {
@@ -76,11 +87,13 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
 
     setBrandImage(file);
     setBrandImagePreview(URL.createObjectURL(file));
+    setRemoveBrandBackground(false);
   };
 
   const removeBrandImage = () => {
     setBrandImage(null);
     setBrandImagePreview("");
+     setRemoveBrandBackground(true);
   };
 
   const updateBrand = async () => {
@@ -91,9 +104,18 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
 
       const formData = new FormData();
 
-      formData.append("brandName", brandName);
-      formData.append("brandSlogan", brandSlogan);
-      formData.append("status", status);
+      if(brandName !== originalBrandName){
+        formData.append("brandName", brandName);
+      }
+
+      if(brandSlogan !== originalBrandSlogan){
+        formData.append("brandSlogan", brandSlogan);
+      }
+
+      if(status !== originalStatus){
+        formData.append("status", status);
+      }
+
 
       if (brandIcon instanceof File) {
         formData.append("brandIcon", brandIcon);
@@ -102,6 +124,19 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
       if (brandImage instanceof File) {
         formData.append("brandImage", brandImage);
       }
+       if (removeBrandIcon) {
+      formData.append("removeBrandIcon", "true");
+    }
+
+    if (removeBrandBackground) {
+      formData.append("removeBrandBackground", "true");
+    }
+
+    if ([...formData.entries()].length === 0) {
+      alert("No changes made");
+      setLoading(false);
+      return;
+    }
 
       const updtBrandApi = await axios.patch(
         `${import.meta.env.VITE_API_URL}/Me/updateBrands/${brandId}`,
@@ -113,10 +148,7 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
         },
       );
 
-      console.log(
-        "updated brands details",
-        updtBrandApi.data,
-      );
+      console.log("updated brands details", updtBrandApi.data);
 
       if (updtBrandApi.data.success) {
         alert("Brand updated successfully");
@@ -150,9 +182,7 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
       <div className="max-h-[94vh] w-full max-w-6xl overflow-y-auto rounded-2xl border border-neutral-800 bg-[#0d0f12] text-white shadow-2xl">
         <div className="sticky top-0 z-20 flex items-center justify-between border-b border-neutral-800 bg-[#0d0f12] px-6 py-5">
           <div>
-            <h2 className="text-xl font-semibold">
-              Update Brand
-            </h2>
+            <h2 className="text-xl font-semibold">Update Brand</h2>
 
             <p className="mt-1 text-sm text-neutral-500">
               Update your brand details and images
@@ -181,9 +211,7 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <section className="rounded-xl border border-neutral-800 bg-[#111419] p-5">
                   <div className="mb-5">
-                    <h3 className="text-base font-medium">
-                      Brand Information
-                    </h3>
+                    <h3 className="text-base font-medium">Brand Information</h3>
 
                     <p className="mt-1 text-xs text-neutral-500">
                       Update the main information about your brand
@@ -200,9 +228,7 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
                         type="text"
                         placeholder="Enter brand name"
                         value={brandName}
-                        onChange={(e) =>
-                          setBrandName(e.target.value)
-                        }
+                        onChange={(e) => setBrandName(e.target.value)}
                         className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                       />
                     </div>
@@ -215,9 +241,7 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
                       <textarea
                         placeholder="Enter brand slogan"
                         value={brandSlogan}
-                        onChange={(e) =>
-                          setBrandSlogan(e.target.value)
-                        }
+                        onChange={(e) => setBrandSlogan(e.target.value)}
                         rows={4}
                         className="w-full resize-none rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 py-3 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                       />
@@ -250,9 +274,7 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
 
                 <section className="rounded-xl border border-neutral-800 bg-[#111419] p-5">
                   <div className="mb-5">
-                    <h3 className="text-base font-medium">
-                      Brand Icon
-                    </h3>
+                    <h3 className="text-base font-medium">Brand Icon</h3>
 
                     <p className="mt-1 text-xs text-neutral-500">
                       Upload a new logo or keep the existing one
@@ -261,10 +283,7 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
 
                   <label className="flex min-h-[210px] cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-neutral-700 bg-[#0d0f12] transition hover:border-neutral-500 hover:bg-[#14171c]">
                     <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-neutral-800 bg-[#111419]">
-                      <FiUpload
-                        size={20}
-                        className="text-neutral-400"
-                      />
+                      <FiUpload size={20} className="text-neutral-400" />
                     </div>
 
                     <p className="text-sm text-neutral-300">
@@ -315,9 +334,7 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
                             className="h-full w-full object-contain p-2"
                           />
                         ) : (
-                          <span className="text-xs text-neutral-400">
-                            Logo
-                          </span>
+                          <span className="text-xs text-neutral-400">Logo</span>
                         )}
                       </div>
 
@@ -351,17 +368,13 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
                     </h3>
 
                     <p className="mt-1 text-xs text-neutral-500">
-                      Upload a new image or keep the existing
-                      background
+                      Upload a new image or keep the existing background
                     </p>
                   </div>
 
                   <label className="flex min-h-[250px] cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-neutral-700 bg-[#0d0f12] transition hover:border-neutral-500 hover:bg-[#14171c]">
                     <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-neutral-800 bg-[#111419]">
-                      <FiUpload
-                        size={20}
-                        className="text-neutral-400"
-                      />
+                      <FiUpload size={20} className="text-neutral-400" />
                     </div>
 
                     <p className="text-sm text-neutral-300">
@@ -427,9 +440,7 @@ const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
                       <div className="absolute inset-0 bg-black/40" />
 
                       <div className="absolute left-5 top-5">
-                        <span className="text-sm text-white">
-                          Brand
-                        </span>
+                        <span className="text-sm text-white">Brand</span>
                       </div>
 
                       {preview && (
