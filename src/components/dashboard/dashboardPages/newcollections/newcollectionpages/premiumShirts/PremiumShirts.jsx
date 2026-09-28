@@ -267,15 +267,28 @@ const PremiumShirts = () => {
                   transition={{ duration: 0.6, delay: index * 0.12 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -5 }}
+                  onClick={() =>
+                    navigate("/productInfo", { state: { product: shirtData } })
+                  }
                 >
                   <img
                     src={shirtData.variants?.[0]?.images?.[0]?.url}
                     alt={shirtData.name}
                     className={`w-full h-full object-cover duration-700 group-hover:scale-110 ${large ? "h-[666px]" : "h-[330px]"}`}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />{" "}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                   <span className="absolute top-5 left-5 bg-white text-black text-[10px] tracking-[0.3em] px-3 py-2 uppercase">
                     New
+                  </span>
+
+                  <span className="absolute top-5 right-5 bg-white text-black text-[10px] tracking-[0.3em] px-3 py-2 uppercase">
+                    <div className="h-4 w-4 overflow-hidden">
+                      <img
+                        src={shirtData.brand?.brandIcon?.url}
+                        alt={shirtData.brand?.brandName || "Brand"}
+                        className="w-full h-full object-cover overflow-hidden"
+                      />
+                    </div>
                   </span>
                   <div className="absolute bottom-7 left-7 right-7">
                     <p className="tracking-[0.25em] uppercase text-xs text-neutral-300">
@@ -298,7 +311,11 @@ const PremiumShirts = () => {
                       )}
                       <button
                         className="opacity-0 group-hover:opacity-100 duration-500 border-b border-white ml-auto"
-                        onClick={() => navigate("/productInfo")}
+                        onClick={() =>
+                          navigate("/productInfo", {
+                            state: { product: shirtData._id },
+                          })
+                        }
                       >
                         View
                       </button>

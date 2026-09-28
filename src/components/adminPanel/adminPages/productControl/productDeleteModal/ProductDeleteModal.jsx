@@ -1,5 +1,5 @@
 import axios from "axios";
-import React from "react";
+import React, { useState } from "react";
 import { FiX, FiAlertTriangle, FiTrash2 } from "react-icons/fi";
 import { UseMe } from "../../../../context/Meprovider";
 
@@ -10,8 +10,13 @@ const ProductDeleteModal = ({ oncloseDeleteModal }) => {
     productDeleteName,
   } = UseMe();
 
+const [loading, setLoading] = useState(false);
+
+
   const deleteProduct = async () => {
     try {
+
+      setLoading(true)
       const deleteProductApi = await axios.delete(
         `${import.meta.env.VITE_API_URL}/Me/deleteProduct/${productId}`,
       );
@@ -22,6 +27,8 @@ const ProductDeleteModal = ({ oncloseDeleteModal }) => {
     } catch (error) {
       console.log("error in delete product", error);
       console.log("Server response:", error.response?.data);
+    }finally{
+      setLoading(false)
     }
   };
 
@@ -105,11 +112,16 @@ const ProductDeleteModal = ({ oncloseDeleteModal }) => {
 
           <button
             onClick={deleteProduct}
+             disabled={loading}
             className="flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-600"
           >
             <FiTrash2 size={16} />
-            Delete Product
+           
+
+            {loading ? "Deleting..." : "Delete Product"}
           </button>
+
+         
 
         </div>
       </div>

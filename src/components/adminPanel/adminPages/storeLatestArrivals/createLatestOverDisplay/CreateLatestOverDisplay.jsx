@@ -10,6 +10,8 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
   const [latestArrivalsDescription, setLatestArrivalsDescription] =
     useState("");
 
+  const [loading, setLoading] = useState(false);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
 
@@ -46,16 +48,14 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
     }
 
     try {
+      setLoading(true);
       const adminToken = localStorage.getItem("token");
 
       const formData = new FormData();
 
       formData.append("name", latestArrivalsName.trim());
       formData.append("category", latestArrivalsCategory);
-      formData.append(
-        "description",
-        latestArrivalsDescription.trim()
-      );
+      formData.append("description", latestArrivalsDescription.trim());
       formData.append("latestArrivals", latestArrivalsimage);
 
       const createArrivalsApi = await axios.post(
@@ -65,7 +65,7 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-        }
+        },
       );
 
       if (createArrivalsApi.status === 201) {
@@ -82,10 +82,9 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
     } catch (error) {
       console.error("Create latest arrival error:", error);
 
-      alert(
-        error.response?.data?.message ||
-          "Failed to create latest arrival"
-      );
+      alert(error.response?.data?.message || "Failed to create latest arrival");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -122,9 +121,7 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
                 type="text"
                 placeholder="Example: New Shirts"
                 value={latestArrivalsName}
-                onChange={(e) =>
-                  setLatestArrivalsName(e.target.value)
-                }
+                onChange={(e) => setLatestArrivalsName(e.target.value)}
                 className="h-11 w-full rounded-lg border border-[#2A2E33] bg-[#0B0D10] px-4 text-sm text-white outline-none placeholder:text-gray-600 focus:border-[#555B63]"
               />
             </div>
@@ -136,9 +133,7 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
 
               <select
                 value={latestArrivalsCategory}
-                onChange={(e) =>
-                  setLatestArrivalsCategory(e.target.value)
-                }
+                onChange={(e) => setLatestArrivalsCategory(e.target.value)}
                 className="h-11 w-full rounded-lg border border-[#2A2E33] bg-[#0B0D10] px-4 text-sm text-gray-300 outline-none focus:border-[#555B63]"
               >
                 <option value="" disabled>
@@ -162,9 +157,7 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
               <textarea
                 rows={6}
                 value={latestArrivalsDescription}
-                onChange={(e) =>
-                  setLatestArrivalsDescription(e.target.value)
-                }
+                onChange={(e) => setLatestArrivalsDescription(e.target.value)}
                 placeholder="Write a short description about this collection..."
                 className="w-full resize-none rounded-lg border border-[#2A2E33] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none placeholder:text-gray-600 focus:border-[#555B63]"
               />
@@ -214,9 +207,7 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
                     Upload image
                   </p>
 
-                  <p className="mt-1 text-xs text-gray-600">
-                    PNG, JPG or WEBP
-                  </p>
+                  <p className="mt-1 text-xs text-gray-600">PNG, JPG or WEBP</p>
 
                   <div className="mt-4 flex items-center gap-2 rounded-lg border border-[#30343A] px-3 py-2 text-xs text-gray-400">
                     <FiUpload size={14} />
@@ -245,9 +236,11 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
 
           <button
             onClick={createLatestArrivalsfn}
+            disabled={loading}
             className="rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:bg-gray-200"
           >
-            Create Latest Arrival
+            {loading ? "Creating..." : "Create Latest Arrival"}
+            
           </button>
         </div>
       </div>

@@ -26,20 +26,7 @@ const UpdateLatestArrivals = ({ oncloseUpdateLatestArrivals }) => {
   };
   const updateArrivals = async () => {
     try {
-      if (!latestArrivalssName) {
-        alert("Please Enter Name");
-        return;
-      }
-
-      if (!latestArrivalssCategory) {
-        alert("Please select category");
-        return;
-      }
-
-      if (!latestArrivalssDescription) {
-        alert("Please Enter description");
-        return;
-      }
+      
 
       setLoading(true);
       const adminToken = localStorage.getItem("token");
@@ -59,7 +46,7 @@ const UpdateLatestArrivals = ({ oncloseUpdateLatestArrivals }) => {
         { headers: { Authorization: `Bearer ${adminToken}` } },
       );
 
-      if (updateLatestArrivalsApi.status === 201) {
+      if (updateLatestArrivalsApi.status === 200) {
         alert("Latest arrival Updated successfully");
 
         setLatestArrivalssName("");
