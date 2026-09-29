@@ -81,7 +81,8 @@ const ProductGrid = () => {
 
           const productStatus = getProductStatus(totalStock);
 
-          const productImage = productData.variants?.[0]?.images?.[0]?.url;
+         const productImage =
+  productData.variants?.[0]?.color?.mainImage?.url;
 
           const totalVariants = productData.variants?.length || 0;
 

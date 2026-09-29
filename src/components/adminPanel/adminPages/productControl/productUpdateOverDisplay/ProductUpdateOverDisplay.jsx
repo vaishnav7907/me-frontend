@@ -15,16 +15,15 @@ const createEmptyVariant = () => ({
   color: {
     name: "",
     code: "#000000",
+    mainImage: null,
+    subImages: [],
   },
   sizes: [
-    { size: "XS", stock: 0 },
-    { size: "S", stock: 0 },
-    { size: "M", stock: 0 },
-    { size: "L", stock: 0 },
-    { size: "XL", stock: 0 },
-    { size: "XXL", stock: 0 },
+    {
+      size: "",
+      stock: 0,
+    },
   ],
-  images: [],
 });
 
 const ProductUpdateOverDisplay = ({ closeUpdate }) => {
@@ -42,7 +41,6 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
     setProductPrice,
     productRealPrice,
     setProductRealPrice,
-    productImage,
     setProductImage,
     sku,
     setSku,
@@ -75,9 +73,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
   const removeVariant = (variantIndex) => {
     if (variants.length === 1) return;
 
-    setVariants((prev) =>
-      prev.filter((_, index) => index !== variantIndex),
-    );
+    setVariants((prev) => prev.filter((_, index) => index !== variantIndex));
   };
 
   const updateColor = (variantIndex, value) => {
@@ -134,6 +130,61 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
     );
   };
 
+  const updateSize = (variantIndex, sizeIndex, value) => {
+    setVariants((prev) =>
+      prev.map((variant, index) =>
+        index === variantIndex
+          ? {
+              ...variant,
+              sizes: variant.sizes.map((item, index) =>
+                index === sizeIndex
+                  ? {
+                      ...item,
+                      size: value,
+                    }
+                  : item,
+              ),
+            }
+          : variant,
+      ),
+    );
+  };
+
+  const addSize = (variantIndex) => {
+    setVariants((prev) =>
+      prev.map((variant, index) =>
+        index === variantIndex
+          ? {
+              ...variant,
+              sizes: [
+                ...variant.sizes,
+                {
+                  size: "",
+                  stock: 0,
+                },
+              ],
+            }
+          : variant,
+      ),
+    );
+  };
+
+  const removeSize = (variantIndex, sizeIndex) => {
+    setVariants((prev) =>
+      prev.map((variant, index) =>
+        index === variantIndex
+          ? {
+              ...variant,
+              sizes:
+                variant.sizes.length > 1
+                  ? variant.sizes.filter((_, index) => index !== sizeIndex)
+                  : variant.sizes,
+            }
+          : variant,
+      ),
+    );
+  };
+
   const getTotalStock = () => {
     return variants.reduce(
       (total, variant) =>
@@ -146,19 +197,78 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
     );
   };
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files || []);
+  const addMainImage = (variantIndex, file) => {
+    if (!file) return;
 
-    if (!files.length) return;
-
-    setProductImage((prev) => [...prev, ...files]);
-
-    e.target.value = "";
+    setVariants((prev) =>
+      prev.map((variant, index) =>
+        index === variantIndex
+          ? {
+              ...variant,
+              color: {
+                ...variant.color,
+                mainImage: file,
+              },
+            }
+          : variant,
+      ),
+    );
   };
 
-  const removeImage = (imageIndex) => {
-    setProductImage((prev) =>
-      prev.filter((_, index) => index !== imageIndex),
+  const addSubImages = (variantIndex, files) => {
+    const selectedFiles = Array.from(files || []);
+
+    if (!selectedFiles.length) return;
+
+    setVariants((prev) =>
+      prev.map((variant, index) =>
+        index === variantIndex
+          ? {
+              ...variant,
+              color: {
+                ...variant.color,
+                subImages: [
+                  ...(variant.color.subImages || []),
+                  ...selectedFiles,
+                ],
+              },
+            }
+          : variant,
+      ),
+    );
+  };
+
+  const removeMainImage = (variantIndex) => {
+    setVariants((prev) =>
+      prev.map((variant, index) =>
+        index === variantIndex
+          ? {
+              ...variant,
+              color: {
+                ...variant.color,
+                mainImage: null,
+              },
+            }
+          : variant,
+      ),
+    );
+  };
+
+  const removeSubImage = (variantIndex, imageIndex) => {
+    setVariants((prev) =>
+      prev.map((variant, index) =>
+        index === variantIndex
+          ? {
+              ...variant,
+              color: {
+                ...variant.color,
+                subImages: variant.color.subImages.filter(
+                  (_, index) => index !== imageIndex,
+                ),
+              },
+            }
+          : variant,
+      ),
     );
   };
 
@@ -204,9 +314,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
           response.data.data ||
           [];
 
-        const product = products.find(
-          (item) => item._id === productId,
-        );
+        const product = products.find((item) => item._id === productId);
 
         if (!product) {
           alert("Product not found");
@@ -225,6 +333,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
         if (product.brand) {
           setProductBrandName(product.brand.brandName || "");
+
           setSelectBrand(product.brand);
         } else {
           setProductBrandName("");
@@ -235,34 +344,40 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
         if (existingVariants.length > 0) {
           const formattedVariants = existingVariants.map((variant) => {
-            const defaultSizes = [
-              { size: "XS", stock: 0 },
-              { size: "S", stock: 0 },
-              { size: "M", stock: 0 },
-              { size: "L", stock: 0 },
-              { size: "XL", stock: 0 },
-              { size: "XXL", stock: 0 },
-            ];
+            const formattedSizes = (variant.sizes || []).map((sizeItem) => ({
+              size: sizeItem.size || "",
+              stock: Number(sizeItem.stock) || 0,
+            }));
 
-            const formattedSizes = defaultSizes.map((defaultSize) => {
-              const existingSize = variant.sizes?.find(
-                (size) => size.size === defaultSize.size,
-              );
-
-              return {
-                size: defaultSize.size,
-                stock: existingSize?.stock || 0,
-              };
-            });
+            if (formattedSizes.length === 0) {
+              formattedSizes.push({
+                size: "",
+                stock: 0,
+              });
+            }
 
             return {
               color: {
                 name: variant.color?.name || "",
                 code: variant.color?.code || "#000000",
+                mainImage: variant.color?.mainImage || null,
+                subImages: variant.color?.subImages || [],
               },
               sizes: formattedSizes,
-              images: variant.images || [],
             };
+
+            // return {
+            //   color: {
+            //     name: variant.color?.name || "",
+            //     code: variant.color?.code || "#000000",
+
+            //     mainImage: variant.color?.mainImage || null,
+
+            //     subImages: variant.color?.subImages || [],
+            //   },
+
+            //   sizes: formattedSizes,
+            // };
           });
 
           setVariants(formattedVariants);
@@ -277,12 +392,12 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
           !Array.isArray(existingDetails) &&
           Object.keys(existingDetails).length > 0
         ) {
-          const formattedDetails = Object.entries(
-            existingDetails,
-          ).map(([key, value]) => ({
-            key,
-            value: String(value ?? ""),
-          }));
+          const formattedDetails = Object.entries(existingDetails).map(
+            ([key, value]) => ({
+              key,
+              value: String(value ?? ""),
+            }),
+          );
 
           setDetails(formattedDetails);
         } else {
@@ -294,25 +409,14 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
           ]);
         }
 
-        const existingImages =
-          product.variants?.flatMap(
-            (variant) =>
-              variant.images?.map((image) =>
-                typeof image === "string" ? image : image.url,
-              ) || [],
-          ) || [];
-
-        setProductImage(existingImages);
+        setProductImage([]);
       } catch (error) {
         console.log(
           "GET PRODUCT ERROR:",
           error.response?.data || error.message,
         );
 
-        alert(
-          error.response?.data?.message ||
-            "Failed to load product",
-        );
+        alert(error.response?.data?.message || "Failed to load product");
       } finally {
         setProductLoading(false);
       }
@@ -349,8 +453,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
     const existingBrand = getBrands.find(
       (brand) =>
-        brand.brandName?.trim().toLowerCase() ===
-        value.trim().toLowerCase(),
+        brand.brandName?.trim().toLowerCase() === value.trim().toLowerCase(),
     );
 
     setSelectBrand(existingBrand || null);
@@ -358,6 +461,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
   const handleSelectedBrand = (brand) => {
     setProductBrandName(brand.brandName);
+
     setSelectBrand(brand);
     setOpenBrand(false);
   };
@@ -370,6 +474,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
   const calculateDiscount = (realPrice, price) => {
     const original = Number(realPrice);
+
     const selling = Number(price);
 
     if (!original || !selling || selling >= original) {
@@ -377,8 +482,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
       return;
     }
 
-    const discountValue =
-      ((original - selling) / original) * 100;
+    const discountValue = ((original - selling) / original) * 100;
 
     setDiscount(Math.round(discountValue));
   };
@@ -396,9 +500,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
   const removeDetails = (index) => {
     if (details.length === 1) return;
 
-    setDetails((prev) =>
-      prev.filter((_, i) => i !== index),
-    );
+    setDetails((prev) => prev.filter((_, i) => i !== index));
   };
 
   const updateDetailKey = (index, value) => {
@@ -452,6 +554,20 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
     ]);
   };
 
+  const getImagePreview = (image) => {
+    if (!image) return "";
+
+    if (image instanceof File) {
+      return URL.createObjectURL(image);
+    }
+
+    if (typeof image === "string") {
+      return image;
+    }
+
+    return image.url || "";
+  };
+
   const updateProducts = async (e) => {
     e.preventDefault();
 
@@ -485,6 +601,11 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
       return;
     }
 
+    if (Number(productPrice) > Number(productRealPrice)) {
+      alert("Selling price cannot be greater than real price");
+      return;
+    }
+
     if (!sku.trim()) {
       alert("SKU is required");
       return;
@@ -502,18 +623,13 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
     }
 
     const detailKeys = details
-      .map((detail) =>
-        detail.key.trim().toLowerCase(),
-      )
+      .map((detail) => detail.key.trim().toLowerCase())
       .filter(Boolean);
 
-    const duplicateDetails =
-      detailKeys.length !== new Set(detailKeys).size;
+    const duplicateDetails = detailKeys.length !== new Set(detailKeys).size;
 
     if (duplicateDetails) {
-      alert(
-        "You cannot use the same detail key more than once",
-      );
+      alert("You cannot use the same detail key more than once");
       return;
     }
 
@@ -523,9 +639,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
     }
 
     const invalidVariant = variants.some(
-      (variant) =>
-        !variant.color.name.trim() ||
-        !variant.color.code.trim(),
+      (variant) => !variant.color.name.trim() || !variant.color.code.trim(),
     );
 
     if (invalidVariant) {
@@ -533,122 +647,123 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
       return;
     }
 
-    const cleanedVariants = variants.map((variant) => ({
-      color: {
-        name: variant.color.name.trim(),
-        code: variant.color.code,
-      },
+    const invalidMainImage = variants.some(
+      (variant) => !variant.color.mainImage,
+    );
 
-      sizes: variant.sizes.map((size) => ({
-        size: size.size,
-        stock: Number(size.stock) || 0,
-      })),
-
-      images: (variant.images || []).map((image) => {
-        if (typeof image === "string") {
-          return {
-            url: image,
-          };
-        }
-
-        return {
-          url: image.url,
-          publicId: image.publicId,
-        };
-      }),
-    }));
+    if (invalidMainImage) {
+      alert("Please add a main image for every color variant");
+      return;
+    }
 
     try {
-      const detailsObject = details.reduce(
-        (result, item) => {
-          const key = item.key.trim();
-          const value = item.value.trim();
+      const detailsObject = details.reduce((result, item) => {
+        const key = item.key.trim();
 
-          if (key && value) {
-            result[key] = value;
-          }
+        const value = item.value.trim();
 
-          return result;
-        },
-        {},
-      );
+        if (key && value) {
+          result[key] = value;
+        }
+
+        return result;
+      }, {});
 
       const formData = new FormData();
 
-      formData.append(
-        "name",
-        productName.trim(),
-      );
+      formData.append("name", productName.trim());
 
-      formData.append(
-        "description",
-        productDescription.trim(),
-      );
+      formData.append("description", productDescription.trim());
 
-      formData.append(
-        "category",
-        productCategory,
-      );
+      formData.append("category", productCategory);
 
-      formData.append(
-        "price",
-        Number(productPrice),
-      );
+      formData.append("price", Number(productPrice));
 
-      formData.append(
-        "realPrice",
-        Number(productRealPrice),
-      );
+      formData.append("realPrice", Number(productRealPrice));
 
-      formData.append(
-        "discount",
-        Number(discount) || 0,
-      );
+      formData.append("discount", Number(discount) || 0);
 
-      formData.append(
-        "brand",
-        selectBrand._id,
-      );
+      formData.append("brand", selectBrand._id);
 
-      formData.append(
-        "sku",
-        sku.trim().toUpperCase(),
-      );
+      formData.append("sku", sku.trim().toUpperCase());
 
-      formData.append(
-        "status",
-        status,
-      );
+      formData.append("status", status);
 
-      formData.append(
-        "details",
-        JSON.stringify(detailsObject),
-      );
+      formData.append("details", JSON.stringify(detailsObject));
 
-      formData.append(
-        "variants",
-        JSON.stringify(cleanedVariants),
-      );
+      const imageFiles = [];
 
-      productImage.forEach((image) => {
-        if (image instanceof File) {
-          formData.append("images", image);
+      const variantsForBackend = variants.map((variant) => {
+        const mainImage = variant.color.mainImage;
+
+        let mainImageData = null;
+
+        if (mainImage instanceof File) {
+          imageFiles.push(mainImage);
+
+          mainImageData = {
+            replace: true,
+          };
+        } else if (mainImage) {
+          mainImageData = {
+            url: mainImage.url || mainImage,
+            publicId: mainImage.publicId || "",
+          };
         }
+
+        const subImagesData = (variant.color.subImages || []).map((image) => {
+          if (image instanceof File) {
+            imageFiles.push(image);
+
+            return {
+              replace: true,
+            };
+          }
+
+          return {
+            url: image.url || image,
+            publicId: image.publicId || "",
+          };
+        });
+
+        return {
+          color: {
+            name: variant.color.name.trim(),
+
+            code: variant.color.code,
+
+            mainImage: mainImageData,
+
+            subImages: subImagesData,
+          },
+
+          sizes: variant.sizes.map((size) => ({
+            size: size.size,
+
+            stock: Number(size.stock) || 0,
+          })),
+        };
+      });
+
+      formData.append("variants", JSON.stringify(variantsForBackend));
+
+      imageFiles.forEach((image) => {
+        formData.append("images", image);
       });
 
       console.log("PRODUCT ID:", productId);
-      console.log("BRAND ID:", selectBrand._id);
-      console.log(
-        "CLEANED VARIANTS:",
-        cleanedVariants,
-      );
-      console.log(
-        "DETAILS:",
-        detailsObject,
-      );
 
-      const adminToken =
-        localStorage.getItem("token");
+      console.log("BRAND ID:", selectBrand._id);
+
+      console.log("VARIANTS:", variantsForBackend);
+
+      console.log("IMAGE FILES:", imageFiles);
+
+      console.log("IMAGE FILE COUNT:", imageFiles.length);
+
+      console.log("DETAILS:", detailsObject);
+
+      const adminToken = localStorage.getItem("token");
 
       setLoading(true);
 
@@ -662,10 +777,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
         },
       );
 
-      console.log(
-        "UPDATE RESPONSE:",
-        response.data,
-      );
+      console.log("UPDATE RESPONSE:", response.data);
 
       if (response.status === 200) {
         alert("Product updated successfully");
@@ -674,15 +786,9 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
         closeUpdate();
       }
     } catch (error) {
-      console.log(
-        "UPDATE ERROR:",
-        error.response?.data || error.message,
-      );
+      console.log("UPDATE ERROR:", error.response?.data || error.message);
 
-      alert(
-        error.response?.data?.message ||
-          "Product update failed",
-      );
+      alert(error.response?.data?.message || "Product update failed");
     } finally {
       setLoading(false);
     }
@@ -703,9 +809,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
       <div className="max-h-[94vh] w-full max-w-6xl overflow-y-auto rounded-2xl border border-neutral-800 bg-[#0d0f12] text-white shadow-2xl">
         <div className="sticky top-0 z-20 flex items-center justify-between border-b border-neutral-800 bg-[#0d0f12] px-6 py-5">
           <div>
-            <h2 className="text-xl font-semibold">
-              Update Product
-            </h2>
+            <h2 className="text-xl font-semibold">Update Product</h2>
 
             <p className="mt-1 text-sm text-neutral-500">
               Update your product details
@@ -724,13 +828,10 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
         <div className="space-y-4 p-6">
           <section>
             <div className="mb-5">
-              <h3 className="text-base font-medium">
-                Basic Information
-              </h3>
+              <h3 className="text-base font-medium">Basic Information</h3>
 
               <p className="mt-1 text-xs text-neutral-500">
-                Update the main information about your
-                product
+                Update the main information about your product
               </p>
             </div>
 
@@ -743,9 +844,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                 <input
                   type="text"
                   value={productName}
-                  onChange={(e) =>
-                    setProductName(e.target.value)
-                  }
+                  onChange={(e) => setProductName(e.target.value)}
                   placeholder="Enter product name"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                 />
@@ -758,9 +857,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
                 <textarea
                   value={productDescription}
-                  onChange={(e) =>
-                    setProductDescription(e.target.value)
-                  }
+                  onChange={(e) => setProductDescription(e.target.value)}
                   placeholder="Enter product description"
                   rows={5}
                   className="w-full resize-none rounded-lg border border-neutral-800 bg-[#12151a] px-4 py-3 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
@@ -774,32 +871,22 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
                 <select
                   value={productCategory}
-                  onChange={(e) =>
-                    setProductCategory(e.target.value)
-                  }
+                  onChange={(e) => setProductCategory(e.target.value)}
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none focus:border-neutral-500"
                 >
-                  <option value="">
-                    Select category
-                  </option>
-                  <option value="Shirts">
-                    Shirts
-                  </option>
-                  <option value="Pants">
-                    Pants
-                  </option>
-                  <option value="Jackets">
-                    Jackets
-                  </option>
-                  <option value="Innerwear">
-                    Innerwear
-                  </option>
-                  <option value="Shorts">
-                    Shorts
-                  </option>
-                  <option value="T-Shirts">
-                    T-Shirts
-                  </option>
+                  <option value="">Select category</option>
+
+                  <option value="Shirts">Shirts</option>
+
+                  <option value="Pants">Pants</option>
+
+                  <option value="Jackets">Jackets</option>
+
+                  <option value="Innerwear">Innerwear</option>
+
+                  <option value="Shorts">Shorts</option>
+
+                  <option value="T-Shirts">T-Shirts</option>
                 </select>
               </div>
 
@@ -818,9 +905,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                     type="text"
                     value={productBrandName}
                     onChange={brandOnchange}
-                    onFocus={() =>
-                      setOpenBrand(true)
-                    }
+                    onFocus={() => setOpenBrand(true)}
                     placeholder="Search brand"
                     className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] pl-10 pr-10 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                   />
@@ -844,68 +929,49 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                       </div>
                     ) : filteredBrands.length > 0 ? (
                       <div className="max-h-60 overflow-y-auto">
-                        {filteredBrands.map(
-                          (brand) => (
-                            <button
-                              type="button"
-                              key={brand._id}
-                              onClick={() =>
-                                handleSelectedBrand(
-                                  brand,
-                                )
-                              }
-                              className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-neutral-800"
-                            >
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-[#0d0f12]">
-                                {brand.brandIcon ? (
-                                  <img
-                                    src={
-                                      brand.brandIcon
-                                    }
-                                    alt={
-                                      brand.brandName
-                                    }
-                                    className="h-full w-full object-contain"
-                                  />
-                                ) : (
-                                  <span className="text-xs text-neutral-600">
-                                    {brand.brandName
-                                      ?.charAt(
-                                        0,
-                                      )
-                                      ?.toUpperCase()}
-                                  </span>
-                                )}
-                              </div>
+                        {filteredBrands.map((brand) => (
+                          <button
+                            type="button"
+                            key={brand._id}
+                            onClick={() => handleSelectedBrand(brand)}
+                            className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-neutral-800"
+                          >
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-[#0d0f12]">
+                              {brand.brandIcon ? (
+                                <img
+                                  src={brand.brandIcon}
+                                  alt={brand.brandName}
+                                  className="h-full w-full object-contain"
+                                />
+                              ) : (
+                                <span className="text-xs text-neutral-600">
+                                  {brand.brandName?.charAt(0)?.toUpperCase()}
+                                </span>
+                              )}
+                            </div>
 
-                              <div className="flex-1">
-                                <p className="text-sm text-white">
-                                  {
-                                    brand.brandName
-                                  }
+                            <div className="flex-1">
+                              <p className="text-sm text-white">
+                                {brand.brandName}
+                              </p>
+
+                              {brand.brandSlogan && (
+                                <p className="mt-0.5 truncate text-xs text-neutral-600">
+                                  {brand.brandSlogan}
                                 </p>
+                              )}
+                            </div>
 
-                                {brand.brandSlogan && (
-                                  <p className="mt-0.5 truncate text-xs text-neutral-600">
-                                    {
-                                      brand.brandSlogan
-                                    }
-                                  </p>
-                                )}
-                              </div>
-
-                              <FiCheck
-                                size={16}
-                                className={
-                                  selectBrand?._id ===
-                                  brand._id
-                                    ? "text-white"
-                                    : "text-transparent"
-                                }
-                              />
-                            </button>
-                          ),
-                        )}
+                            <FiCheck
+                              size={16}
+                              className={
+                                selectBrand?._id === brand._id
+                                  ? "text-white"
+                                  : "text-transparent"
+                              }
+                            />
+                          </button>
+                        ))}
                       </div>
                     ) : (
                       <div className="px-4 py-4">
@@ -931,34 +997,24 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                       <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-white">
                         {selectBrand.brandIcon ? (
                           <img
-                            src={
-                              selectBrand.brandIcon
-                            }
-                            alt={
-                              selectBrand.brandName
-                            }
+                            src={selectBrand.brandIcon}
+                            alt={selectBrand.brandName}
                             className="h-full w-full object-contain p-1"
                           />
                         ) : (
                           <span className="text-sm text-neutral-500">
-                            {selectBrand.brandName
-                              ?.charAt(0)
-                              ?.toUpperCase()}
+                            {selectBrand.brandName?.charAt(0)?.toUpperCase()}
                           </span>
                         )}
                       </div>
 
                       <div>
                         <p className="text-sm font-medium text-white">
-                          {
-                            selectBrand.brandName
-                          }
+                          {selectBrand.brandName}
                         </p>
 
                         <p className="mt-0.5 max-w-[180px] truncate text-xs text-neutral-500">
-                          {
-                            selectBrand.brandSlogan
-                          }
+                          {selectBrand.brandSlogan}
                         </p>
 
                         <p className="mt-1 text-xs text-green-500">
@@ -967,18 +1023,13 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                       </div>
                     </div>
 
-                    <FiCheck
-                      size={18}
-                      className="ml-4 text-green-500"
-                    />
+                    <FiCheck size={18} className="ml-4 text-green-500" />
                   </div>
                 ) : (
                   <div className="flex w-full items-center justify-between rounded-xl border border-red-500/10 bg-red-500/[0.03] px-4 py-3 md:w-auto md:min-w-[300px]">
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-dashed border-neutral-800 bg-[#0d0f12]">
-                        <span className="text-xs text-neutral-700">
-                          No
-                        </span>
+                        <span className="text-xs text-neutral-700">No</span>
                       </div>
 
                       <div>
@@ -999,13 +1050,10 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
           <section className="border-t border-neutral-800 pt-8">
             <div className="mb-5">
-              <h3 className="text-base font-medium">
-                Pricing & Inventory
-              </h3>
+              <h3 className="text-base font-medium">Pricing & Inventory</h3>
 
               <p className="mt-1 text-xs text-neutral-500">
-                Update pricing and inventory
-                information
+                Update pricing and inventory information
               </p>
             </div>
 
@@ -1023,10 +1071,8 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                     const value = e.target.value;
 
                     setProductPrice(value);
-                    calculateDiscount(
-                      productRealPrice,
-                      value,
-                    );
+
+                    calculateDiscount(productRealPrice, value);
                   }}
                   placeholder="0.00"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
@@ -1046,10 +1092,8 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                     const value = e.target.value;
 
                     setProductRealPrice(value);
-                    calculateDiscount(
-                      value,
-                      productPrice,
-                    );
+
+                    calculateDiscount(value, productPrice);
                   }}
                   placeholder="0.00"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
@@ -1084,9 +1128,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                 <input
                   type="text"
                   value={sku}
-                  onChange={(e) =>
-                    setSku(e.target.value)
-                  }
+                  onChange={(e) => setSku(e.target.value)}
                   placeholder="ME-SHIRT-001"
                   className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm uppercase outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                 />
@@ -1097,12 +1139,10 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
           <section className="border-t border-neutral-800 pt-8">
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-medium">
-                  Product Variants
-                </h3>
+                <h3 className="text-base font-medium">Product Variants</h3>
 
                 <p className="mt-1 text-xs text-neutral-500">
-                  Add colors and stock for each size
+                  Add colors, images and stock for each size
                 </p>
               </div>
 
@@ -1117,243 +1157,324 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
             </div>
 
             <div className="space-y-5">
-              {variants.map(
-                (variant, variantIndex) => (
-                  <div
-                    key={variantIndex}
-                    className="rounded-xl border border-neutral-800 bg-[#111419] p-5"
-                  >
-                    <div className="mb-5 flex items-center justify-between">
-                      <span className="text-sm font-medium">
-                        Variant{" "}
-                        {variantIndex + 1}
-                      </span>
+              {variants.map((variant, variantIndex) => (
+                <div
+                  key={variantIndex}
+                  className="rounded-xl border border-neutral-800 bg-[#111419] p-5"
+                >
+                  <div className="mb-5 flex items-center justify-between">
+                    <span className="text-sm font-medium">
+                      Variant {variantIndex + 1}
+                    </span>
 
-                      {variants.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            removeVariant(
-                              variantIndex,
-                            )
-                          }
-                          className="flex items-center gap-2 text-xs text-neutral-500 transition hover:text-white"
-                        >
-                          <FiTrash2 size={15} />
-                          Remove
-                        </button>
-                      )}
+                    {variants.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeVariant(variantIndex)}
+                        className="flex items-center gap-2 text-xs text-neutral-500 transition hover:text-white"
+                      >
+                        <FiTrash2 size={15} />
+                        Remove
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm text-neutral-300">
+                        Color Name
+                      </label>
+
+                      <input
+                        type="text"
+                        value={variant.color.name}
+                        onChange={(e) =>
+                          updateColor(variantIndex, e.target.value)
+                        }
+                        placeholder="Black"
+                        className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                      />
                     </div>
 
-                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                      <div>
-                        <label className="mb-2 block text-sm text-neutral-300">
-                          Color Name
-                        </label>
+                    <div>
+                      <label className="mb-2 block text-sm text-neutral-300">
+                        Color Code
+                      </label>
+
+                      <div className="flex h-11 items-center gap-3 rounded-lg border border-neutral-800 bg-[#0d0f12] px-3">
+                        <input
+                          type="color"
+                          value={
+                            /^#[0-9A-Fa-f]{6}$/.test(variant.color.code)
+                              ? variant.color.code
+                              : "#000000"
+                          }
+                          onChange={(e) =>
+                            updateColorCode(variantIndex, e.target.value)
+                          }
+                          className="h-8 w-10 cursor-pointer rounded border-0 bg-transparent p-0"
+                        />
 
                         <input
                           type="text"
-                          value={
-                            variant.color.name
-                          }
+                          value={variant.color.code}
                           onChange={(e) =>
-                            updateColor(
-                              variantIndex,
-                              e.target.value,
-                            )
+                            updateColorCode(variantIndex, e.target.value)
                           }
-                          placeholder="Black"
-                          className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                          placeholder="#000000"
+                          maxLength={7}
+                          className="h-8 w-full bg-transparent text-sm uppercase text-neutral-300 outline-none placeholder:text-neutral-600"
                         />
-                      </div>
-
-                      <div>
-                        <label className="mb-2 block text-sm text-neutral-300">
-                          Color Code
-                        </label>
-
-                        <div className="flex h-11 items-center gap-3 rounded-lg border border-neutral-800 bg-[#0d0f12] px-3">
-                          <input
-                            type="color"
-                            value={
-                              /^#[0-9A-Fa-f]{6}$/.test(
-                                variant.color.code,
-                              )
-                                ? variant.color
-                                    .code
-                                : "#000000"
-                            }
-                            onChange={(e) =>
-                              updateColorCode(
-                                variantIndex,
-                                e.target.value,
-                              )
-                            }
-                            className="h-8 w-10 cursor-pointer rounded border-0 bg-transparent p-0"
-                          />
-
-                          <input
-                            type="text"
-                            value={
-                              variant.color.code
-                            }
-                            onChange={(e) =>
-                              updateColorCode(
-                                variantIndex,
-                                e.target.value,
-                              )
-                            }
-                            placeholder="#000000"
-                            maxLength={7}
-                            className="h-8 w-full bg-transparent text-sm uppercase text-neutral-300 outline-none placeholder:text-neutral-600"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-5">
-                      <div className="mb-3 flex items-center justify-between">
-                        <label className="block text-sm text-neutral-300">
-                          Size & Stock
-                        </label>
-
-                        <span className="text-xs text-neutral-500">
-                          Variant Stock:{" "}
-                          <span className="text-white">
-                            {variant.sizes.reduce(
-                              (
-                                total,
-                                size,
-                              ) =>
-                                total +
-                                Number(
-                                  size.stock ||
-                                    0,
-                                ),
-                              0,
-                            )}
-                          </span>
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-                        {variant.sizes.map(
-                          (
-                            sizeItem,
-                            sizeIndex,
-                          ) => (
-                            <div
-                              key={
-                                sizeItem.size
-                              }
-                              className="rounded-lg border border-neutral-800 bg-[#0d0f12] p-3"
-                            >
-                              <div className="mb-2 flex items-center justify-between">
-                                <span className="text-sm font-medium">
-                                  {
-                                    sizeItem.size
-                                  }
-                                </span>
-
-                                <span className="text-[10px] uppercase tracking-wider text-neutral-600">
-                                  Stock
-                                </span>
-                              </div>
-
-                              <div className="flex items-center gap-1">
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    updateStock(
-                                      variantIndex,
-                                      sizeIndex,
-                                      sizeItem.stock -
-                                        1,
-                                    )
-                                  }
-                                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
-                                >
-                                  <FiMinus
-                                    size={
-                                      13
-                                    }
-                                  />
-                                </button>
-
-                                <input
-                                  type="number"
-                                  min="0"
-                                  value={
-                                    sizeItem.stock
-                                  }
-                                  onChange={(e) =>
-                                    updateStock(
-                                      variantIndex,
-                                      sizeIndex,
-                                      e.target
-                                        .value,
-                                    )
-                                  }
-                                  className="h-8 min-w-0 w-full rounded-md border border-neutral-800 bg-[#111419] text-center text-xs outline-none focus:border-neutral-600"
-                                />
-
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    updateStock(
-                                      variantIndex,
-                                      sizeIndex,
-                                      sizeItem.stock +
-                                        1,
-                                    )
-                                  }
-                                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 transition hover:border-neutral-600 hover:text-white"
-                                >
-                                  <FiPlus
-                                    size={
-                                      13
-                                    }
-                                  />
-                                </button>
-                              </div>
-                            </div>
-                          ),
-                        )}
                       </div>
                     </div>
                   </div>
-                ),
-              )}
+
+                  <div className="mt-6">
+                    <div className="mb-3">
+                      <label className="block text-sm text-neutral-300">
+                        Main Image
+                      </label>
+
+                      <p className="mt-1 text-xs text-neutral-600">
+                        Main image for {variant.color.name} color
+                      </p>
+                    </div>
+
+                    {variant.color.mainImage ? (
+                      <div className="relative w-44 overflow-hidden rounded-xl border border-neutral-800 bg-[#0d0f12]">
+                        <img
+                          src={getImagePreview(variant.color.mainImage)}
+                          alt="Main"
+                          className="aspect-square w-full object-cover"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={() => removeMainImage(variantIndex)}
+                          className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-md bg-black/80 text-neutral-300 hover:text-white"
+                        >
+                          <FiTrash2 size={15} />
+                        </button>
+
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-2 py-2 text-center text-[10px] text-white">
+                          Main Image
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="flex h-44 w-44 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-neutral-700 bg-[#0d0f12] transition hover:border-neutral-500 hover:bg-[#14171c]">
+                        <FiUpload size={20} className="mb-2 text-neutral-500" />
+
+                        <span className="text-xs text-neutral-500">
+                          Upload Main Image
+                        </span>
+
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/webp"
+                          className="hidden"
+                          onChange={(e) => {
+                            addMainImage(variantIndex, e.target.files?.[0]);
+
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                    )}
+                  </div>
+
+                  <div className="mt-6">
+                    <div className="mb-3">
+                      <label className="block text-sm text-neutral-300">
+                        Sub Images
+                      </label>
+
+                      <p className="mt-1 text-xs text-neutral-600">
+                        Front, back, side and other images
+                      </p>
+                    </div>
+
+                    <label className="flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-neutral-700 bg-[#0d0f12] transition hover:border-neutral-500 hover:bg-[#14171c]">
+                      <FiUpload size={20} className="mb-2 text-neutral-500" />
+
+                      <p className="text-sm text-neutral-400">
+                        Click to upload sub images
+                      </p>
+
+                      <p className="mt-1 text-xs text-neutral-600">
+                        Multiple images allowed
+                      </p>
+
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/png,image/jpeg,image/jpg,image/webp"
+                        className="hidden"
+                        onChange={(e) => {
+                          addSubImages(variantIndex, e.target.files);
+
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+
+                    {variant.color.subImages?.length > 0 && (
+                      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6">
+                        {variant.color.subImages.map((image, imageIndex) => (
+                          <div
+                            key={imageIndex}
+                            className="group relative overflow-hidden rounded-lg border border-neutral-800 bg-[#0d0f12]"
+                          >
+                            <img
+                              src={getImagePreview(image)}
+                              alt="Sub"
+                              className="aspect-square w-full object-cover"
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                removeSubImage(variantIndex, imageIndex)
+                              }
+                              className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-md bg-black/80 text-neutral-300 opacity-0 transition group-hover:opacity-100 hover:text-white"
+                            >
+                              <FiTrash2 size={14} />
+                            </button>
+
+                            {image instanceof File && (
+                              <div className="absolute bottom-0 left-0 right-0 truncate bg-black/70 px-2 py-1 text-[9px] text-neutral-300">
+                                {image.name}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-6">
+                    <div className="mb-3 flex items-center justify-between">
+                      <label className="block text-sm text-neutral-300">
+                        Size & Stock
+                      </label>
+
+                      <span className="text-xs text-neutral-500">
+                        Variant Stock:{" "}
+                        <span className="text-white">
+                          {variant.sizes.reduce(
+                            (total, size) => total + Number(size.stock || 0),
+                            0,
+                          )}
+                        </span>
+                      </span>
+                    </div>
+
+                    <div className="space-y-3">
+                      {variant.sizes.map((sizeItem, sizeIndex) => (
+                        <div
+                          key={sizeIndex}
+                          className="flex items-center gap-3 rounded-lg border border-neutral-800 bg-[#0d0f12] p-3"
+                        >
+                          <input
+                            type="text"
+                            value={sizeItem.size}
+                            onChange={(e) =>
+                              updateSize(
+                                variantIndex,
+                                sizeIndex,
+                                e.target.value,
+                              )
+                            }
+                            placeholder="Enter size"
+                            className="h-10 w-full rounded-lg border border-neutral-800 bg-[#111419] px-3 text-sm uppercase outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+                          />
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateStock(
+                                variantIndex,
+                                sizeIndex,
+                                sizeItem.stock - 1,
+                              )
+                            }
+                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 hover:border-neutral-600 hover:text-white"
+                          >
+                            <FiMinus size={13} />
+                          </button>
+
+                          <input
+                            type="number"
+                            min="0"
+                            value={sizeItem.stock}
+                            onChange={(e) =>
+                              updateStock(
+                                variantIndex,
+                                sizeIndex,
+                                e.target.value,
+                              )
+                            }
+                            className="h-9 w-20 rounded-md border border-neutral-800 bg-[#111419] text-center text-xs outline-none focus:border-neutral-600"
+                          />
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateStock(
+                                variantIndex,
+                                sizeIndex,
+                                sizeItem.stock + 1,
+                              )
+                            }
+                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-400 hover:border-neutral-600 hover:text-white"
+                          >
+                            <FiPlus size={13} />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => removeSize(variantIndex, sizeIndex)}
+                            disabled={variant.sizes.length === 1}
+                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-neutral-800 text-neutral-500 hover:border-red-500/40 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
+                          >
+                            <FiTrash2 size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => addSize(variantIndex)}
+                      className="mt-3 flex items-center gap-2 rounded-lg border border-neutral-800 px-3 py-2 text-xs text-neutral-400 hover:border-neutral-600 hover:text-white"
+                    >
+                      <FiPlus size={14} />
+                      Add Size
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className="mt-5 flex items-center justify-between rounded-xl border border-neutral-800 bg-[#111419] px-5 py-4">
               <div>
-                <p className="text-sm font-medium">
-                  Total Product Stock
-                </p>
+                <p className="text-sm font-medium">Total Product Stock</p>
 
                 <p className="mt-1 text-xs text-neutral-500">
-                  Combined stock across all
-                  colors and sizes
+                  Combined stock across all colors and sizes
                 </p>
               </div>
 
-              <span className="text-2xl font-semibold">
-                {getTotalStock()}
-              </span>
+              <span className="text-2xl font-semibold">{getTotalStock()}</span>
             </div>
           </section>
 
           <section className="border-t border-neutral-800 pt-8">
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-medium">
-                  Product Details
-                </h3>
+                <h3 className="text-base font-medium">Product Details</h3>
 
                 <p className="mt-1 text-xs text-neutral-500">
-                  Add custom product information
-                  using key and value
+                  Add custom product information using key and value
                 </p>
               </div>
 
@@ -1381,12 +1502,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                     <input
                       type="text"
                       value={detail.key}
-                      onChange={(e) =>
-                        updateDetailKey(
-                          index,
-                          e.target.value,
-                        )
-                      }
+                      onChange={(e) => updateDetailKey(index, e.target.value)}
                       placeholder="Example: Fit"
                       className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                     />
@@ -1400,12 +1516,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                     <input
                       type="text"
                       value={detail.value}
-                      onChange={(e) =>
-                        updateDetailValue(
-                          index,
-                          e.target.value,
-                        )
-                      }
+                      onChange={(e) => updateDetailValue(index, e.target.value)}
                       placeholder="Example: Regular Fit"
                       className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
                     />
@@ -1414,17 +1525,13 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                   <div className="flex items-end">
                     <button
                       type="button"
-                      onClick={() =>
-                        removeDetails(index)
-                      }
+                      onClick={() => removeDetails(index)}
                       disabled={details.length === 1}
                       className="flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-neutral-800 px-4 text-sm text-neutral-400 transition hover:border-red-500/40 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30 md:w-11 md:px-0"
                     >
                       <FiTrash2 size={15} />
 
-                      <span className="md:hidden">
-                        Remove
-                      </span>
+                      <span className="md:hidden">Remove</span>
                     </button>
                   </div>
                 </div>
@@ -1433,8 +1540,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
             <div className="mt-4 rounded-lg border border-neutral-800 bg-[#111419] px-4 py-3">
               <p className="text-xs text-neutral-500">
-                Example: Fit → Regular Fit,
-                Material → Cotton, Pattern → Solid,
+                Example: Fit → Regular Fit, Material → Cotton, Pattern → Solid,
                 Wash Care → Machine Wash.
               </p>
             </div>
@@ -1442,114 +1548,24 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
           <section className="border-t border-neutral-800 pt-8">
             <div className="mb-5">
-              <h3 className="text-base font-medium">
-                Product Images
-              </h3>
-
-              <p className="mt-1 text-xs text-neutral-500">
-                Existing images are kept unless
-                you upload new images.
-              </p>
-            </div>
-
-            <label className="flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-neutral-700 bg-[#111419] transition hover:border-neutral-500 hover:bg-[#14171c]">
-              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-neutral-800 bg-[#0d0f12]">
-                <FiUpload
-                  size={20}
-                  className="text-neutral-400"
-                />
-              </div>
-
-              <p className="text-sm text-neutral-300">
-                Click to upload images
-              </p>
-
-              <p className="mt-1 text-xs text-neutral-600">
-                PNG, JPG, JPEG or WEBP
-              </p>
-
-              <input
-                type="file"
-                multiple
-                accept="image/png,image/jpeg,image/jpg,image/webp"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-            </label>
-
-            {productImage.length > 0 && (
-              <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                {productImage.map(
-                  (image, index) => {
-                    const imageUrl =
-                      image instanceof File
-                        ? URL.createObjectURL(
-                            image,
-                          )
-                        : image;
-
-                    return (
-                      <div
-                        key={index}
-                        className="group relative overflow-hidden rounded-lg border border-neutral-800 bg-[#111419]"
-                      >
-                        <img
-                          src={imageUrl}
-                          alt="Product"
-                          className="aspect-square w-full object-cover"
-                        />
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            removeImage(index)
-                          }
-                          className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-md bg-black/80 text-neutral-300 opacity-0 transition group-hover:opacity-100 hover:text-white"
-                        >
-                          <FiTrash2
-                            size={15}
-                          />
-                        </button>
-
-                        <div className="absolute bottom-0 left-0 right-0 truncate bg-black/70 px-2 py-2 text-[10px] text-neutral-300">
-                          {image instanceof File
-                            ? image.name
-                            : "Existing image"}
-                        </div>
-                      </div>
-                    );
-                  },
-                )}
-              </div>
-            )}
-          </section>
-
-          <section className="border-t border-neutral-800 pt-8">
-            <div className="mb-5">
-              <h3 className="text-base font-medium">
-                Product Status
-              </h3>
+              <h3 className="text-base font-medium">Product Status</h3>
             </div>
 
             <div className="flex flex-wrap gap-3">
-              {["Active", "Inactive"].map(
-                (item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() =>
-                      setStatus(item)
-                    }
-                    className={`rounded-lg border px-5 py-2.5 text-sm transition ${
-                      status === item
-                        ? "border-white bg-white text-black"
-                        : "border-neutral-800 bg-[#111419] text-neutral-400 hover:border-neutral-600 hover:text-white"
-                    }`}
-                  >
-                    {item}
-                  </button>
-                ),
-              )}
+              {["Active", "Inactive"].map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setStatus(item)}
+                  className={`rounded-lg border px-5 py-2.5 text-sm transition ${
+                    status === item
+                      ? "border-white bg-white text-black"
+                      : "border-neutral-800 bg-[#111419] text-neutral-400 hover:border-neutral-600 hover:text-white"
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
             </div>
           </section>
         </div>
@@ -1569,9 +1585,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
             disabled={loading}
             className="rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading
-              ? "Updating..."
-              : "Update Product"}
+            {loading ? "Updating..." : "Update Product"}
           </button>
         </div>
       </div>

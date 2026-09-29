@@ -272,7 +272,7 @@ const PremiumShirts = () => {
                   }
                 >
                   <img
-                    src={shirtData.variants?.[0]?.images?.[0]?.url}
+                    src={shirtData.variants?.[0]?.color?.mainImage?.url}
                     alt={shirtData.name}
                     className={`w-full h-full object-cover duration-700 group-hover:scale-110 ${large ? "h-[666px]" : "h-[330px]"}`}
                   />

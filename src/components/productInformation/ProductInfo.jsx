@@ -17,7 +17,7 @@ const ProductInfo = () => {
   const product = location.state?.product;
 
   const [selectedImage, setSelectedImage] = useState(
-    product?.variants?.[0]?.images?.[0]?.url || "",
+    product?.variants?.[0]?.color?.mainImage?.url || "",
   );
 
   const [selectedVariant, setSelectedVariant] = useState(
