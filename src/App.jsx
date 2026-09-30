@@ -40,6 +40,7 @@ import AdminWelcomePage from "./components/adminPanel/adminAuthentication/adminW
 import { useState } from "react";
 import AdminSignup from "./components/adminPanel/adminAuthentication/adminSignup/AdminSignup";
 import AdminLogin from "./components/adminPanel/adminAuthentication/adminLogin/AdminLogin";
+import Checkout from "./components/buyProducts/Checkout";
 // import AdminWelcomePage from "./components/adminPanel/adminAuthentication/adminWelcomePage/AdminWelcomePage";
 
 function App() {
@@ -77,6 +78,8 @@ function App() {
             {/* brand subpage*/}
             <Route path="/BrandSubpage" element={<BrandSubpage />} />
             <Route path="/productInfo" element={<ProductInfo />} />
+
+            <Route path="/productInfo/Checkout" element={<Checkout />} />
             <Route path="/Offers" element={<OfferPage />} />
             <Route path="/CartOrder" element={<CartOrder />} />
             {/* end brand subpage */}
@@ -93,7 +96,7 @@ function App() {
                 )
               }
             />
-           
+
             <Route
               path="/adminDash"
               element={

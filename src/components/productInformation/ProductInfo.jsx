@@ -1,12 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { motion } from "motion/react";
-import {
-  IoArrowBack,
-  IoStar,
-  IoHeartOutline,
-  IoAdd,
-  IoRemove,
-} from "react-icons/io5";
+import { IoArrowBack, IoStar, IoAdd, IoRemove } from "react-icons/io5";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const ProductInfo = () => {
@@ -45,21 +39,21 @@ const ProductInfo = () => {
 
   const handlevariantChange = (variant) => {
     setSelectedVariant(variant);
-    setSelectedImage(variant?.images?.[0]?.url || "");
+    setSelectedImage(variant?.color?.mainImage?.url || "");
     setSelectedSize("");
     setQuantity(1);
   };
 
   const increaseQuantity = () => {
-    if (selectedSize) {
-      const selectedSizeData = selectedVariant?.sizes?.find(
-        (size) => size.size === selectedSize,
-      );
+    if (!selectedSize) {
+      return;
+    }
 
-      if (selectedSizeData && quantity < selectedSizeData.stock) {
-        setQuantity((prev) => prev + 1);
-      }
-    } else {
+    const selectedSizeData = selectedVariant?.sizes?.find(
+      (size) => size.size === selectedSize,
+    );
+
+    if (selectedSizeData && quantity < selectedSizeData.stock) {
       setQuantity((prev) => prev + 1);
     }
   };
@@ -70,8 +64,86 @@ const ProductInfo = () => {
     }
   };
 
-  const [selectColor, setSelectColor] = useState(null);
+  const handleImageChange = (image) => {
+    setSelectedImage(image.url);
+  };
 
+  const mainImage = selectedVariant?.color?.mainImage;
+  const subImages = selectedVariant?.color?.subImages || [];
+
+  const galleryImages = [
+    ...(mainImage?.url
+      ? [{ url: mainImage.url, publicId: mainImage.publicId }]
+      : []),
+    ...subImages,
+  ];
+
+  const handleCartItems = () => {
+    if (!selectedVariant) return;
+
+    if (!selectedSize) {
+      alert("Please select a size");
+      return;
+    }
+
+    const selectedSizeData = selectedVariant.sizes.find(
+      (size) => size.size === selectedSize,
+    );
+
+    if (!selectedSizeData || selectedSizeData.stock <= 0) {
+      alert("Selected size is out of stock");
+      return;
+    }
+
+    const cartItem = {
+      productId: product._id,
+      name: product.name,
+      price: product.price,
+      image: selectedImage,
+      color: selectedVariant.color,
+      size: selectedSize,
+      quantity,
+    };
+
+    console.log(cartItem);
+
+    navigate("/mainpage/Cart", { state: { cartProducts: cartItem } });
+  };
+
+  const handleBuyNow = () => {
+    if (!selectedVariant) {
+      alert("Please select a color");
+      return;
+    }
+
+    if (!selectedSize) {
+      alert("Please select a size");
+      return;
+    }
+
+    const selectedSizeData = selectedVariant.sizes?.find(
+      (size) => size.size === selectedSize,
+    );
+
+    if (!selectedSizeData || selectedSizeData.stock <= 0) {
+      alert("Selected size is out of stock");
+      return;
+    }
+
+    const buyNowProduct = {
+      productId: product._id,
+      name: product.name,
+      price: product.price,
+      quantity,
+      size: selectedSize,
+      color: selectedVariant.color,
+      image: selectedImage,
+    };
+
+    console.log("Buy Now:", buyNowProduct);
+
+    navigate("/productInfo/Checkout", { state: { products: buyNowProduct } });
+  };
   return (
     <section className="min-h-screen bg-black text-white">
       <div className="pl-5 pt-7">
@@ -90,23 +162,24 @@ const ProductInfo = () => {
         <div className="grid grid-cols-2 gap-16 ">
           <motion.div layout>
             <div className="overflow-hidden rounded-3xl bg-neutral-900">
-              <img
-                src={selectedImage}
-                alt={product.name}
-                className="w-full h-[700px] object-cover hover:scale-110 transition duration-700"
-              />
+              {selectedImage ? (
+                <img
+                  src={selectedImage}
+                  alt={product.name}
+                  className="w-full h-[700px] object-cover hover:scale-110 transition duration-700"
+                />
+              ) : (
+                <div className="w-full h-[700px] flex items-center justify-center text-white/40">
+                  No Image
+                </div>
+              )}
             </div>
-
             <div className="grid grid-cols-2 gap-4 mt-5">
-              {selectedVariant?.images?.map((image, index) => (
+              {galleryImages.map((image, index) => (
                 <button
                   key={image.publicId || index}
-                  onClick={() => setSelectedImage(image.url)}
-                  className={`overflow-hidden rounded-xl border ${
-                    selectedImage === image.url
-                      ? "border-white"
-                      : "border-white/10"
-                  }`}
+                  onClick={() => handleImageChange(image)}
+                  className={`overflow-hidden rounded-xl border ${selectedImage === image.url ? "border-white" : "border-white/10"}`}
                 >
                   <img
                     src={image.url}
@@ -242,10 +315,16 @@ const ProductInfo = () => {
             </div>
 
             <div className="flex gap-5 mt-12">
-              <button className="flex-1 bg-white text-black py-4 rounded-full text-lg font-medium hover:bg-gray-200 transition">
+              <button
+                className="flex-1 bg-white text-black py-4 rounded-full text-lg font-medium hover:bg-gray-200 transition"
+                onClick={handleCartItems}
+              >
                 Add to Cart
               </button>
-              <button className="border border-white rounded-full hover:bg-white hover:text-black transition py-4 text-lg flex-1">
+              <button
+                className="border border-white rounded-full hover:bg-white hover:text-black transition py-4 text-lg flex-1"
+                onClick={handleBuyNow}
+              >
                 Buy Now
               </button>
               {/* <button className="w-14 border border-white/20 rounded-full flex items-center justify-center hover:border-white transition">

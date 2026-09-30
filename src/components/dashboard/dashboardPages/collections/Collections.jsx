@@ -132,9 +132,9 @@ const MenCollection = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-14 px-3" >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-14 px-3">
           {filteredProducts.map((data, index) => {
-            const image = data.variants?.[0]?.images?.[0]?.url;
+            const image = data.variants?.[0]?.color?.mainImage?.url || "";
             return (
               <motion.div
                 key={data._id}
