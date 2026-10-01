@@ -4,10 +4,71 @@ import { useNavigate } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
 import { RiArrowRightLongFill } from "react-icons/ri";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import axios from "axios";
+import { UseMe } from "../../context/Meprovider";
 const Signup = () => {
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    FullName,
+    setFullName,
+    Email,
+    setEmail,
+    Password,
+    setPassword,
+    Phone,
+    setPhone,
+  } = UseMe();
+
+  const onchangeFullName = (e) => {
+    setFullName(e.target.value);
+  };
+
+  const onchangeEmail = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const onchangePassword = (e) => {
+    setPassword(e.target.value);
+  };
+
+  const onchangePhone = (e) => {
+    setPhone(e.target.value);
+  };
+
+  const userSingnupFn = async (e) => {
+    e.preventDefault();
+    try {
+      const userSignupApi = await axios.post(
+        `${import.meta.env.VITE_API_URL}/Me/userSignup`,
+        {
+          Email,
+          FullName,
+          Phone,
+          Password,
+        },
+      );
+
+      console.log("user signup", userSignupApi.data);
+
+      alert("Admin account created successfully ✅");
+
+      navigate("/mainpage");
+
+      setEmail("");
+      setFullName("");
+      setPhone("");
+      setPassword("");
+    } catch (error) {
+      console.log("Error in user signup:", error);
+      console.log("Server response:", error.response?.data);
+
+      alert(error.response?.data?.message || "user signup failed");
+    }
+  };
+
   return (
     <section className="relative min-h-screen bg-black text-white overflow-hidden">
       {/* Watermark */}
@@ -96,7 +157,10 @@ const Signup = () => {
           transition={{ duration: 0.8 }}
           className="flex flex-col items-center justify-center pt-24 pb-10"
         >
-          <form className="w-full max-w-md flex flex-col gap-14">
+          <form
+            className="w-full max-w-md flex flex-col gap-14"
+            onSubmit={userSingnupFn}
+          >
             {/* Email */}
 
             <div className="space-y-4">
@@ -107,6 +171,8 @@ const Signup = () => {
               <input
                 type="email"
                 placeholder="Enter your email"
+                value={Email}
+                onChange={onchangeEmail}
                 className="
                 w-full
                 bg-transparent
@@ -129,6 +195,8 @@ const Signup = () => {
               <input
                 type="email"
                 placeholder="Enter your Username"
+                value={FullName}
+                onChange={onchangeFullName}
                 className="
                 w-full
                 bg-transparent
@@ -149,8 +217,10 @@ const Signup = () => {
               </label>
 
               <input
-                type="email"
+                type="Phone Number"
                 placeholder="Enter your Phone Number"
+                value={Phone}
+                onChange={onchangePhone}
                 className="
                 w-full
                 bg-transparent
@@ -174,6 +244,8 @@ const Signup = () => {
               <div className="relative">
                 <input
                   type="text"
+                  value={Password}
+                  onChange={onchangePassword}
                   placeholder="••••••••"
                   className="
                   w-full
@@ -228,10 +300,8 @@ const Signup = () => {
               />
             </motion.button>
 
-            <div className="h-[2px] bg-white/10 "/>
+            <div className="h-[2px] bg-white/10 " />
           </form>
-
-          
         </motion.div>
       </div>
     </section>

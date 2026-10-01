@@ -57,7 +57,7 @@ const AdminSignup = ({ setAdminSignUp, setAdminSignIn }) => {
       // Open login
       setAdminSignIn(true);
 
-      // Optional: clear form after successful signup
+      
       setFullName("");
       setEmail("");
       setPassword("");

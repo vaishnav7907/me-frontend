@@ -6,12 +6,12 @@ const MeContext = createContext();
 export const MeProvider = ({ children }) => {
   const [sidebar, setSidebar] = useState(false);
 
-  // ================= ADMIN AUTH =================
+  // ================= ADMIN AND USER AUTH   =================
 
   const [FullName, setFullName] = useState("");
   const [Email, setEmail] = useState("");
   const [Password, setPassword] = useState("");
-
+  const [Phone, setPhone] = useState("");
   // ================= PRODUCT =================
 
   const [productName, setProductName] = useState("");
@@ -73,12 +73,16 @@ export const MeProvider = ({ children }) => {
         setSidebar,
 
         // Authentication
+
+        
         FullName,
         setFullName,
         Email,
         setEmail,
         Password,
         setPassword,
+        Phone,
+        setPhone,
 
         // Product
         productName,

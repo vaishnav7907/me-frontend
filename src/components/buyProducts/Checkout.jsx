@@ -1,10 +1,19 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoArrowBack, IoCheckmarkCircleOutline } from "react-icons/io5";
+import axios from "axios";
 const Checkout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const buyNowProduct = location.state?.products;
+
+  const createChekoutFn = async () => {
+    try {
+      const createCheckoutFn = await axios.post(
+        `${import.meta.env.VITE_API_URL}/Me/Checkout`,
+      );
+    } catch (error) {}
+  };
 
   if (!buyNowProduct) {
     return (
