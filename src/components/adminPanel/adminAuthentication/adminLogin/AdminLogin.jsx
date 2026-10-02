@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  FiArrowLeft,
-  FiEye,
-  FiEyeOff,
-  FiLock,
-  FiMail,
-} from "react-icons/fi";
+import { FiArrowLeft, FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
 import { UseMe } from "../../../context/Meprovider";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -13,12 +7,7 @@ import { useNavigate } from "react-router-dom";
 const AdminLogin = ({ setAdminSignIn, todash }) => {
   const [showPassword, setShowPassword] = useState(false);
 
-  const {
-    FullName,
-    setFullName,
-    Password,
-    setPassword,
-  } = UseMe();
+  const { FullName, setFullName, Password, setPassword } = UseMe();
 
   const navigate = useNavigate();
 
@@ -30,39 +19,43 @@ const AdminLogin = ({ setAdminSignIn, todash }) => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const adminSigninApi = await axios.post(
-        `${import.meta.env.VITE_API_URL}/Me/userAdminLogin`,
-        {
-          FullName,
-          Password,
-        }
-      );
+  try {
+    const adminSigninApi = await axios.post(
+      `${import.meta.env.VITE_API_URL}/Me/userAdminLogin`,
+      {
+        FullName,
+        Password,
+      },
+    );
 
-      localStorage.setItem(
-        "token",
-        adminSigninApi.data.token
-      );
+    const { user, token } = adminSigninApi.data;
 
-      console.log("login data", adminSigninApi.data);
+    console.log("login data", adminSigninApi.data);
 
-      alert("Admin login successfully ✅");
-
-      setAdminSignIn(false);
-      todash(true);
-
-      navigate("/adminDash");
-    } catch (error) {
-      console.log("Error in admin login:", error);
-      console.log(
-        "Server response:",
-        error.response?.data
-      );
+    if (user.role !== "admin") {
+      alert("Only admin can sign in here");
+      return;
     }
-  };
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    alert("Admin login successfully ✅");
+
+    setAdminSignIn(false);
+    todash(true);
+
+    navigate("/adminDash");
+  } catch (error) {
+    console.log("Error in admin login:", error);
+    console.log("Server response:", error.response?.data);
+
+    alert(error.response?.data?.message || "Admin login failed");
+  }
+};
 
   return (
     <div className="fixed inset-0 z-[200] bg-[#070809] flex items-center justify-center px-5">
@@ -80,15 +73,12 @@ const AdminLogin = ({ setAdminSignIn, todash }) => {
                 size={15}
                 className="group-hover:-translate-x-1 transition-transform"
               />
-
               Back
             </button>
 
             <div>
               <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center">
-                <span className="text-black text-xl font-bold">
-                  ME
-                </span>
+                <span className="text-black text-xl font-bold">ME</span>
               </div>
 
               <h1 className="text-4xl font-semibold text-white tracking-tight mt-7">
@@ -96,8 +86,8 @@ const AdminLogin = ({ setAdminSignIn, todash }) => {
               </h1>
 
               <p className="text-sm text-neutral-500 leading-6 mt-3 max-w-xs">
-                Sign in to manage your store, products,
-                orders and business operations.
+                Sign in to manage your store, products, orders and business
+                operations.
               </p>
             </div>
 
@@ -108,19 +98,14 @@ const AdminLogin = ({ setAdminSignIn, todash }) => {
 
           <div className="p-10 flex flex-col justify-center">
             <div>
-              <h2 className="text-2xl font-semibold text-white">
-                Sign In
-              </h2>
+              <h2 className="text-2xl font-semibold text-white">Sign In</h2>
 
               <p className="text-sm text-neutral-500 mt-1">
                 Enter your administrator credentials
               </p>
             </div>
 
-            <form
-              onSubmit={handleSubmit}
-              className="mt-7 space-y-5"
-            >
+            <form onSubmit={handleSubmit} className="mt-7 space-y-5">
               <div>
                 <label className="block text-xs font-medium text-neutral-400 mb-2">
                   User Name
@@ -165,11 +150,7 @@ const AdminLogin = ({ setAdminSignIn, todash }) => {
                   />
 
                   <input
-                    type={
-                      showPassword
-                        ? "text"
-                        : "password"
-                    }
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     value={Password}
                     onChange={passwordOnChange}
@@ -180,9 +161,7 @@ const AdminLogin = ({ setAdminSignIn, todash }) => {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowPassword(!showPassword)
-                    }
+                    onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-white transition"
                   >
                     {showPassword ? (

@@ -53,7 +53,7 @@ const Signup = () => {
 
       console.log("user signup", userSignupApi.data);
 
-      alert("Admin account created successfully ✅");
+      alert(" successfully joined ✅");
 
       navigate("/mainpage");
 
@@ -189,11 +189,11 @@ const Signup = () => {
 
             <div className="space-y-4">
               <label className="uppercase tracking-[0.35em] text-xs text-gray-500">
-                Username
+                User name
               </label>
 
               <input
-                type="email"
+                type="text"
                 placeholder="Enter your Username"
                 value={FullName}
                 onChange={onchangeFullName}
@@ -217,7 +217,7 @@ const Signup = () => {
               </label>
 
               <input
-                type="Phone Number"
+                type="tel"
                 placeholder="Enter your Phone Number"
                 value={Phone}
                 onChange={onchangePhone}
@@ -243,7 +243,7 @@ const Signup = () => {
 
               <div className="relative">
                 <input
-                  type="text"
+                  type={showPassword ? "text" : "password"}
                   value={Password}
                   onChange={onchangePassword}
                   placeholder="••••••••"

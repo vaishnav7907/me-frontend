@@ -4,11 +4,61 @@ import { useNavigate } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
 import { RiArrowRightLongFill } from "react-icons/ri";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import { UseMe } from "../../context/Meprovider";
+import axios from "axios";
 
 const Signin = () => {
   const navigate = useNavigate();
 
+  const { FullName, setFullName, Password, setPassword } = UseMe();
+
+  const onchangeFullname = (e) => {
+    setFullName(e.target.value);
+  };
+
+  const onchangePassword = (e) => {
+    setPassword(e.target.value);
+  };
+
   const [showPassword, setShowPassword] = useState(false);
+
+  const loginSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const userloginApi = await axios.post(
+        `${import.meta.env.VITE_API_URL}/Me/userAdminLogin`,
+        {
+          FullName,
+          Password,
+        },
+      );
+
+      console.log("user signIn", userloginApi.data);
+
+      const { token, user } = userloginApi.data;
+
+      if (user.role !== "user") {
+        alert("Only users can sign in here");
+        return;
+      }
+
+      localStorage.setItem("userToken", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      setFullName("");
+      setPassword("");
+
+      alert("Successfully joined ✅");
+
+      navigate("/mainpage");
+    } catch (error) {
+      console.log("Error in user sign in:", error);
+      console.log("Server response:", error.response?.data);
+
+      alert(error.response?.data?.message || "User sign in failed");
+    }
+  };
 
   return (
     <section className="relative min-h-screen bg-black text-white overflow-hidden">
@@ -100,17 +150,22 @@ const Signin = () => {
           transition={{ duration: 0.8 }}
           className="flex flex-col items-center justify-center pt-24"
         >
-          <form className="w-full max-w-md flex flex-col gap-14">
+          <form
+            className="w-full max-w-md flex flex-col gap-14"
+            onSubmit={loginSubmit}
+          >
             {/* Email */}
 
             <div className="space-y-4">
               <label className="uppercase tracking-[0.35em] text-xs text-gray-500">
-                Email
+                USER NAME
               </label>
 
               <input
-                type="email"
-                placeholder="Enter your email"
+                type="text"
+                value={FullName}
+                onChange={onchangeFullname}
+                placeholder="User Name"
                 className="
                 w-full
                 bg-transparent
@@ -134,7 +189,9 @@ const Signin = () => {
 
               <div className="relative">
                 <input
-                  type= "text" 
+                  type={showPassword ? "text" : "password"}
+                  value={Password}
+                  onChange={onchangePassword}
                   placeholder="••••••••"
                   className="
                   w-full
