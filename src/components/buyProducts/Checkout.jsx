@@ -7,13 +7,137 @@ const Checkout = () => {
   const location = useLocation();
   const buyNowProduct = location.state?.products;
 
-  const createChekoutFn = async () => {
-    try {
-      const createCheckoutFn = await axios.post(
-        `${import.meta.env.VITE_API_URL}/Me/Checkout`,
-      );
-    } catch (error) {}
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [district, setDistrict] = useState("");
+  const [state, setState] = useState("");
+  const [pincode, setPincode] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
+
+  const totalAmount =
+    Number(buyNowProduct.price) * Number(buyNowProduct.quantity);
+
+  const onchangeName = (e) => {
+    setName(e.target.value);
   };
+
+  const onchangePhone = (e) => {
+    setPhone(e.target.value);
+  };
+
+  const onchangeEmail = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const onchangeAddress = (e) => {
+    setAddress(e.target.value);
+  };
+
+  const onchangeCity = (e) => {
+    setCity(e.target.value);
+  };
+
+  const onchangeDistrict = (e) => {
+    setDistrict(e.target.value);
+  };
+
+  const onchangeState = (e) => {
+    setState(e.target.value);
+  };
+
+  const onchangePincode = (e) => {
+    setPincode(e.target.value);
+  };
+  const createCheckout = async () => {
+    try {
+      const userToken = localStorage.getItem("token");
+
+      if (!buyNowProduct) {
+        alert("Product not found");
+        return;
+      }
+
+      if (
+        !name ||
+        !phone ||
+        !email ||
+        !address ||
+        !city ||
+        !district ||
+        !state ||
+        !pincode
+      ) {
+        alert("Please complete the delivery address");
+        return;
+      }
+
+      if (!paymentMethod) {
+        alert("Please select a payment method");
+        return;
+      }
+
+      const checkoutData = {
+        product: {
+          productId: buyNowProduct.productId,
+          quantity: buyNowProduct.quantity,
+          size: buyNowProduct.size,
+          color: {
+            name: buyNowProduct.color?.name,
+          },
+        },
+
+        deliveryAddress: {
+          name,
+          phone,
+          email,
+          address,
+          city,
+          district,
+          state,
+          pincode,
+        },
+
+        paymentMethod: paymentMethod,
+      };
+
+      console.log("Sending checkout data:", checkoutData);
+
+      const createCheckoutApi = await axios.post(
+        `${import.meta.env.VITE_API_URL}/Me/Checkout`,
+        checkoutData,
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        },
+      );
+
+      console.log("Checkout response:", createCheckoutApi.data);
+
+      alert("Order placed successfully");
+    } catch (error) {
+      console.log("Error in create checkout:", error);
+      console.log("Server response:", error.response?.data);
+
+      alert(
+        error.response?.data?.message ||
+          "Something went wrong while creating checkout",
+      );
+    }
+  };
+
+  // const buyNowProduct = {
+  //     productId: product._id,
+  //     name: product.name,
+  //     price: product.price,
+  //     quantity,
+  //     size: selectedSize,
+  //     color: selectedVariant.color,
+  //     image: selectedImage,
+  //   };
 
   if (!buyNowProduct) {
     return (
@@ -59,16 +183,16 @@ const Checkout = () => {
                 type="text"
                 name="name"
                 placeholder="Full Name"
-                // value={address.name}
-                // onChange={handleChange}
+                value={name}
+                onChange={onchangeName}
                 className="w-full bg-transparent border border-white/20 rounded-xl px-5 py-4 outline-none focus:border-white transition"
               />
               <input
                 type="tel"
                 name="phone"
                 placeholder="Phone Number"
-                // value={address.phone}
-                // onChange={handleChange}
+                value={phone}
+                onChange={onchangePhone}
                 maxLength={10}
                 className="w-full bg-transparent border border-white/20 rounded-xl px-5 py-4 outline-none focus:border-white transition"
               />
@@ -77,15 +201,15 @@ const Checkout = () => {
                 type="text"
                 name="name"
                 placeholder="E-mail"
-                // value={address.name}
-                // onChange={handleChange}
+                value={email}
+                onChange={onchangeEmail}
                 className="w-full bg-transparent border border-white/20 rounded-xl px-5 py-4 outline-none focus:border-white transition"
               />
               <textarea
                 name="address"
                 placeholder="Full Address / House Name / Street"
-                // value={address.address}
-                // onChange={handleChange}
+                value={address}
+                onChange={onchangeAddress}
                 rows={4}
                 className="w-full bg-transparent border border-white/20 rounded-xl px-5 py-4 outline-none focus:border-white transition resize-none"
               />
@@ -94,16 +218,16 @@ const Checkout = () => {
                   type="text"
                   name="city"
                   placeholder="City"
-                  //   value={address.city}
-                  //   onChange={handleChange}
+                  value={city}
+                  onChange={onchangeCity}
                   className="w-full bg-transparent border border-white/20 rounded-xl px-5 py-4 outline-none focus:border-white transition"
                 />
                 <input
                   type="text"
                   name="district"
                   placeholder="District"
-                  //   value={address.district}
-                  //   onChange={handleChange}
+                  value={district}
+                  onChange={onchangeDistrict}
                   className="w-full bg-transparent border border-white/20 rounded-xl px-5 py-4 outline-none focus:border-white transition"
                 />
               </div>
@@ -111,21 +235,21 @@ const Checkout = () => {
                 type="text"
                 name="state"
                 placeholder="State"
-                // value={address.state}
-                // onChange={handleChange}
+                value={state}
+                onChange={onchangeState}
                 className="w-full bg-transparent border border-white/20 rounded-xl px-5 py-4 outline-none focus:border-white transition"
               />
               <input
                 type="text"
                 name="pincode"
                 placeholder="Pincode"
-                // value={address.pincode}
-                // onChange={handleChange}
+                value={pincode}
+                onChange={onchangePincode}
                 maxLength={6}
                 className="w-full bg-transparent border border-white/20 rounded-xl px-5 py-4 outline-none focus:border-white transition"
               />
             </div>
-            {/* <div className="mt-10">
+            <div className="mt-10">
               <h2 className="text-2xl font-light mb-6">Payment Method</h2>
               <div className="space-y-4">
                 <button
@@ -143,7 +267,7 @@ const Checkout = () => {
                       </p>
                     </div>
                     {paymentMethod === "Cash on Delivery" && (
-                      <IoCheckmarkCircleOutline className="text-2xl" />
+                      <IoCheckmarkCircleOutline className={`text-2xl `} />
                     )}
                   </div>
                 </button>
@@ -162,20 +286,20 @@ const Checkout = () => {
                       </p>
                     </div>
                     {paymentMethod === "Online Payment" && (
-                      <IoCheckmarkCircleOutline className="text-2xl" />
+                      <IoCheckmarkCircleOutline className={`text-2xl `} />
                     )}
                   </div>
                 </button>
               </div>
-            </div> */}
+            </div>
           </div>
           <div>
             <h2 className="text-2xl font-light mb-8"> Order Summary </h2>
             <div className="border border-white/10 rounded-2xl p-6">
               <div className="flex gap-5">
                 <img
-                  //   src={buyNowProduct.image}
-                  //   alt={buyNowProduct.name}
+                  src={buyNowProduct.image}
+                  alt={buyNowProduct.name}
                   className="w-32 h-40 object-cover rounded-xl"
                 />
                 <div className="flex-1">
@@ -183,32 +307,32 @@ const Checkout = () => {
                   <p className="text-white/50 mt-3">
                     Color:
                     <span className="text-white/80 ml-2">
-                      {/* {buyNowProduct.color?.name} */} yelow
+                      {buyNowProduct.color?.name}
                     </span>
                   </p>
                   <p className="text-white/50 mt-1">
                     Size:
                     <span className="text-white/80 ml-2">
-                      {/* {buyNowProduct.size} */}l
+                      {buyNowProduct.size}
                     </span>
                   </p>
                   <p className="text-white/50 mt-1">
                     Quantity:
-                    <span className="text-white/80 ml-2">1</span>
+                    <span className="text-white/80 ml-2">
+                      {buyNowProduct.quantity}
+                    </span>
                   </p>
-                  <p className="text-xl mt-5"> 09878 </p>
+                  <p className="text-xl mt-5"> {buyNowProduct.price} </p>
                 </div>
               </div>
               <div className="h-px bg-white/10 my-8" />
               <div className="flex justify-between text-white/60">
                 <span>Product Price</span>
-                <span> ₹09878 </span>
+                <span> ₹{buyNowProduct.price} </span>
               </div>
               <div className="flex justify-between text-white/60 mt-4">
                 <span>Quantity</span>
-                {/* <span> × {buyNowProduct.quantity} </span> */}
-
-                <span>x 1</span>
+                <span> × {buyNowProduct.quantity} </span>
               </div>
               <div className="flex justify-between text-white/60 mt-4">
                 <span>Delivery</span>
@@ -216,10 +340,14 @@ const Checkout = () => {
               </div>
               <div className="h-px bg-white/10 my-6" />
               <div className="flex justify-between text-2xl">
-                <span>Total</span> <span> ₹40000 </span>
+                <span>Total</span> <span> ₹{totalAmount} </span>
               </div>
             </div>
-            <button className="w-full mt-8 bg-white text-black py-4 rounded-full text-lg font-medium hover:bg-gray-200 transition">
+            <button
+              type="button"
+              onClick={createCheckout}
+              className="w-full mt-8 bg-white text-black py-4 rounded-full text-lg font-medium hover:bg-gray-200 transition"
+            >
               payment
             </button>
           </div>
