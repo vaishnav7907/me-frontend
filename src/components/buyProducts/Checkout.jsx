@@ -53,7 +53,8 @@ const Checkout = () => {
   };
   const createCheckout = async () => {
     try {
-      const userToken = localStorage.getItem("token");
+      const userToken = localStorage.getItem("userToken");
+      console.log("USER TOKEN:", userToken);
 
       if (!buyNowProduct) {
         alert("Product not found");
@@ -128,16 +129,6 @@ const Checkout = () => {
       );
     }
   };
-
-  // const buyNowProduct = {
-  //     productId: product._id,
-  //     name: product.name,
-  //     price: product.price,
-  //     quantity,
-  //     size: selectedSize,
-  //     color: selectedVariant.color,
-  //     image: selectedImage,
-  //   };
 
   if (!buyNowProduct) {
     return (
@@ -348,7 +339,7 @@ const Checkout = () => {
               onClick={createCheckout}
               className="w-full mt-8 bg-white text-black py-4 rounded-full text-lg font-medium hover:bg-gray-200 transition"
             >
-              payment
+              {paymentMethod==="Online Payment"?"Payment":"Order"}
             </button>
           </div>
         </div>
