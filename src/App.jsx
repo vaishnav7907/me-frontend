@@ -41,6 +41,7 @@ import { useState } from "react";
 import AdminSignup from "./components/adminPanel/adminAuthentication/adminSignup/AdminSignup";
 import AdminLogin from "./components/adminPanel/adminAuthentication/adminLogin/AdminLogin";
 import Checkout from "./components/buyProducts/Checkout";
+import OrderSuccess from "./components/buyProducts/OrderSuccess";
 // import AdminWelcomePage from "./components/adminPanel/adminAuthentication/adminWelcomePage/AdminWelcomePage";
 
 function App() {
@@ -80,6 +81,8 @@ function App() {
             <Route path="/productInfo" element={<ProductInfo />} />
 
             <Route path="/productInfo/Checkout" element={<Checkout />} />
+            <Route path="/orderSuccess" element={<OrderSuccess/>}/>
+
             <Route path="/Offers" element={<OfferPage />} />
             <Route path="/CartOrder" element={<CartOrder />} />
             {/* end brand subpage */}

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoArrowBack, IoCheckmarkCircleOutline } from "react-icons/io5";
 import axios from "axios";
+
 const Checkout = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,7 +17,7 @@ const Checkout = () => {
   const [state, setState] = useState("");
   const [pincode, setPincode] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
-
+  const [loading, setLoading] = useState(false);
   const totalAmount =
     Number(buyNowProduct.price) * Number(buyNowProduct.quantity);
 
@@ -51,10 +52,16 @@ const Checkout = () => {
   const onchangePincode = (e) => {
     setPincode(e.target.value);
   };
+
   const createCheckout = async () => {
     try {
       const userToken = localStorage.getItem("userToken");
       console.log("USER TOKEN:", userToken);
+
+      if (!userToken) {
+        alert("Please login first");
+        return;
+      }
 
       if (!buyNowProduct) {
         alert("Product not found");
@@ -80,6 +87,12 @@ const Checkout = () => {
         return;
       }
 
+      if (paymentMethod === "Online Payment") {
+        await handleOnlinePayment(userToken);
+        return;
+      }
+
+      
       const checkoutData = {
         product: {
           productId: buyNowProduct.productId,
@@ -106,6 +119,8 @@ const Checkout = () => {
 
       console.log("Sending checkout data:", checkoutData);
 
+      setLoading(true);
+
       const createCheckoutApi = await axios.post(
         `${import.meta.env.VITE_API_URL}/Me/Checkout`,
         checkoutData,
@@ -118,7 +133,10 @@ const Checkout = () => {
 
       console.log("Checkout response:", createCheckoutApi.data);
 
-      alert("Order placed successfully");
+      if (createCheckoutApi.data.success) {
+        alert("Order placed successfully");
+        navigate("/orderSuccess");
+      }
     } catch (error) {
       console.log("Error in create checkout:", error);
       console.log("Server response:", error.response?.data);
@@ -127,6 +145,146 @@ const Checkout = () => {
         error.response?.data?.message ||
           "Something went wrong while creating checkout",
       );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOnlinePayment = async (userToken) => {
+    try {
+      if (!window.Razorpay) {
+        alert("Razorpay failed to load");
+        return;
+      }
+
+      setLoading(true);
+
+      const orderResponse = await axios.post(
+        `${import.meta.env.VITE_API_URL}/Me/createRazorpayOrder`,
+        { amount: totalAmount },
+        { headers: { Authorization: `Bearer ${userToken}` } },
+      );
+      console.log("Razorpay order:", orderResponse.data);
+      if (!orderResponse.data.success) {
+        alert("Unable to create Razorpay order");
+        return;
+      }
+
+      const razorpayOrder = orderResponse.data.order;
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: "ME",
+        description: buyNowProduct.name,
+        order_id: razorpayOrder.id,
+        prefill: {
+          name: name,
+          email: email,
+          contact: phone,
+        },
+        theme: {
+          color: "#000000",
+        },
+
+        handler: async (response) => {
+          try {
+            console.log("Razorpay payment response:", response);
+
+            const verifyResponse = await axios.post(
+              `${import.meta.env.VITE_API_URL}/Me/verifyRazorpayPayment`,
+              {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              },
+              { headers: { Authorization: `Bearer ${userToken}` } },
+            );
+
+            console.log("Payment verification:", verifyResponse.data);
+            if (!verifyResponse.data.success) {
+              alert("Payment verification failed");
+              return;
+            }
+
+            const checkoutData = {
+              product: {
+                productId: buyNowProduct.productId,
+                quantity: buyNowProduct.quantity,
+                size: buyNowProduct.size,
+                color: {
+                  name: buyNowProduct.color?.name,
+                },
+              },
+
+              deliveryAddress: {
+                name,
+                phone,
+                email,
+                address,
+                city,
+                district,
+                state,
+                pincode,
+              },
+
+              paymentMethod: "Online Payment",
+
+              paymentDetails: {
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+              },
+            };
+
+            console.log("Creating online checkout:", checkoutData);
+
+            const checkoutResponse = await axios.post(
+              `${import.meta.env.VITE_API_URL}/Me/Checkout`,
+              checkoutData,
+              { headers: { Authorization: `Bearer ${userToken}` } },
+            );
+
+            console.log("Checkout response:", checkoutResponse.data);
+
+            if (checkoutResponse.data.success) {
+              alert("Payment successful");
+              navigate("/orderSuccess");
+            }
+          } catch (error) {
+            console.log("Payment verification error:", error);
+            console.log("Server response:", error.response?.data);
+
+            alert(
+              error.response?.data?.message || "Payment verification failed",
+            );
+          } finally {
+            setLoading(false);
+          }
+        },
+
+        modal: {
+          ondismiss: () => {
+            setLoading(false);
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.on("payment.failed", (response) => {
+        console.log("Payment failed:", response.error);
+        alert(response.error?.description || "Payment failed");
+
+        setLoading(false);
+      });
+
+      razorpay.open();
+    } catch (error) {
+      console.log("Razorpay error:", error);
+      console.log("Server response:", error.response?.data);
+
+      alert(error.response?.data?.message || "Unable to create Razorpay order");
+
+      setLoading(false);
     }
   };
 
@@ -337,9 +495,14 @@ const Checkout = () => {
             <button
               type="button"
               onClick={createCheckout}
-              className="w-full mt-8 bg-white text-black py-4 rounded-full text-lg font-medium hover:bg-gray-200 transition"
+              disabled={loading}
+              className="w-full mt-8 bg-white text-black py-4 rounded-full text-lg font-medium hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {paymentMethod==="Online Payment"?"Payment":"Order"}
+              {loading
+                ? "Processing..."
+                : paymentMethod === "Online Payment"
+                  ? `Pay ₹${totalAmount}`
+                  : "Order"}
             </button>
           </div>
         </div>
