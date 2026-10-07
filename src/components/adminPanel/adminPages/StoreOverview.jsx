@@ -434,7 +434,7 @@ const StoreOverview = () => {
 
         {/*  */}
 
-        <div className="mt-10">
+        {/* <div className="mt-10">
           <div>
             <div>
               <p className="uppercase tracking-[0.20em] text-neutral-500 text-[10px] font-medium ">
@@ -498,7 +498,7 @@ const StoreOverview = () => {
 
             
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
