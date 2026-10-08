@@ -2,94 +2,86 @@ import { tableFeatures, useTable } from "@tanstack/react-table";
 import React from "react";
 import { BsBox } from "react-icons/bs";
 import { FiSearch } from "react-icons/fi";
-import { FiChevronDown } from "react-icons/fi";
+import { FiChevronDown, FiEdit } from "react-icons/fi";
 import { FiEye } from "react-icons/fi";
 import { BsThreeDots } from "react-icons/bs";
+
+import { FiPackage, FiTruck, FiCheckCircle, FiClock } from "react-icons/fi";
+import { useState } from "react";
+import { useEffect } from "react";
+import axios from "axios";
 const StoreOrders = () => {
-  const orders = [
-    {
-      id: "#ME-1048",
-      customer: "Arjun Nair",
-      email: "arjun.nair@gmail.com",
-      items: 3,
-      amount: 7499,
-      payment: "Paid",
-      status: "Delivered",
-      date: "30 Aug 2026",
-    },
-    {
-      id: "#ME-1047",
-      customer: "Rahul Kumar",
-      email: "rahul.kumar@gmail.com",
-      items: 2,
-      amount: 4299,
-      payment: "Paid",
-      status: "Shipped",
-      date: "30 Aug 2026",
-    },
-    {
-      id: "#ME-1046",
-      customer: "Vishnu Raj",
-      email: "vishnu.raj@gmail.com",
-      items: 1,
-      amount: 1899,
-      payment: "Pending",
-      status: "Processing",
-      date: "29 Aug 2026",
-    },
-    {
-      id: "#ME-1045",
-      customer: "Adithya S",
-      email: "adithya.s@gmail.com",
-      items: 4,
-      amount: 9499,
-      payment: "Paid",
-      status: "Delivered",
-      date: "29 Aug 2026",
-    },
-    {
-      id: "#ME-1044",
-      customer: "Akshay Menon",
-      email: "akshay.menon@gmail.com",
-      items: 2,
-      amount: 3599,
-      payment: "Failed",
-      status: "Cancelled",
-      date: "28 Aug 2026",
-    },
-    {
-      id: "#ME-1043",
-      customer: "Nikhil Das",
-      email: "nikhil.das@gmail.com",
-      items: 3,
-      amount: 6199,
-      payment: "Paid",
-      status: "Shipped",
-      date: "28 Aug 2026",
-    },
-    {
-      id: "#ME-1042",
-      customer: "Akhil Paul",
-      email: "akhil.paul@gmail.com",
-      items: 1,
-      amount: 1599,
-      payment: "Pending",
-      status: "Processing",
-      date: "27 Aug 2026",
-    },
-    {
-      id: "#ME-1041",
-      customer: "Manu Joseph",
-      email: "manu.joseph@gmail.com",
-      items: 5,
-      amount: 11499,
-      payment: "Paid",
-      status: "Delivered",
-      date: "27 Aug 2026",
-    },
-  ];
+  const [allOrders, setAllOrders] = useState([]);
+  const [orderStatusFilter, setOrderStatusFilter] = useState("All");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("All");
+  const getAllOrders = async () => {
+    try {
+      const getAllOrdersFn = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/getAdminOrder`,
+      );
+
+      setAllOrders(getAllOrdersFn.data.orders);
+      console.log("all orders", getAllOrdersFn.data.orders);
+    } catch (error) {
+      console.log("error in get all orders", error);
+      alert(error.message);
+    }
+  };
+
+  useEffect(() => {
+    getAllOrders();
+  }, []);
+
+  const filteredOrder = allOrders.filter((statusFilter) => {
+    const orderStatusMatch =
+      orderStatusFilter === "All" ||
+      statusFilter.orderStatus === orderStatusFilter;
+
+    const paymentStatusMatch =
+      paymentStatusFilter === "All" ||
+      statusFilter.paymentStatus === paymentStatusFilter;
+
+    return orderStatusMatch && paymentStatusMatch;
+  });
+
+  const orders = filteredOrder.map((order, index) => ({
+    orderId: order._id,
+    id: `#ME-${index + 1}`,
+    customer: order.user?.FullName,
+    email: order.user?.Email,
+    items: order.product?.quantity,
+    amount: order.product?.price,
+    payment: order.paymentStatus,
+    status: order.orderStatus,
+    date: new Date(order.createdAt).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }),
+  }));
+
+  const [selectOrders, setSelectOrders] = useState([]);
+
+  const toggleSelectAll = () => {
+    if (selectOrders.length === orders.length) {
+      setSelectOrders([]);
+    } else {
+      setSelectOrders(orders.map((order) => order.id));
+    }
+  };
 
   const columns = [
+    {
+      accessorKey: "checkbox",
+      header: (
+        <input
+          type="checkbox"
+          checked={orders.length > 0 && selectOrders.length === orders.length}
+          onChange={toggleSelectAll}
+          className="accent-purple-600 w-4 h-4 cursor-pointer"
+        />
+      ),
+    },
     { accessorKey: "id", header: "order" },
     { accessorKey: "customer", header: "customer" },
     { accessorKey: "items", header: "items" },
@@ -106,6 +98,45 @@ const StoreOrders = () => {
     features: tableFeatures(),
   });
 
+  const [selectUpdateOrder, setselectUpdateOrder] = useState(null);
+  const [updateStatusModal, setUpdateStatusModal] = useState(false);
+  const [orderids, setOrderids] = useState(null);
+  const [newStatus, setNewStatus] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  console.log("order id s", orderids);
+
+  const openStatusModal = (order) => {
+    setselectUpdateOrder(order);
+    setUpdateStatusModal(true);
+  };
+
+  const updateOrders = async () => {
+    try {
+      const adminToken = localStorage.getItem("token");
+
+      setLoading(true);
+      const updateOrderstatusfn = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/Me/updateOrderStatus/${orderids}`,
+        { orderStatus: newStatus },
+        { headers: { Authorization: `Bearer ${adminToken}` } },
+      );
+
+      console.log("update order status", updateOrderstatusfn.data);
+
+      if (updateOrderstatusfn.data.success) {
+        alert("Order Status Updated Successfully");
+        setUpdateStatusModal(false);
+        setNewStatus("");
+        getAllOrders();
+      }
+    } catch (error) {
+      console.log(error.response?.data?.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="px-7 py-7">
@@ -120,42 +151,59 @@ const StoreOrders = () => {
               </span>
             </div>
 
-            <button
-              className="flex items-center gap-2 h-9 px-2.5 bg-white font-semibold text-sm rounded-lg  transition
-                                  hover:bg-[#e8e8e8]"
-            >
+            <button className="flex items-center gap-2 h-9 px-2.5 bg-white font-semibold text-sm rounded-lg  transition hover:bg-[#e8e8e8]">
               <p>Export</p>
             </button>
           </div>
         </div>
         {/* overview */}
-        <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 text-white">
-          <div className="rounded-xl border border-[#24272c] bg-[#151719] p-5">
-            <p className="text-sm text-gray-500">Total Orders</p>
-            <h2 className="mt-2 text-2xl font-semibold">24</h2>
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          <div className="bg-[#12151A] border border-[#242932] rounded-xl p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-gray-400 text-sm">Total Orders</p>
+              <FiPackage className="text-purple-400" size={20} />
+            </div>
+            <h2 className="text-2xl font-semibold mt-3">{orders.length}</h2>
           </div>
-
-          <div className="rounded-xl border border-[#24272c] bg-[#151719] p-5">
-            <p className="text-sm text-gray-500">Processing</p>
-            <h2 className="mt-2 text-2xl font-semibold">18</h2>
+          <div className="bg-[#12151A] border border-[#242932] rounded-xl p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-gray-400 text-sm">Pending</p>
+              <FiClock className="text-yellow-400" size={20} />
+            </div>
+            <h2 className="text-2xl font-semibold mt-3">
+              {orders.filter((order) => order.orderStatus === "Pending").length}
+            </h2>
           </div>
-          <div className="rounded-xl border border-[#24272c] bg-[#151719] p-5">
-            <p className="text-sm text-gray-500">Shipped</p>
-            <h2 className="mt-2 text-2xl font-semibold">2</h2>
+          <div className="bg-[#12151A] border border-[#242932] rounded-xl p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-gray-400 text-sm">Shipped</p>
+              <FiTruck className="text-blue-400" size={20} />
+            </div>
+            <h2 className="text-2xl font-semibold mt-3">
+              {
+                orders.filter(
+                  (order) =>
+                    order.orderStatus === "Shipped" ||
+                    order.orderStatus === "Out for Delivery",
+                ).length
+              }
+            </h2>
           </div>
-
-          <div className="rounded-xl border border-[#24272c] bg-[#151719] p-5">
-            <span className="flex justify-between items-center">
-              <p className="text-sm text-gray-500">Paid revenue</p>
-              <BsBox size={18} />
-            </span>
-
-            <h2 className="mt-2 text-2xl font-semibold">128</h2>
+          <div className="bg-[#12151A] border border-[#242932] rounded-xl p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-gray-400 text-sm">Delivered</p>
+              <FiCheckCircle className="text-green-400" size={20} />
+            </div>
+            <h2 className="text-2xl font-semibold mt-3">
+              {
+                orders.filter((order) => order.orderStatus === "Delivered")
+                  .length
+              }
+            </h2>
           </div>
         </div>
 
         <div className="w-full overflow-hidden rounded-2xl border border-[#23272d] bg-[#111417] shadow-[0_10px_40px_rgba(0,0,0,0.18)]  mt-5">
-          {/* ================= TOOLBAR ================= */}
           <div className="flex items-center justify-between gap-4 border-b border-[#23272d] px-5 py-4">
             {/* Search */}
             <div className="relative w-full max-w-[340px]">
@@ -173,10 +221,17 @@ const StoreOrders = () => {
 
             <div className="flex items-center gap-5">
               <div className="relative w-[160px]">
-                <select className="h-10 w-full appearance-none rounded-lg border border-[#292f36] bg-[#0b0e10]  px-3  pr-9 text-sm text-gray-400 outline-none focus:border-gray-500 ">
-                  <option value="All">All Status</option>
+                <select
+                  value={orderStatusFilter}
+                  onChange={(e) => setOrderStatusFilter(e.target.value)}
+                  className="rounded-lg border border-[#24272c] bg-[#151719] px-4 py-2 text-sm text-white outline-none"
+                >
+                  <option value="All">All Orders</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Confirmed">Confirmed</option>
                   <option value="Processing">Processing</option>
                   <option value="Shipped">Shipped</option>
+                  <option value="Out for Delivery">Out for Delivery</option>
                   <option value="Delivered">Delivered</option>
                   <option value="Cancelled">Cancelled</option>
                 </select>
@@ -187,11 +242,16 @@ const StoreOrders = () => {
                 />
               </div>
               <div className="relative w-[160px]">
-                <select className="h-10 w-full appearance-none rounded-lg border border-[#292f36] bg-[#0b0e10]  px-3  pr-9 text-sm text-gray-400 outline-none focus:border-gray-500 ">
+                <select
+                  className="h-10 w-full appearance-none rounded-lg border border-[#292f36] bg-[#0b0e10]  px-3  pr-9 text-sm text-gray-400 outline-none focus:border-gray-500 "
+                  value={paymentStatusFilter}
+                  onChange={(e) => setPaymentStatusFilter(e.target.value)}
+                >
                   <option value="All">All Payments</option>
-                  <option value="Processing">Paid</option>
-                  <option value="Shipped">Pending</option>
-                  <option value="Delivered">Failed</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Failed">Failed</option>
+                  <option value="Refunded">Refunded</option>
                 </select>
 
                 <FiChevronDown
@@ -229,7 +289,19 @@ const StoreOrders = () => {
                           key={tableCell.id}
                           className="px-5 py-4 whitespace-nowrap"
                         >
+                          {tableCell.column.id === "checkbox" && (
+                            <div>
+                              <input
+                                type="checkbox"
+                                checked={selectOrders.includes(
+                                  tablebody.original.id,
+                                )}
+                                className="accent-purple-600 w-4 h-4 cursor-pointer"
+                              />
+                            </div>
+                          )}
                           {/* ORDER ID */}
+
                           {tableCell.column.id === "id" && (
                             <div>
                               <p className="text-sm font-medium text-white">
@@ -277,10 +349,30 @@ const StoreOrders = () => {
                           {tableCell.column.id === "payment" && (
                             <div>
                               <span
-                                className={`inline-flex items-center text-xs font-mediu ${value === "Paid" ? "text-green-400" : value === "Pending" ? "text-yellow-400" : "text-red-400"} `}
+                                className={`inline-flex items-center text-xs font-medium ${
+                                  value === "Paid"
+                                    ? "text-green-400"
+                                    : value === "Pending"
+                                      ? "text-yellow-400"
+                                      : value === "Failed"
+                                        ? "text-red-400"
+                                        : value === "Refunded"
+                                          ? "text-purple-400"
+                                          : "text-gray-400"
+                                }`}
                               >
                                 <span
-                                  className={` mr-2 h-1.5 w-1.5 rounded-full ${value === "Paid" ? "bg-green-400" : value === "Pending" ? "bg-yellow-400" : "bg-red-400"}`}
+                                  className={`mr-2 h-1.5 w-1.5 rounded-full ${
+                                    value === "Paid"
+                                      ? "bg-green-400"
+                                      : value === "Pending"
+                                        ? "bg-yellow-400"
+                                        : value === "Failed"
+                                          ? "bg-red-400"
+                                          : value === "Refunded"
+                                            ? "bg-purple-400"
+                                            : "bg-gray-400"
+                                  }`}
                                 />
 
                                 {value}
@@ -300,9 +392,15 @@ const StoreOrders = () => {
                           ? "border-blue-400/15 bg-blue-400/[0.06] text-blue-400"
                           : value === "Processing"
                             ? "border-yellow-400/15 bg-yellow-400/[0.06] text-yellow-400"
-                            : value === "Cancelled"
-                              ? "border-red-400/15 bg-red-400/[0.06] text-red-400"
-                              : "border-gray-400/15 bg-gray-400/[0.06] text-gray-400"
+                            : value === "Out for Delivery"
+                              ? "border-purple-400/15 bg-purple-400/[0.06] text-purple-400"
+                              : value === "Confirmed"
+                                ? "border-cyan-400/15 bg-cyan-400/[0.06] text-cyan-400"
+                                : value === "Pending"
+                                  ? "border-gray-400/15 bg-gray-400/[0.06] text-gray-400"
+                                  : value === "Cancelled"
+                                    ? "border-red-400/15 bg-red-400/[0.06] text-red-400"
+                                    : "border-gray-400/15 bg-gray-400/[0.06] text-gray-400"
                     }
                   `}
                               >
@@ -334,9 +432,13 @@ const StoreOrders = () => {
                               <button
                                 type="button"
                                 title="More actions"
+                                onClick={() => {
+                                  openStatusModal(tablebody.original);
+                                  setOrderids(tablebody.original.orderId);
+                                }}
                                 className=" flex h-8 w-8 items-center justify-center rounded-lg text-gray-500  transition-all  duration-200 hover:bg-white/[0.05] hover:text-white"
                               >
-                                <BsThreeDots size={18} />
+                                <FiEdit size={18} />
                               </button>
                             </div>
                           )}
@@ -347,6 +449,80 @@ const StoreOrders = () => {
                 ))}
               </tbody>
             </table>
+
+            {updateStatusModal && selectUpdateOrder && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+                <div className="w-[400px] rounded-xl border border-white/10 bg-[#12151A] p-6 shadow-2xl">
+                  <div className="mb-5 flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-white">
+                      Update Order Status
+                    </h2>
+
+                    <button
+                      type="button"
+                      onClick={() => setUpdateStatusModal(false)}
+                      className="text-xl text-gray-500 hover:text-white"
+                    >
+                      ×
+                    </button>
+                  </div>
+
+                  <div className="mb-5">
+                    <p className="text-sm text-gray-400">Order</p>
+                    <p className="mt-1 text-white">{selectUpdateOrder.id}</p>
+                  </div>
+
+                  <div className="mb-5">
+                    <p className="text-sm text-gray-400">Current Status</p>
+                    <p className="mt-1 text-white">
+                      {selectUpdateOrder.status}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm text-gray-400">
+                      New Status
+                    </label>
+
+                    <select
+                      className="w-full rounded-lg border border-white/10 bg-[#0B0D10] px-3 py-2 text-sm text-white outline-none"
+                      defaultValue=""
+                      value={newStatus}
+                      onChange={(e) => setNewStatus(e.target.value)}
+                    >
+                      <option value="" disabled>
+                        Select status
+                      </option>
+                      <option value="Confirmed">Confirmed</option>
+                      <option value="Processing">Processing</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Out for Delivery">Out for Delivery</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </div>
+
+                  <div className="mt-6 flex justify-end gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setUpdateStatusModal(false)}
+                      className="rounded-lg bg-white/5 px-4 py-2 text-sm text-gray-300 hover:bg-white/10"
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={updateOrders}
+                      disabled={loading || !newStatus}
+                      className="rounded-lg bg-purple-600 px-4 py-2 text-sm text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {loading ? "Updating..." : "Update"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
