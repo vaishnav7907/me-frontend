@@ -4,8 +4,9 @@ import { BsBox } from "react-icons/bs";
 import { FiSearch } from "react-icons/fi";
 import { FiChevronDown, FiEdit } from "react-icons/fi";
 import { FiEye } from "react-icons/fi";
+import { MdOutlineLayers } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
-
+import { IoClose, IoLayersOutline, IoChevronDown } from "react-icons/io5";
 import { FiPackage, FiTruck, FiCheckCircle, FiClock } from "react-icons/fi";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -62,11 +63,19 @@ const StoreOrders = () => {
 
   const [selectOrders, setSelectOrders] = useState([]);
 
+  // const toggleSelectAll = () => {
+  //   if (selectOrders.length === orders.length) {
+  //     setSelectOrders([]);
+  //   } else {
+  //     setSelectOrders(orders.map((order) => order.id));
+  //   }
+  // };
+
   const toggleSelectAll = () => {
     if (selectOrders.length === orders.length) {
       setSelectOrders([]);
     } else {
-      setSelectOrders(orders.map((order) => order.id));
+      setSelectOrders(orders.map((order) => order.orderId));
     }
   };
 
@@ -137,6 +146,65 @@ const StoreOrders = () => {
     }
   };
 
+  const [bulkOrderIds, setBulkOrderIds] = useState(null);
+
+  const [bulkOrderStatusModal, setBulkOrderStatusModal] = useState(false);
+  const [bulkNewStatus, setBulkNewStatus] = useState("");
+  const statusOptions = [
+    "Confirmed",
+    "Processing",
+    "Shipped",
+    "Out for Delivery",
+    "Delivered",
+    "Cancelled",
+  ];
+
+  console.log("bulknew status", bulkNewStatus);
+  console.log("selected ids", selectOrders);
+  console.log("bulk order idd", bulkOrderIds);
+
+  const bulkUpdateOrderStatus = async () => {
+    if (!selectOrders.length || !bulkNewStatus) {
+      alert("Select orders and a new status");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const adminToken = localStorage.getItem("token");
+
+      const response = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/Me/bulkUpdateOrderStatus`,
+        {
+          orderIds: selectOrders,
+          orderStatus: bulkNewStatus,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        },
+      );
+
+      if (response.data.success) {
+        alert("Selected orders updated successfully");
+        setBulkOrderStatusModal(false);
+        setBulkNewStatus("");
+        setSelectOrders([]);
+        await getAllOrders();
+      }
+    } catch (error) {
+      console.log(
+        "Bulk update error:",
+        error.response?.data?.message || error.message,
+      );
+      alert(error.response?.data?.message || "Failed to update orders");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="px-7 py-7">
@@ -157,7 +225,7 @@ const StoreOrders = () => {
           </div>
         </div>
         {/* overview */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-4 gap-4 mb-6 mt-6">
           <div className="bg-[#12151A] border border-[#242932] rounded-xl p-5">
             <div className="flex items-center justify-between">
               <p className="text-gray-400 text-sm">Total Orders</p>
@@ -259,6 +327,19 @@ const StoreOrders = () => {
                   size={15}
                 />
               </div>
+
+              <div>
+                <button
+                  onClick={() => setBulkOrderStatusModal(true)}
+                  disabled={selectOrders.length === 0}
+                  className="flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <MdOutlineLayers size={18} /> Bulk Update
+                  <span className="rounded-md bg-white/15 px-2 py-0.5 text-xs">
+                    {selectOrders.length}
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
           <div className="">
@@ -290,16 +371,24 @@ const StoreOrders = () => {
                           className="px-5 py-4 whitespace-nowrap"
                         >
                           {tableCell.column.id === "checkbox" && (
-                            <div>
-                              <input
-                                type="checkbox"
-                                checked={selectOrders.includes(
-                                  tablebody.original.id,
-                                )}
-                                className="accent-purple-600 w-4 h-4 cursor-pointer"
-                              />
-                            </div>
+                            <input
+                              type="checkbox"
+                              checked={selectOrders.includes(
+                                tablebody.original.orderId,
+                              )}
+                              onChange={() => {
+                                const orderId = tablebody.original.orderId;
+
+                                setSelectOrders((prev) =>
+                                  prev.includes(orderId)
+                                    ? prev.filter((id) => id !== orderId)
+                                    : [...prev, orderId],
+                                );
+                              }}
+                              className="h-4 w-4 cursor-pointer accent-purple-600"
+                            />
                           )}
+
                           {/* ORDER ID */}
 
                           {tableCell.column.id === "id" && (
@@ -435,6 +524,7 @@ const StoreOrders = () => {
                                 onClick={() => {
                                   openStatusModal(tablebody.original);
                                   setOrderids(tablebody.original.orderId);
+                                  setBulkOrderIds(tablebody.original.orderId);
                                 }}
                                 className=" flex h-8 w-8 items-center justify-center rounded-lg text-gray-500  transition-all  duration-200 hover:bg-white/[0.05] hover:text-white"
                               >
@@ -523,6 +613,107 @@ const StoreOrders = () => {
                 </div>
               </div>
             )}
+
+            <div>
+              {bulkOrderStatusModal && selectOrders && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+                    <div className="w-full max-w-md overflow-hidden rounded-2xl border border-[#242932] bg-[#12151A] shadow-2xl">
+                      <div className="flex items-center justify-between border-b border-[#242932] p-5">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400">
+                            <IoLayersOutline size={23} />
+                          </div>
+                          <div>
+                            <h2 className="text-lg font-semibold text-white">
+                              Bulk Update Orders
+                            </h2>
+                            <p className="mt-1 text-xs text-gray-400">
+                              Update multiple orders at once
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setBulkOrderStatusModal(false);
+                            setBulkNewStatus("");
+                          }}
+                          className="rounded-lg p-2 text-gray-400 transition hover:bg-[#242932] hover:text-white"
+                        >
+                          <IoClose size={21} />
+                        </button>
+                      </div>
+                      <div className="space-y-5 p-5">
+                        <div className="rounded-xl border border-[#2D2547] bg-purple-500/5 p-4">
+                          <p className="text-sm text-gray-400">
+                            Selected orders
+                          </p>
+                          <p className="mt-2 text-2xl font-bold text-white">
+                            {selectOrders.length}
+                          </p>
+                          <p className="mt-1 text-xs text-purple-300">
+                            Orders selected for status update
+                          </p>
+                        </div>
+                        <div>
+                          <label className="mb-2 block text-sm font-medium text-gray-300">
+                            New Order Status
+                          </label>
+                          <div className="relative">
+                            <select
+                              value={bulkNewStatus}
+                              onChange={(e) => setBulkNewStatus(e.target.value)}
+                              className="w-full appearance-none rounded-xl border border-[#242932] bg-[#0B0D10] px-4 py-3 pr-10 text-sm text-white outline-none transition focus:border-purple-500"
+                            >
+                              <option value="">Choose a status</option>
+                              {statusOptions.map((status) => (
+                                <option key={status} value={status}>
+                                  {status}
+                                </option>
+                              ))}
+                            </select>
+                            <IoChevronDown
+                              size={17}
+                              className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-xs leading-5 text-gray-500">
+                          Only select a status that is valid for every selected
+                          order. Your backend should validate each order's
+                          current status.
+                        </p>
+                        <div className="flex gap-3 pt-1">
+                          <button
+                            onClick={() => {
+                              setBulkOrderStatusModal(false);
+                              setBulkNewStatus("");
+                            }}
+                            className="flex-1 rounded-xl border border-[#242932] px-4 py-3 text-sm font-semibold text-gray-300 transition hover:bg-[#242932]"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={bulkUpdateOrderStatus}
+                            disabled={
+                              selectOrders.length === 0 ||
+                              !bulkNewStatus ||
+                              loading
+                            }
+                            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            <IoLayersOutline size={17} />{" "}
+                            {loading
+                              ? "Updating Bulk Order..."
+                              : "Update Bulk Order"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
