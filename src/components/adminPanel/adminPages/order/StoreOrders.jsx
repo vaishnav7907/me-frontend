@@ -8,6 +8,7 @@ import { MdOutlineLayers } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
 import { IoClose, IoLayersOutline, IoChevronDown } from "react-icons/io5";
 import { FiPackage, FiTruck, FiCheckCircle, FiClock } from "react-icons/fi";
+import { IoCloseOutline } from "react-icons/io5";
 import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
@@ -53,12 +54,24 @@ const StoreOrders = () => {
     items: order.product?.quantity,
     amount: order.product?.price,
     payment: order.paymentStatus,
+    paymentMethod: order.paymentMethod,
     status: order.orderStatus,
     date: new Date(order.createdAt).toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "short",
       year: "numeric",
     }),
+    phone: order.deliveryAddress?.phone,
+    city: order.deliveryAddress?.city,
+    district: order.deliveryAddress?.district,
+    state: order.deliveryAddress?.state,
+    pincode: order.deliveryAddress?.pincode,
+    address: order.deliveryAddress?.address,
+    name: order.product?.name,
+    quantity: order.product?.quantity,
+    size: order.product?.size,
+    image: order.product?.image,
+    color: order.product?.color?.name,
   }));
 
   const [selectOrders, setSelectOrders] = useState([]);
@@ -205,6 +218,10 @@ const StoreOrders = () => {
     }
   };
 
+  // const [orderDetailsModal, setOrderDetailsModal] = useState(false);
+  const [orderDetailsModal, setOrderDetailsModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
   return (
     <div>
       <div className="px-7 py-7">
@@ -225,51 +242,51 @@ const StoreOrders = () => {
           </div>
         </div>
         {/* overview */}
-        <div className="grid grid-cols-4 gap-4 mb-6 mt-6">
-          <div className="bg-[#12151A] border border-[#242932] rounded-xl p-5">
-            <div className="flex items-center justify-between">
-              <p className="text-gray-400 text-sm">Total Orders</p>
-              <FiPackage className="text-purple-400" size={20} />
-            </div>
-            <h2 className="text-2xl font-semibold mt-3">{orders.length}</h2>
-          </div>
-          <div className="bg-[#12151A] border border-[#242932] rounded-xl p-5">
-            <div className="flex items-center justify-between">
-              <p className="text-gray-400 text-sm">Pending</p>
-              <FiClock className="text-yellow-400" size={20} />
-            </div>
-            <h2 className="text-2xl font-semibold mt-3">
-              {orders.filter((order) => order.orderStatus === "Pending").length}
-            </h2>
-          </div>
-          <div className="bg-[#12151A] border border-[#242932] rounded-xl p-5">
-            <div className="flex items-center justify-between">
-              <p className="text-gray-400 text-sm">Shipped</p>
-              <FiTruck className="text-blue-400" size={20} />
-            </div>
-            <h2 className="text-2xl font-semibold mt-3">
-              {
-                orders.filter(
-                  (order) =>
-                    order.orderStatus === "Shipped" ||
-                    order.orderStatus === "Out for Delivery",
-                ).length
-              }
-            </h2>
-          </div>
-          <div className="bg-[#12151A] border border-[#242932] rounded-xl p-5">
-            <div className="flex items-center justify-between">
-              <p className="text-gray-400 text-sm">Delivered</p>
-              <FiCheckCircle className="text-green-400" size={20} />
-            </div>
-            <h2 className="text-2xl font-semibold mt-3">
-              {
-                orders.filter((order) => order.orderStatus === "Delivered")
-                  .length
-              }
-            </h2>
-          </div>
-        </div>
+        <div className="mb-6 mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  <div className="rounded-xl border border-[#242932] bg-[#12151A] p-5">
+    <div className="flex items-center justify-between">
+      <p className="text-sm text-gray-400">Total Orders</p>
+      <FiPackage className="text-purple-400" size={20} />
+    </div>
+    <h2 className="mt-3 text-2xl font-semibold">{orders.length}</h2>
+  </div>
+
+  <div className="rounded-xl border border-[#242932] bg-[#12151A] p-5">
+    <div className="flex items-center justify-between">
+      <p className="text-sm text-gray-400">Pending</p>
+      <FiClock className="text-yellow-400" size={20} />
+    </div>
+    <h2 className="mt-3 text-2xl font-semibold">
+      {orders.filter((order) => order.status === "Pending").length}
+    </h2>
+  </div>
+
+  <div className="rounded-xl border border-[#242932] bg-[#12151A] p-5">
+    <div className="flex items-center justify-between">
+      <p className="text-sm text-gray-400">Shipped</p>
+      <FiTruck className="text-blue-400" size={20} />
+    </div>
+    <h2 className="mt-3 text-2xl font-semibold">
+      {
+        orders.filter(
+          (order) =>
+            order.status === "Shipped" ||
+            order.status === "Out for Delivery",
+        ).length
+      }
+    </h2>
+  </div>
+
+  <div className="rounded-xl border border-[#242932] bg-[#12151A] p-5">
+    <div className="flex items-center justify-between">
+      <p className="text-sm text-gray-400">Delivered</p>
+      <FiCheckCircle className="text-green-400" size={20} />
+    </div>
+    <h2 className="mt-3 text-2xl font-semibold">
+      {orders.filter((order) => order.status === "Delivered").length}
+    </h2>
+  </div>
+</div>
 
         <div className="w-full overflow-hidden rounded-2xl border border-[#23272d] bg-[#111417] shadow-[0_10px_40px_rgba(0,0,0,0.18)]  mt-5">
           <div className="flex items-center justify-between gap-4 border-b border-[#23272d] px-5 py-4">
@@ -288,27 +305,7 @@ const StoreOrders = () => {
             {/* View Toggle */}
 
             <div className="flex items-center gap-5">
-              <div className="relative w-[160px]">
-                <select
-                  value={orderStatusFilter}
-                  onChange={(e) => setOrderStatusFilter(e.target.value)}
-                  className="rounded-lg border border-[#24272c] bg-[#151719] px-4 py-2 text-sm text-white outline-none"
-                >
-                  <option value="All">All Orders</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Confirmed">Confirmed</option>
-                  <option value="Processing">Processing</option>
-                  <option value="Shipped">Shipped</option>
-                  <option value="Out for Delivery">Out for Delivery</option>
-                  <option value="Delivered">Delivered</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
-
-                <FiChevronDown
-                  className=" pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                  size={15}
-                />
-              </div>
+             
               <div className="relative w-[160px]">
                 <select
                   className="h-10 w-full appearance-none rounded-lg border border-[#292f36] bg-[#0b0e10]  px-3  pr-9 text-sm text-gray-400 outline-none focus:border-gray-500 "
@@ -320,6 +317,28 @@ const StoreOrders = () => {
                   <option value="Pending">Pending</option>
                   <option value="Failed">Failed</option>
                   <option value="Refunded">Refunded</option>
+                </select>
+
+                <FiChevronDown
+                  className=" pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  size={15}
+                />
+              </div>
+
+               <div className="relative w-[160px]">
+                <select
+                  value={orderStatusFilter}
+                  onChange={(e) => setOrderStatusFilter(e.target.value)}
+                  className="rounded-lg border border-[#24272c] bg-[#0b0e10]  px-4 py-2 text-sm text-white outline-none"
+                >
+                  <option value="All">All Orders</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Shipped">Shipped</option>
+                  <option value="Out for Delivery">Out for Delivery</option>
+                  <option value="Delivered">Delivered</option>
+                  <option value="Cancelled">Cancelled</option>
                 </select>
 
                 <FiChevronDown
@@ -513,6 +532,34 @@ const StoreOrders = () => {
                                 type="button"
                                 title="View order"
                                 className="  flex  h-8  w-8  items-center  justify-center  rounded-lg  text-gray-500  transition-all  duration-200  hover:bg-white/[0.05]  hover:text-white"
+                                onClick={() => {
+                                  setOrderDetailsModal(true);
+                                  setSelectedOrder({
+                                    id: tablebody.original.orderId,
+                                    orderStatus: tablebody.original.status,
+                                    paymentStatus: tablebody.original.payment,
+                                    FullName: tablebody.original.customer,
+                                    Email: tablebody.original.email,
+                                    phone: tablebody.original.phone,
+                                    paymentMethod: tablebody.original.payment,
+                                    price: tablebody.original.amount,
+                                    price: tablebody.original.amount,
+                                    city: tablebody.original.city,
+                                    district: tablebody.original.district,
+                                    state: tablebody.original.state,
+                                    pincode: tablebody.original.pincode,
+                                    address: tablebody.original.address,
+                                    productName: tablebody.original.name,
+                                    productImage: tablebody.original.image,
+                                    productColor: tablebody.original.color,
+                                    productSize: tablebody.original.size,
+                                    productQuantity:
+                                      tablebody.original.quantity,
+                                    paymentMethod:
+                                      tablebody.original.paymentMethod,
+                                    orderDate: tablebody.original.date,
+                                  });
+                                }}
                               >
                                 <FiEye size={15} />
                               </button>
@@ -708,6 +755,249 @@ const StoreOrders = () => {
                               : "Update Bulk Order"}
                           </button>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              {orderDetailsModal && selectedOrder && (
+                <div
+                  className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+                  onClick={() => setOrderDetailsModal(false)}
+                >
+                  <div
+                    className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-[#242932] bg-[#12151A] text-white shadow-2xl"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Header */}
+                    <div className="flex items-center justify-between border-b border-[#242932] p-6">
+                      <div>
+                        <h2 className="text-xl font-semibold">Order Details</h2>
+                        <p className="mt-1 text-sm text-gray-400">
+                          Order ID:{" "}
+                          {selectedOrder.orderNumber || selectedOrder.id}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        title="Close"
+                        onClick={() => setOrderDetailsModal(false)}
+                        className="rounded-lg p-2 text-gray-400 transition hover:bg-[#242932] hover:text-white"
+                      >
+                        <IoClose size={23} />
+                      </button>
+                    </div>
+
+                    <div className="space-y-5 p-6">
+                      {/* Customer and Payment */}
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div className="rounded-xl border border-[#242932] p-4">
+                          <h3 className="mb-4 font-semibold text-purple-400">
+                            Customer Information
+                          </h3>
+
+                          <p className="text-xs text-gray-500">Full Name</p>
+                          <p className="mt-1 break-words">
+                            {selectedOrder.FullName || "N/A"}
+                          </p>
+
+                          <p className="mt-4 text-xs text-gray-500">
+                            Email Address
+                          </p>
+                          <p className="mt-1 break-all text-sm">
+                            {selectedOrder.Email || "N/A"}
+                          </p>
+
+                          <p className="mt-4 text-xs text-gray-500">
+                            Phone Number
+                          </p>
+                          <p className="mt-1">{selectedOrder.phone || "N/A"}</p>
+                        </div>
+
+                        <div className="rounded-xl border border-[#242932] p-4">
+                          <h3 className="mb-4 font-semibold text-purple-400">
+                            Payment Information
+                          </h3>
+
+                          <p className="text-xs text-gray-500">
+                            Payment Method
+                          </p>
+                          <p className="mt-1">
+                            {selectedOrder.paymentMethod || "N/A"}
+                          </p>
+
+                          <p className="mt-4 text-xs text-gray-500">
+                            Payment Status
+                          </p>
+
+                          <span
+                            className={`mt-1 inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+                              selectedOrder.paymentStatus === "Paid"
+                                ? "bg-green-500/10 text-green-400"
+                                : selectedOrder.payment === "Failed"
+                                  ? "bg-red-500/10 text-red-400"
+                                  : selectedOrder.payment === "Refunded"
+                                    ? "bg-purple-500/10 text-purple-400"
+                                    : "bg-yellow-500/10 text-yellow-400"
+                            }`}
+                          >
+                            {selectedOrder.paymentStatus || "N/A"}
+                          </span>
+
+                          <p className="mt-4 text-xs text-gray-500">
+                            Total Amount
+                          </p>
+                          <p className="mt-1 text-xl font-semibold">
+                            ₹
+                            {Number(selectedOrder.price || 0).toLocaleString(
+                              "en-IN",
+                            )}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Delivery Address */}
+                      <div className="rounded-xl border border-[#242932] p-4">
+                        <h3 className="mb-4 font-semibold text-purple-400">
+                          Delivery Address
+                        </h3>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                          <div>
+                            <p className="text-xs text-gray-500">City</p>
+                            <p className="mt-1 text-sm text-gray-300">
+                              {selectedOrder.city || "N/A"}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-gray-500">District</p>
+                            <p className="mt-1 text-sm text-gray-300">
+                              {selectedOrder.district || "N/A"}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-gray-500">State</p>
+                            <p className="mt-1 text-sm text-gray-300">
+                              {selectedOrder.state || "N/A"}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-gray-500">Pincode</p>
+                            <p className="mt-1 text-sm text-gray-300">
+                              {selectedOrder.pincode || "N/A"}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-gray-500">Address</p>
+                            <p className="mt-1 break-words text-sm text-gray-300">
+                              {selectedOrder.address || "N/A"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Product Information */}
+                      <div className="rounded-xl border border-[#242932] p-4">
+                        <h3 className="mb-4 font-semibold text-purple-400">
+                          Product Information
+                        </h3>
+
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                          {selectedOrder.productImage ? (
+                            <img
+                              src={selectedOrder.productImage}
+                              alt={selectedOrder.productName || "Product"}
+                              className="h-28 w-24 rounded-lg bg-[#242932] object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-28 w-24 shrink-0 items-center justify-center rounded-lg bg-[#242932]">
+                              <FiPackage size={28} className="text-gray-500" />
+                            </div>
+                          )}
+
+                          <div className="min-w-0 flex-1">
+                            <p className="text-base font-medium">
+                              {selectedOrder.productName || "Product"}
+                            </p>
+
+                            <p className="mt-2 text-sm text-gray-400">
+                              Size: {selectedOrder.productSize || "N/A"}
+                            </p>
+
+                            <p className="mt-1 text-sm text-gray-400">
+                              Color: {selectedOrder.productColor || "N/A"}
+                            </p>
+
+                            <p className="mt-1 text-sm text-gray-400">
+                              Quantity: {selectedOrder.productQuantity ?? "N/A"}
+                            </p>
+                          </div>
+
+                          <div className="sm:text-right">
+                            <p className="text-xs text-gray-500">Amount</p>
+                            <p className="mt-1 text-lg font-semibold">
+                              ₹
+                              {Number(selectedOrder.price || 0).toLocaleString(
+                                "en-IN",
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Order Status */}
+                      <div className="rounded-xl border border-[#242932] p-4">
+                        <h3 className="mb-3 font-semibold text-purple-400">
+                          Order Status
+                        </h3>
+
+                        <span
+                          className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${
+                            selectedOrder.orderStatus === "Delivered"
+                              ? "border-green-400/15 bg-green-400/[0.06] text-green-400"
+                              : selectedOrder.orderStatus === "Shipped"
+                                ? "border-blue-400/15 bg-blue-400/[0.06] text-blue-400"
+                                : selectedOrder.orderStatus === "Processing"
+                                  ? "border-yellow-400/15 bg-yellow-400/[0.06] text-yellow-400"
+                                  : selectedOrder.orderStatus ===
+                                      "Out for Delivery"
+                                    ? "border-purple-400/15 bg-purple-400/[0.06] text-purple-400"
+                                    : selectedOrder.orderStatus === "Confirmed"
+                                      ? "border-cyan-400/15 bg-cyan-400/[0.06] text-cyan-400"
+                                      : selectedOrder.orderStatus === "Pending"
+                                        ? "border-gray-400/15 bg-gray-400/[0.06] text-gray-400"
+                                        : selectedOrder.orderStatus ===
+                                            "Cancelled"
+                                          ? "border-red-400/15 bg-red-400/[0.06] text-red-400"
+                                          : "border-gray-400/15 bg-gray-400/[0.06] text-gray-400"
+                          }`}
+                        >
+                          {selectedOrder.orderStatus || "N/A"}
+                        </span>
+
+                        <p className="mt-4 text-xs text-gray-500">Order Date</p>
+                        <p className="mt-1 text-sm text-gray-300">
+                          {selectedOrder.orderDate || "N/A"}
+                        </p>
+                      </div>
+
+                      {/* Footer */}
+                      <div className="flex justify-end border-t border-[#242932] pt-4">
+                        <button
+                          type="button"
+                          onClick={() => setOrderDetailsModal(false)}
+                          className="rounded-lg bg-[#242932] px-5 py-2.5 text-sm font-medium transition hover:bg-[#343A46]"
+                        >
+                          Close
+                        </button>
                       </div>
                     </div>
                   </div>

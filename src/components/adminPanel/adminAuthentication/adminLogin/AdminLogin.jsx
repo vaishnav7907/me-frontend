@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FiArrowLeft, FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
+import { IoPersonOutline } from "react-icons/io5";
 import { UseMe } from "../../../context/Meprovider";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -112,7 +113,7 @@ const AdminLogin = ({ setAdminSignIn, todash }) => {
                 </label>
 
                 <div className="relative">
-                  <FiMail
+                  <IoPersonOutline 
                     size={16}
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-600"
                   />
