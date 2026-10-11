@@ -56,7 +56,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
   const [brandsLoading, setBrandsLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [productLoading, setProductLoading] = useState(true);
-
+  const [costPrice, setCostPrice] = useState("");
   const [variants, setVariants] = useState([createEmptyVariant()]);
 
   const [details, setDetails] = useState([
@@ -327,6 +327,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
         setProductCategory(product.category || "");
         setProductPrice(product.price ?? "");
         setProductRealPrice(product.realPrice ?? "");
+        setCostPrice(product.costPrice ?? "");
         setDiscount(product.discount ?? 0);
         setSku(product.sku || "");
         setStatus(product.status || "Active");
@@ -536,6 +537,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
     setProductBrandName("");
     setProductPrice("");
     setProductRealPrice("");
+    setCostPrice("");
     setProductImage([]);
     setSku("");
     setStatus("Active");
@@ -603,6 +605,15 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
 
     if (Number(productPrice) > Number(productRealPrice)) {
       alert("Selling price cannot be greater than real price");
+      return;
+    }
+
+    if (
+      costPrice === "" ||
+      !Number.isFinite(Number(costPrice)) ||
+      Number(costPrice) < 0
+    ) {
+      alert("Enter a valid cost price");
       return;
     }
 
@@ -680,6 +691,8 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
       formData.append("price", Number(productPrice));
 
       formData.append("realPrice", Number(productRealPrice));
+
+      formData.append("costPrice", Number(costPrice));
 
       formData.append("discount", Number(discount) || 0);
 
@@ -1057,7 +1070,7 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-5">
               <div>
                 <label className="mb-2 block text-sm text-neutral-300">
                   Selling Price
@@ -1118,6 +1131,21 @@ const ProductUpdateOverDisplay = ({ closeUpdate }) => {
                     %
                   </span>
                 </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Cost Price
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={costPrice}
+                  onChange={(e) => setCostPrice(e.target.value)}
+                  placeholder="Enter purchase cost"
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                />
               </div>
 
               <div>

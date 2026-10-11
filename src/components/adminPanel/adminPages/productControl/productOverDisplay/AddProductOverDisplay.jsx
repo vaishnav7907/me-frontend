@@ -44,7 +44,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
   const [brandsLoading, setBrandsLoading] = useState(false);
   const [variants, setVariants] = useState([createEmptyVariant()]);
   const [details, setDetails] = useState([{ key: "", value: "" }]);
-
+  const [costPrice, setCostPrice] = useState("");
   useEffect(() => {
     const getBrands = async () => {
       try {
@@ -286,6 +286,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
     setProductBrandName("");
     setProductPrice("");
     setProductRealPrice("");
+    setCostPrice("");
     setProductImage([]);
     setSku("");
     setStatus("Active");
@@ -332,6 +333,14 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
     }
     if (Number(productRealPrice) < Number(productPrice)) {
       alert("Real price should be greater than or equal to selling price");
+      return;
+    }
+    if (
+      costPrice === "" ||
+      !Number.isFinite(Number(costPrice)) ||
+      Number(costPrice) < 0
+    ) {
+      alert("Enter a valid cost price");
       return;
     }
     if (!sku.trim()) {
@@ -406,6 +415,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
       formData.append("brand", selectedBrand._id);
       formData.append("price", price);
       formData.append("realPrice", realPrice);
+      formData.append("costPrice", Number(costPrice));
       formData.append("discount", calculatedDiscount);
       formData.append("stock", totalStock);
       formData.append("sku", sku.trim().toUpperCase());
@@ -677,7 +687,7 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
                 Set pricing and inventory information
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-5">
               <div>
                 <label className="mb-2 block text-sm text-neutral-300">
                   Selling Price
@@ -728,6 +738,21 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
                     %
                   </span>
                 </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm text-neutral-300">
+                  Cost Price
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={costPrice}
+                  onChange={(e) => setCostPrice(e.target.value)}
+                  placeholder="Enter purchase cost"
+                  className="h-11 w-full rounded-lg border border-neutral-800 bg-[#12151a] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                />
               </div>
               <div>
                 <label className="mb-2 block text-sm text-neutral-300">
