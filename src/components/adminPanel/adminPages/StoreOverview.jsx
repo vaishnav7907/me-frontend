@@ -14,8 +14,7 @@ import { SiTicktick } from "react-icons/si";
 import { FaEye } from "react-icons/fa";
 // import { FiMinus } from "react-icons/fi";
 import { BsThreeDots } from "react-icons/bs";
-import {FiTag,} from "react-icons/fi";
-
+import { FiTag } from "react-icons/fi";
 
 const StoreOverview = () => {
   return (
@@ -42,129 +41,124 @@ const StoreOverview = () => {
         </div>
 
         <div className="py-8">
-  <div className="grid grid-cols-4 gap-5">
+          <div className="grid grid-cols-4 gap-5">
+            <div className="group rounded-xl border border-[#252a31] bg-[#111419] px-5 py-5 transition-all duration-300 hover:border-[#343b45] hover:bg-[#14181e]">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-500">
+                    Total Revenue
+                  </p>
 
-    <div className="group rounded-xl border border-[#252a31] bg-[#111419] px-5 py-5 transition-all duration-300 hover:border-[#343b45] hover:bg-[#14181e]">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-500">
-            Total Revenue
-          </p>
+                  <h4 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+                    $482,500
+                  </h4>
+                </div>
 
-          <h4 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-            $482,500
-          </h4>
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#29303a] bg-[#191e25]">
+                  <FiDollarSign size={16} className="text-neutral-300" />
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center gap-2">
+                <span className="flex items-center gap-1 rounded-md bg-green-500/10 px-1.5 py-1 text-[11px] font-medium text-green-400">
+                  <FiArrowUpRight size={13} />
+                  15.4%
+                </span>
+
+                <span className="text-[11px] text-neutral-500">
+                  vs last month
+                </span>
+              </div>
+            </div>
+
+            <div className="group rounded-xl border border-[#252a31] bg-[#111419] px-5 py-5 transition-all duration-300 hover:border-[#343b45] hover:bg-[#14181e]">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-500">
+                    Total Orders
+                  </p>
+
+                  <h4 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+                    1,284
+                  </h4>
+                </div>
+
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#29303a] bg-[#191e25]">
+                  <SiHackthebox size={16} className="text-neutral-300" />
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center gap-2">
+                <span className="flex items-center gap-1 rounded-md bg-green-500/10 px-1.5 py-1 text-[11px] font-medium text-green-400">
+                  <FiArrowUpRight size={13} />
+                  8.7%
+                </span>
+
+                <span className="text-[11px] text-neutral-500">
+                  vs last month
+                </span>
+              </div>
+            </div>
+
+            <div className="group rounded-xl border border-[#252a31] bg-[#111419] px-5 py-5 transition-all duration-300 hover:border-[#343b45] hover:bg-[#14181e]">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-500">
+                    Products
+                  </p>
+
+                  <h4 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+                    248
+                  </h4>
+                </div>
+
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#29303a] bg-[#191e25]">
+                  <LuShoppingBag size={16} className="text-neutral-300" />
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center gap-2">
+                <span className="flex items-center gap-1 rounded-md bg-green-500/10 px-1.5 py-1 text-[11px] font-medium text-green-400">
+                  <FiArrowUpRight size={13} />
+                  4.2%
+                </span>
+
+                <span className="text-[11px] text-neutral-500">
+                  vs last month
+                </span>
+              </div>
+            </div>
+
+            <div className="group rounded-xl border border-[#252a31] bg-[#111419] px-5 py-5 transition-all duration-300 hover:border-[#343b45] hover:bg-[#14181e]">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-500">
+                    Customers
+                  </p>
+
+                  <h4 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+                    8,492
+                  </h4>
+                </div>
+
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#29303a] bg-[#191e25]">
+                  <RxPeople size={17} className="text-neutral-300" />
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center gap-2">
+                <span className="flex items-center gap-1 rounded-md bg-green-500/10 px-1.5 py-1 text-[11px] font-medium text-green-400">
+                  <FiArrowUpRight size={13} />
+                  12.8%
+                </span>
+
+                <span className="text-[11px] text-neutral-500">
+                  vs last month
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#29303a] bg-[#191e25]">
-          <FiDollarSign size={16} className="text-neutral-300" />
-        </div>
-      </div>
-
-      <div className="mt-4 flex items-center gap-2">
-        <span className="flex items-center gap-1 rounded-md bg-green-500/10 px-1.5 py-1 text-[11px] font-medium text-green-400">
-          <FiArrowUpRight size={13} />
-          15.4%
-        </span>
-
-        <span className="text-[11px] text-neutral-500">
-          vs last month
-        </span>
-      </div>
-    </div>
-
-
-    <div className="group rounded-xl border border-[#252a31] bg-[#111419] px-5 py-5 transition-all duration-300 hover:border-[#343b45] hover:bg-[#14181e]">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-500">
-            Total Orders
-          </p>
-
-          <h4 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-            1,284
-          </h4>
-        </div>
-
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#29303a] bg-[#191e25]">
-          <SiHackthebox size={16} className="text-neutral-300" />
-        </div>
-      </div>
-
-      <div className="mt-4 flex items-center gap-2">
-        <span className="flex items-center gap-1 rounded-md bg-green-500/10 px-1.5 py-1 text-[11px] font-medium text-green-400">
-          <FiArrowUpRight size={13} />
-          8.7%
-        </span>
-
-        <span className="text-[11px] text-neutral-500">
-          vs last month
-        </span>
-      </div>
-    </div>
-
-
-    <div className="group rounded-xl border border-[#252a31] bg-[#111419] px-5 py-5 transition-all duration-300 hover:border-[#343b45] hover:bg-[#14181e]">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-500">
-            Products
-          </p>
-
-          <h4 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-            248
-          </h4>
-        </div>
-
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#29303a] bg-[#191e25]">
-          <LuShoppingBag size={16} className="text-neutral-300" />
-        </div>
-      </div>
-
-      <div className="mt-4 flex items-center gap-2">
-        <span className="flex items-center gap-1 rounded-md bg-green-500/10 px-1.5 py-1 text-[11px] font-medium text-green-400">
-          <FiArrowUpRight size={13} />
-          4.2%
-        </span>
-
-        <span className="text-[11px] text-neutral-500">
-          vs last month
-        </span>
-      </div>
-    </div>
-
-
-    <div className="group rounded-xl border border-[#252a31] bg-[#111419] px-5 py-5 transition-all duration-300 hover:border-[#343b45] hover:bg-[#14181e]">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-500">
-            Customers
-          </p>
-
-          <h4 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-            8,492
-          </h4>
-        </div>
-
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#29303a] bg-[#191e25]">
-          <RxPeople size={17} className="text-neutral-300" />
-        </div>
-      </div>
-
-      <div className="mt-4 flex items-center gap-2">
-        <span className="flex items-center gap-1 rounded-md bg-green-500/10 px-1.5 py-1 text-[11px] font-medium text-green-400">
-          <FiArrowUpRight size={13} />
-          12.8%
-        </span>
-
-        <span className="text-[11px] text-neutral-500">
-          vs last month
-        </span>
-      </div>
-    </div>
-
-  </div>
-</div>
 
         <div className="grid grid-cols-6 gap-3">
           <div className="col-span-4">

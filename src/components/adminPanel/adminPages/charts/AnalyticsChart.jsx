@@ -1,44 +1,64 @@
+import axios from "axios";
 import React, { useState } from "react";
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useEffect } from "react";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 const AnalyticsChart = () => {
-  const [selectedYear, setSelectedYear] = useState("2026");
-  const analyticsData = [
-    {
-      year: 2025,
-      months: [
-        { month: "Jan", revenue: 85000, profit: 18000 },
-        { month: "Feb", revenue: 95000, profit: 22000 },
-        { month: "Mar", revenue: 110000, profit: 27000 },
-        { month: "Apr", revenue: 100000, profit: 24000 },
-        { month: "May", revenue: 120000, profit: 30000 },
-        { month: "Jun", revenue: 130000, profit: 35000 },
-        { month: "Jul", revenue: 125000, profit: 32000 },
-        { month: "Aug", revenue: 140000, profit: 40000 },
-        { month: "Sep", revenue: 155000, profit: 45000 },
-        { month: "Oct", revenue: 170000, profit: 52000 },
-        { month: "Nov", revenue: 200000, profit: 65000 },
-        { month: "Dec", revenue: 250000, profit: 85000 },
-      ],
-    },
 
-    {
-      year: 2026,
-      months: [
-        { month: "Jan", revenue: 120000, profit: 28000 },
-        { month: "Feb", revenue: 135000, profit: 32000 },
-        { month: "Mar", revenue: 150000, profit: 40000 },
-        { month: "Apr", revenue: 142000, profit: 35000 },
-        { month: "May", revenue: 165000, profit: 45000 },
-        { month: "Jun", revenue: 180000, profit: 52000 },
-        { month: "Jul", revenue: 195000, profit: 58000 },
-        { month: "Aug", revenue: 210000, profit: 65000 },
-        { month: "Sep", revenue: 225000, profit: 72000 },
-        { month: "Oct", revenue: 240000, profit: 80000 },
-        { month: "Nov", revenue: 280000, profit: 95000 },
-        { month: "Dec", revenue: 340000, profit: 120000 },
-      ],
-    },
-  ];
+  const currentYear= new Date().getFullYear()
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+
+  const [getAnalysis, setGetAnalysis] = useState(null);
+  const [loading, setLoading] = useState(false);
+ const [error, setError] = useState("");
+  const getDataAnalysis = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const adminToken = localStorage.getItem("token");
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/getAdminAnalytics`,
+        {
+          params: {
+            period: "monthly",
+            year: selectedYear,
+          },
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        },
+      );
+
+      setGetAnalysis(response.data);
+    } catch (error) {
+      console.error(
+        "Error fetching analytics:",
+        error.response?.data?.message || error.message,
+      );
+
+      setError(error.response?.data?.message || "Failed to fetch analytics");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getDataAnalysis();
+  }, [selectedYear]);
+
+  const analyticsData= getAnalysis?.analytics ?? []
+  const summary = getAnalysis?.summary
+  
+
   return (
     <div className="w-full bg-[#101318] border border-[#242932] rounded-2xl overflow-hidden">
       <div className="px-6  pt-6 flex justify-between items-center ">
@@ -140,7 +160,7 @@ const AnalyticsChart = () => {
                 strokeWidth: 1,
               }}
             />
-             <Line
+            <Line
               type="monotone"
               dataKey="revenue"
               name="Revenue"
@@ -154,7 +174,7 @@ const AnalyticsChart = () => {
               }}
             />
 
-              <Line
+            <Line
               type="monotone"
               dataKey="profit"
               name="Profit"
@@ -167,12 +187,9 @@ const AnalyticsChart = () => {
                 stroke: "#101318",
               }}
             />
-
           </LineChart>
         </ResponsiveContainer>
       </div>
-
-      
     </div>
   );
 };
