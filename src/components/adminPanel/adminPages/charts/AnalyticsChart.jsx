@@ -132,7 +132,7 @@ const AnalyticsChart = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 px-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-7 px-6">
         <div className="bg-[#15191f] border border-[#242932] rounded-xl p-4">
           <p className="text-[10px] uppercase tracking-[0.15em] text-[#626a76]">
             Total Revenue
@@ -166,7 +166,7 @@ const AnalyticsChart = () => {
         </div>
       </div>
 
-      <div className="w-full h-[380px] px-3 sm:px-6 mt-6 pb-6">
+      <div className="w-full h-[463px] px-3 sm:px-6 mt-6 pb-6">
         {loading ? (
           <div className="h-full flex items-center justify-center text-sm text-[#737b87]">
             Loading analytics...

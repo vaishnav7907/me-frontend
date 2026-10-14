@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import {
   CartesianGrid,
   Line,
@@ -8,376 +9,461 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import {
-  FiActivity,
-  FiDollarSign,
-  FiFilter,
-  FiPackage,
-  FiPercent,
-  FiShoppingBag,
-  FiTrendingDown,
-  FiTrendingUp,
-  FiUsers,
-} from "react-icons/fi";
-import { FiSearch, FiChevronDown, FiEye } from "react-icons/fi";
+import { FiChevronDown } from "react-icons/fi";
 import { LuFilter } from "react-icons/lu";
+
 const AnalyticsCompleteChart = () => {
+  const currentYear = new Date().getFullYear();
+
+  const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedPeriod, setSelectedPeriod] = useState("monthly");
   const [selectedMetric, setSelectedMetric] = useState("all");
-  const businessStartYear = 2022;
-  const currentYear = 2026;
-  const yearlyData = [
-    {
-      year: 2022,
-      revenue: 1250000,
-      profit: 285000,
-      loss: 72000,
-      orders: 1180,
-      customers: 840,
-      productsSold: 1640,
-    },
-    {
-      year: 2023,
-      revenue: 1680000,
-      profit: 410000,
-      loss: 85000,
-      orders: 1650,
-      customers: 1240,
-      productsSold: 2310,
-    },
-    {
-      year: 2024,
-      revenue: 2150000,
-      profit: 570000,
-      loss: 92000,
-      orders: 2240,
-      customers: 1780,
-      productsSold: 3180,
-    },
-    {
-      year: 2025,
-      revenue: 2380000,
-      profit: 640000,
-      loss: 108000,
-      orders: 2460,
-      customers: 2040,
-      productsSold: 3520,
-    },
-    {
-      year: 2026,
-      revenue: 2745000,
-      profit: 780000,
-      loss: 95000,
-      orders: 2890,
-      customers: 2410,
-      productsSold: 4210,
-    },
-  ];
-  const periodData = {
-    daily: [
-      { label: "Mon", revenue: 18500, profit: 5200, loss: 1200, orders: 34 },
-      { label: "Tue", revenue: 21300, profit: 6800, loss: 900, orders: 41 },
-      { label: "Wed", revenue: 19800, profit: 5900, loss: 1400, orders: 38 },
-      { label: "Thu", revenue: 24600, profit: 7600, loss: 1100, orders: 46 },
-      { label: "Fri", revenue: 28500, profit: 9200, loss: 1600, orders: 52 },
-      { label: "Sat", revenue: 32100, profit: 10800, loss: 1300, orders: 61 },
-      { label: "Sun", revenue: 29800, profit: 9700, loss: 1800, orders: 57 },
-    ],
-    weekly: [
-      { label: "W1", revenue: 125000, profit: 32000, loss: 8500, orders: 280 },
-      { label: "W2", revenue: 142000, profit: 38000, loss: 7200, orders: 315 },
-      { label: "W3", revenue: 156000, profit: 42000, loss: 9100, orders: 342 },
-      { label: "W4", revenue: 149000, profit: 39500, loss: 6800, orders: 329 },
-      { label: "W5", revenue: 172000, profit: 48000, loss: 7500, orders: 374 },
-      { label: "W6", revenue: 185000, profit: 53000, loss: 8200, orders: 401 },
-      { label: "W7", revenue: 194000, profit: 57000, loss: 6900, orders: 425 },
-      { label: "W8", revenue: 210000, profit: 64000, loss: 7800, orders: 462 },
-    ],
-    monthly: [
-      { label: "Jan", revenue: 120000, profit: 28000, loss: 8500, orders: 260 },
-      { label: "Feb", revenue: 135000, profit: 32000, loss: 7200, orders: 285 },
-      { label: "Mar", revenue: 150000, profit: 40000, loss: 9100, orders: 315 },
-      { label: "Apr", revenue: 142000, profit: 35000, loss: 6800, orders: 298 },
-      { label: "May", revenue: 165000, profit: 45000, loss: 7500, orders: 342 },
-      { label: "Jun", revenue: 180000, profit: 52000, loss: 8200, orders: 378 },
-      { label: "Jul", revenue: 195000, profit: 58000, loss: 6900, orders: 405 },
-      { label: "Aug", revenue: 210000, profit: 65000, loss: 7800, orders: 432 },
-      { label: "Sep", revenue: 225000, profit: 72000, loss: 8400, orders: 468 },
-      { label: "Oct", revenue: 240000, profit: 80000, loss: 7600, orders: 492 },
-      { label: "Nov", revenue: 280000, profit: 95000, loss: 9200, orders: 568 },
-      {
-        label: "Dec",
-        revenue: 340000,
-        profit: 120000,
-        loss: 10500,
-        orders: 684,
-      },
-    ],
-    yearly: yearlyData.map((item) => ({
-      label: String(item.year),
-      revenue: item.revenue,
-      profit: item.profit,
-      loss: item.loss,
-      orders: item.orders,
-    })),
+  const [getAnalysis, setGetAnalysis] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const getDataAnalysis = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const adminToken = localStorage.getItem("token");
+
+      if (!adminToken) {
+        throw new Error("Admin authentication required. Please log in again.");
+      }
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/getAdminAnalytics`,
+        {
+          params: {
+            period: selectedPeriod,
+            year: selectedYear,
+          },
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        },
+      );
+
+      setGetAnalysis(response.data);
+    } catch (error) {
+      console.error(
+        "Error fetching analytics:",
+        error.response?.data?.message || error.message,
+      );
+
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to fetch analytics",
+      );
+
+      setGetAnalysis(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedPeriod, selectedYear]);
+
+  useEffect(() => {
+    getDataAnalysis();
+  }, [getDataAnalysis]);
+
+  const analyticsData = useMemo(
+    () => getAnalysis?.analytics ?? [],
+    [getAnalysis],
+  );
+
+  const summary = getAnalysis?.summary;
+
+  const formatCurrency = (value) =>
+    `₹${Number(value).toLocaleString("en-IN", {
+      maximumFractionDigits: 2,
+    })}`;
+
+  const formatAxisCurrency = (value) => {
+    if (Math.abs(value) >= 10000000) {
+      return `₹${(value / 10000000).toFixed(1)}Cr`;
+    }
+
+    if (Math.abs(value) >= 100000) {
+      return `₹${(value / 100000).toFixed(1)}L`;
+    }
+
+    if (Math.abs(value) >= 1000) {
+      return `₹${(value / 1000).toFixed(1)}k`;
+    }
+
+    return `₹${value}`;
   };
-  const products = [
-    {
-      id: 1,
-      name: "Classic White Shirt",
-      category: "Shirts",
-      sold: 1240,
-      revenue: 97960,
-      profit: 31200,
-    },
-    {
-      id: 2,
-      name: "Slim Fit Jeans",
-      category: "Pants",
-      sold: 1085,
-      revenue: 107415,
-      profit: 35800,
-    },
-    {
-      id: 3,
-      name: "Oversized T-Shirt",
-      category: "T-Shirts",
-      sold: 980,
-      revenue: 44100,
-      profit: 16400,
-    },
-    {
-      id: 4,
-      name: "Essential Hoodie",
-      category: "T-Shirts",
-      sold: 865,
-      revenue: 82175,
-      profit: 28900,
-    },
-    {
-      id: 5,
-      name: "Tailored Blazer",
-      category: "Jackets",
-      sold: 720,
-      revenue: 128880,
-      profit: 42700,
-    },
-    {
-      id: 6,
-      name: "Leather Jacket",
-      category: "Jackets",
-      sold: 615,
-      revenue: 122385,
-      profit: 39600,
-    },
-    {
-      id: 7,
-      name: "Classic Chinos",
-      category: "Pants",
-      sold: 580,
-      revenue: 57420,
-      profit: 18900,
-    },
-    {
-      id: 8,
-      name: "Premium Polo",
-      category: "Shirts",
-      sold: 510,
-      revenue: 40290,
-      profit: 14100,
-    },
-  ];
-  const ageGroups = [
-    {
-      age: "18–24",
-      customers: 420,
-      orders: 620,
-      revenue: 386000,
-      averageOrder: 623,
-    },
-    {
-      age: "25–34",
-      customers: 920,
-      orders: 1420,
-      revenue: 945000,
-      averageOrder: 665,
-    },
-    {
-      age: "35–44",
-      customers: 670,
-      orders: 1040,
-      revenue: 812000,
-      averageOrder: 781,
-    },
-    {
-      age: "45–54",
-      customers: 290,
-      orders: 470,
-      revenue: 398000,
-      averageOrder: 847,
-    },
-    {
-      age: "55+",
-      customers: 110,
-      orders: 180,
-      revenue: 142000,
-      averageOrder: 789,
-    },
-  ];
-  const categories = [
-    { name: "Shirts", sold: 1750, revenue: 138250, percentage: 31 },
-    { name: "Pants", sold: 1665, revenue: 164835, percentage: 29 },
-    { name: "T-Shirts", sold: 1845, revenue: 126275, percentage: 27 },
-    { name: "Jackets", sold: 1335, revenue: 251265, percentage: 13 },
-  ];
-  const metricData = {
-    all: {
-      title: "Complete Business Performance",
-      description:
-        "Revenue, profit and loss across the complete business lifecycle",
-    },
-    revenue: {
-      title: "Revenue Performance",
-      description: "Track the growth and strength of your business revenue",
-    },
-    profit: {
-      title: "Profit Performance",
-      description:
-        "Understand how efficiently revenue is converted into profit",
-    },
-    loss: {
-      title: "Loss Performance",
-      description: "Monitor losses and identify areas requiring attention",
-    },
+
+  const formatLabel = (label) => {
+    if (!label) return "";
+
+    const value = String(label);
+    const match = value.match(/^(\d{4})-(\d{2})(?:-(\d{2}))?$/);
+
+    if (!match) return value;
+
+    const [, year, month, day] = match;
+
+    const date = new Date(
+      Number(year),
+      Number(month) - 1,
+      day ? Number(day) : 1,
+    );
+
+    if (selectedPeriod === "yearly") {
+      return year;
+    }
+
+    if (selectedPeriod === "daily") {
+      return date.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+      });
+    }
+
+    return date.toLocaleDateString("en-IN", {
+      month: "short",
+    });
   };
+
+  const chartData = useMemo(
+    () =>
+      analyticsData.map((item) => ({
+        ...item,
+        chartLabel: formatLabel(item.label),
+      })),
+    [analyticsData, selectedPeriod],
+  );
+
+  const metricOptions = [
+    { value: "all", label: "All Metrics" },
+    { value: "revenue", label: "Revenue" },
+    { value: "profit", label: "Profit" },
+    { value: "loss", label: "Loss" },
+  ];
+
+  const periodOptions = [
+    { value: "daily", label: "Daily" },
+    { value: "weekly", label: "Weekly" },
+    { value: "monthly", label: "Monthly" },
+    { value: "yearly", label: "Yearly" },
+  ];
+
+  const yearOptions = Array.from(
+    { length: currentYear - 2021 },
+    (_, index) => currentYear - index,
+  );
+
+  const metrics = [
+    { key: "revenue", name: "Revenue", color: "#ffffff" },
+    { key: "profit", name: "Profit", color: "#8b5cf6" },
+    { key: "loss", name: "Loss", color: "#f87171" },
+  ];
+
+  const visibleMetrics =
+    selectedMetric === "all"
+      ? metrics
+      : metrics.filter((metric) => metric.key === selectedMetric);
+
+  const getTotal = (key) => {
+    const summaryKey = {
+      revenue: "totalRevenue",
+      profit: "totalProfit",
+      loss: "totalLoss",
+    }[key];
+
+    const summaryValue = summary?.[summaryKey];
+
+    if (summaryValue != null && Number.isFinite(Number(summaryValue))) {
+      return Number(summaryValue);
+    }
+
+    if (!analyticsData.length) return null;
+
+    if (key === "profit" && summary?.profitAvailable === false) {
+      return null;
+    }
+
+    const values = analyticsData.map((item) => item[key]);
+
+    if (
+      values.some((value) => value == null || !Number.isFinite(Number(value)))
+    ) {
+      return null;
+    }
+
+    return values.reduce((total, value) => total + Number(value), 0);
+  };
+
+  const summaryCards = [
+    {
+      label: "Total Revenue",
+      value: getTotal("revenue"),
+      color: "text-white",
+    },
+    {
+      label: "Total Profit",
+      value: getTotal("profit"),
+      color: "text-purple-400",
+    },
+    {
+      label: "Total Loss",
+      value: getTotal("loss"),
+      color: "text-red-400",
+    },
+  ];
+
+  const periodLabel =
+    periodOptions.find((period) => period.value === selectedPeriod)?.label ??
+    "Monthly";
+
+    
+
   return (
-    <div className="px-3 py-3">
-      <div>
-        <div>
-          <div className="flex justify-between items-center">
+    <div className="w-full px-3 py-3">
+      <div className="overflow-hidden rounded-2xl border border-[#242932] bg-[#101318]">
+        <div className="p-5 sm:p-6">
+          <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex flex-col gap-1">
-              <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] ">
-                performance analytics
+              <p className="text-[10px] uppercase tracking-[0.10em] text-neutral-500">
+                Performance Analytics
               </p>
 
-              <h3 className="text-white text-lg">
+              <h3 className="text-lg font-semibold text-white">
                 Complete Business Performance
               </h3>
-              <p className="text-neutral-500 text-xs">
-                Revenue, profit and loss accross the complete business lifecycle
+
+              <p className="text-xs text-neutral-500">
+                Revenue, profit and loss across your business
               </p>
             </div>
 
-            <div className="flex gap-3">
-              <div className="h-10 w-10 flex justify-center items-center rounded-lg border border-[#292f36] bg-[#0b0e10] text-white ">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#292f36] bg-[#0b0e10] text-white">
                 <LuFilter size={20} />
               </div>
-              <div className="w-[1px] h-10 bg-white/20 text-white/70" />
-              <div className=" relative w-[150px]">
+
+              <div className="hidden h-10 w-px bg-white/20 sm:block" />
+
+              <div className="relative w-full sm:w-[150px]">
                 <select
-                  name=""
-                  id=""
-                  className="h-10 w-full appearance-none rounded-lg border border-[#292f36] bg-[#0b0e10] px-3 pr-9 text-sm text-gray-400 outline-none focus:border-gray-500"
+                  value={selectedMetric}
+                  onChange={(event) => setSelectedMetric(event.target.value)}
+                  aria-label="Select analytics metric"
+                  className="h-10 w-full appearance-none rounded-lg border border-[#292f36] bg-[#0b0e10] px-3 pr-9 text-sm text-gray-300 outline-none transition hover:border-gray-500 focus:border-purple-500"
                 >
-                  <option value="">All Metrics</option>
-                  <option value="">Revenue</option>
-                  <option value="">Profit</option>
-                  <option value="">Loss</option>
+                  {metricOptions.map((metric) => (
+                    <option key={metric.value} value={metric.value}>
+                      {metric.label}
+                    </option>
+                  ))}
                 </select>
+
                 <FiChevronDown
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                   size={15}
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                 />
               </div>
 
-              <div className="w-[1px] h-10 bg-white/20 text-white/70" />
-              <div className=" relative w-[150px]">
+              <div className="relative w-full sm:w-[150px]">
                 <select
-                  name=""
-                  id=""
-                  className="h-10 w-full appearance-none rounded-lg border border-[#292f36] bg-[#0b0e10] px-3 pr-9 text-sm text-gray-400 outline-none focus:border-gray-500"
+                  value={selectedPeriod}
+                  onChange={(event) => setSelectedPeriod(event.target.value)}
+                  aria-label="Select analytics period"
+                  className="h-10 w-full appearance-none rounded-lg border border-[#292f36] bg-[#0b0e10] px-3 pr-9 text-sm text-gray-300 outline-none transition hover:border-gray-500 focus:border-purple-500"
                 >
-                  <option value="">Daily</option>
-                  <option value="">Weekly</option>
-                  <option value="">Monthly</option>
-                  <option value="">Yearly</option>
+                  {periodOptions.map((period) => (
+                    <option key={period.value} value={period.value}>
+                      {period.label}
+                    </option>
+                  ))}
                 </select>
+
                 <FiChevronDown
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                   size={15}
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                />
+              </div>
+
+              <div className="relative w-full sm:w-[120px]">
+                <select
+                  value={selectedYear}
+                  onChange={(event) =>
+                    setSelectedYear(Number(event.target.value))
+                  }
+                  aria-label="Select analytics year"
+                  className="h-10 w-full appearance-none rounded-lg border border-[#292f36] bg-[#0b0e10] px-3 pr-9 text-sm text-gray-300 outline-none transition hover:border-gray-500 focus:border-purple-500"
+                >
+                  {yearOptions.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+
+                <FiChevronDown
+                  size={15}
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                 />
               </div>
             </div>
           </div>
-          {/* graph */}
-          <div className="mt-10">
-            <div className="w-full h-[380px]  px-3 sm:px-6 mt-6 pb-6">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  margin={{ top: 10, right: 10, left: -15, bottom: 5 }}
-                >
-                  <CartesianGrid
-                    stroke="#242932"
-                    strokeDasharray="4 4"
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="month"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{
-                      fill: "#626a76",
-                      fontSize: 11,
-                    }}
-                    dy={10}
-                  />
 
-                  {/* Y AXIS */}
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{
-                      fill: "#626a76",
-                      fontSize: 11,
-                    }}
-                    // tickFormatter={formatCurrency}
-                  />
-                  <Tooltip
-                    // content={<CustomTooltip />}
-                    cursor={{
-                      stroke: "#343a44",
-                      strokeWidth: 1,
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="revenue"
-                    name="Revenue"
-                    stroke="#ffffff"
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{
-                      r: 5,
-                      strokeWidth: 2,
-                      stroke: "#101318",
-                    }}
-                  />
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {summaryCards.map((card) => (
+              <div
+                key={card.label}
+                className="rounded-xl border border-[#242932] bg-[#15191f] p-4"
+              >
+                <p className="text-[10px] uppercase tracking-[0.15em] text-[#626a76]">
+                  {card.label}
+                </p>
 
-                  <Line
-                    type="monotone"
-                    dataKey="profit"
-                    name="Profit"
-                    stroke="#6f7783"
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{
-                      r: 5,
-                      strokeWidth: 2,
-                      stroke: "#101318",
+                <h3 className={`mt-2 text-xl font-semibold ${card.color}`}>
+                  {loading
+                    ? "Loading..."
+                    : card.value == null
+                      ? "Unavailable"
+                      : formatCurrency(card.value)}
+                </h3>
+
+                <p className="mt-1 text-[11px] text-[#626a76]">
+                  {periodLabel} performance · {selectedYear}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8">
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h4 className="text-sm font-medium text-white">
+                  {selectedMetric === "all"
+                    ? "Revenue, Profit & Loss"
+                    : `${metricOptions.find((item) => item.value === selectedMetric)?.label} Performance`}
+                </h4>
+
+                <p className="mt-1 text-xs text-[#626a76]">
+                  {periodLabel} analytics for {selectedYear}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4">
+                {visibleMetrics.map((metric) => (
+                  <div key={metric.key} className="flex items-center gap-2">
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ backgroundColor: metric.color }}
+                    />
+
+                    <span className="text-xs text-gray-400">{metric.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="h-[320px] w-full sm:h-[380px]">
+              {loading ? (
+                <div className="flex h-full items-center justify-center text-sm text-[#737b87]">
+                  Loading analytics...
+                </div>
+              ) : error ? (
+                <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+                  <p className="max-w-md text-sm text-red-400">{error}</p>
+
+                  <button
+                    type="button"
+                    onClick={getDataAnalysis}
+                    className="rounded-lg border border-[#292e36] px-4 py-2 text-sm text-white transition hover:bg-[#181c22]"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              ) : chartData.length === 0 ? (
+                <div className="flex h-full items-center justify-center text-sm text-[#737b87]">
+                  No analytics data available for {selectedYear}.
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={chartData}
+                    margin={{
+                      top: 10,
+                      right: 10,
+                      left: -15,
+                      bottom: 5,
                     }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+                  >
+                    <CartesianGrid
+                      stroke="#242932"
+                      strokeDasharray="4 4"
+                      vertical={false}
+                    />
+
+                    <XAxis
+                      dataKey="chartLabel"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#626a76", fontSize: 11 }}
+                      dy={10}
+                      minTickGap={selectedPeriod === "daily" ? 20 : 10}
+                    />
+
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#626a76", fontSize: 11 }}
+                      tickFormatter={formatAxisCurrency}
+                      width={65}
+                    />
+
+                    <Tooltip
+                      cursor={{
+                        stroke: "#343a44",
+                        strokeWidth: 1,
+                      }}
+                      contentStyle={{
+                        backgroundColor: "#15191f",
+                        border: "1px solid #292e36",
+                        borderRadius: "10px",
+                        color: "#ffffff",
+                      }}
+                      labelStyle={{
+                        color: "#ffffff",
+                        marginBottom: "6px",
+                      }}
+                      formatter={(value, name) => [
+                        value == null ? "Unavailable" : formatCurrency(value),
+                        name,
+                      ]}
+                      labelFormatter={(_, payload) =>
+                        payload?.[0]?.payload?.label ?? ""
+                      }
+                    />
+
+                    {visibleMetrics.map((metric) => (
+                      <Line
+                        key={metric.key}
+                        type="monotone"
+                        dataKey={metric.key}
+                        name={metric.name}
+                        stroke={metric.color}
+                        strokeWidth={2}
+                        dot={false}
+                        connectNulls={false}
+                        activeDot={{
+                          r: 5,
+                          strokeWidth: 2,
+                          stroke: "#101318",
+                        }}
+                      />
+                    ))}
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
         </div>
@@ -385,4 +471,5 @@ const AnalyticsCompleteChart = () => {
     </div>
   );
 };
+
 export default AnalyticsCompleteChart;

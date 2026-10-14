@@ -15,8 +15,74 @@ import { FaEye } from "react-icons/fa";
 // import { FiMinus } from "react-icons/fi";
 import { BsThreeDots } from "react-icons/bs";
 import { FiTag } from "react-icons/fi";
+import axios from "axios";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const StoreOverview = () => {
+  const [monthProfitLoss, setMonthProfitLoss] = useState(null);
+
+  const monthProfitOrLoss = async () => {
+    try {
+      const adminToken = localStorage.getItem("token");
+      const monthProfitOrLossApi = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/previousMonthAnalysis`,
+        { headers: { Authorization: `Bearer ${adminToken}` } },
+      );
+      console.log("month profit or losss", monthProfitOrLossApi.data);
+
+      setMonthProfitLoss(monthProfitOrLossApi.data);
+    } catch (error) {
+      console.log("Error in previous month analysis:", error);
+    }
+  };
+
+  // useEffect(() => {
+  //   monthProfitOrLoss();
+  // }, []);
+
+  const [allOrders, setAllOrders] = useState([]);
+  const getAllOrders = async () => {
+    try {
+      const getAllOrdersFn = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/getAdminOrder`,
+      );
+
+      setAllOrders(getAllOrdersFn.data.orders);
+      console.log("all orders", getAllOrdersFn.data.orders);
+    } catch (error) {
+      console.log("error in get all orders", error);
+      alert(error.message);
+    }
+  };
+
+  useEffect(() => {
+    monthProfitOrLoss();
+    getAllOrders();
+  }, []);
+
+  const orderStatuses = [
+    { name: "Pending", color: "text-amber-300", barColor: "bg-amber-400" },
+    { name: "Confirmed", color: "text-green-400", barColor: "bg-green-400" },
+    { name: "Processing", color: "text-orange-400", barColor: "bg-orange-400" },
+    { name: "Shipped", color: "text-blue-400", barColor: "bg-blue-400" },
+    {
+      name: "Out for Delivery",
+      color: "text-purple-400",
+      barColor: "bg-purple-400",
+    },
+    {
+      name: "Delivered",
+      color: "text-emerald-400",
+      barColor: "bg-emerald-400",
+    },
+    { name: "Cancelled", color: "text-red-400", barColor: "bg-red-400" },
+  ];
+
+  const activeOrders = allOrders.filter(
+    (order) => !["Delivered", "Cancelled"].includes(order.orderStatus),
+  ).length;
+
   return (
     <div className="min-h-screen px-6 py-6 ">
       <div>
@@ -46,11 +112,14 @@ const StoreOverview = () => {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-500">
-                    Total Revenue
+                    Previous Month Revenue
                   </p>
 
                   <h4 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-                    $482,500
+                    ₹
+                    {(
+                      monthProfitLoss?.previousMonth?.revenue ?? 0
+                    ).toLocaleString("en-IN")}
                   </h4>
                 </div>
 
@@ -60,13 +129,63 @@ const StoreOverview = () => {
               </div>
 
               <div className="mt-4 flex items-center gap-2">
-                <span className="flex items-center gap-1 rounded-md bg-green-500/10 px-1.5 py-1 text-[11px] font-medium text-green-400">
-                  <FiArrowUpRight size={13} />
-                  15.4%
-                </span>
-
                 <span className="text-[11px] text-neutral-500">
-                  vs last month
+                  {monthProfitLoss?.previousMonth?.month ?? "Loading..."}
+                </span>
+              </div>
+            </div>
+
+            <div className="group rounded-xl border border-[#252a31] bg-[#111419] px-5 py-5 transition-all duration-300 hover:border-[#343b45] hover:bg-[#14181e]">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-500">
+                    Previous Month Profit
+                  </p>
+
+                  <h4 className="mt-2 text-2xl font-semibold tracking-tight text-green-400">
+                    ₹
+                    {(
+                      monthProfitLoss?.previousMonth?.profit ?? 0
+                    ).toLocaleString("en-IN")}
+                  </h4>
+                </div>
+
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#29303a] bg-[#191e25]">
+                  <FiArrowUpRight size={16} className="text-green-400" />
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center gap-2">
+                <span className="text-[11px] text-neutral-500">
+                  Revenue minus product cost
+                </span>
+              </div>
+            </div>
+
+            <div className="group rounded-xl border border-[#252a31] bg-[#111419] px-5 py-5 transition-all duration-300 hover:border-[#343b45] hover:bg-[#14181e]">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-500">
+                    Previous Month Loss
+                  </p>
+
+                  <h4 className="mt-2 text-2xl font-semibold tracking-tight text-red-400">
+                    ₹
+                    {(monthProfitLoss?.previousMonth?.loss ?? 0).toLocaleString(
+                      "en-IN",
+                    )}
+                  </h4>
+                </div>
+
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#29303a] bg-[#191e25]">
+                  <BiError size={17} className="text-red-400" />
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center gap-2">
+                <span className="text-[11px] text-neutral-500">
+                  {monthProfitLoss?.previousMonth?.totalOrders ?? 0} delivered
+                  orders
                 </span>
               </div>
             </div>
@@ -79,7 +198,7 @@ const StoreOverview = () => {
                   </p>
 
                   <h4 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-                    1,284
+                    {monthProfitLoss?.previousMonth?.totalOrders ?? 0}
                   </h4>
                 </div>
 
@@ -89,71 +208,8 @@ const StoreOverview = () => {
               </div>
 
               <div className="mt-4 flex items-center gap-2">
-                <span className="flex items-center gap-1 rounded-md bg-green-500/10 px-1.5 py-1 text-[11px] font-medium text-green-400">
-                  <FiArrowUpRight size={13} />
-                  8.7%
-                </span>
-
                 <span className="text-[11px] text-neutral-500">
-                  vs last month
-                </span>
-              </div>
-            </div>
-
-            <div className="group rounded-xl border border-[#252a31] bg-[#111419] px-5 py-5 transition-all duration-300 hover:border-[#343b45] hover:bg-[#14181e]">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-500">
-                    Products
-                  </p>
-
-                  <h4 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-                    248
-                  </h4>
-                </div>
-
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#29303a] bg-[#191e25]">
-                  <LuShoppingBag size={16} className="text-neutral-300" />
-                </div>
-              </div>
-
-              <div className="mt-4 flex items-center gap-2">
-                <span className="flex items-center gap-1 rounded-md bg-green-500/10 px-1.5 py-1 text-[11px] font-medium text-green-400">
-                  <FiArrowUpRight size={13} />
-                  4.2%
-                </span>
-
-                <span className="text-[11px] text-neutral-500">
-                  vs last month
-                </span>
-              </div>
-            </div>
-
-            <div className="group rounded-xl border border-[#252a31] bg-[#111419] px-5 py-5 transition-all duration-300 hover:border-[#343b45] hover:bg-[#14181e]">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-500">
-                    Customers
-                  </p>
-
-                  <h4 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-                    8,492
-                  </h4>
-                </div>
-
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#29303a] bg-[#191e25]">
-                  <RxPeople size={17} className="text-neutral-300" />
-                </div>
-              </div>
-
-              <div className="mt-4 flex items-center gap-2">
-                <span className="flex items-center gap-1 rounded-md bg-green-500/10 px-1.5 py-1 text-[11px] font-medium text-green-400">
-                  <FiArrowUpRight size={13} />
-                  12.8%
-                </span>
-
-                <span className="text-[11px] text-neutral-500">
-                  vs last month
+                  Delivered orders last month
                 </span>
               </div>
             </div>
@@ -166,96 +222,115 @@ const StoreOverview = () => {
           </div>
 
           <div className="col-span-2">
-            <div className="w-full  bg-[#101318] border border-[#242932] rounded-2xl overflow-hidden  px-7 py-7">
-              <div className="flex justify-between items-start">
-                <div className="flex flex-col gap-1">
-                  <p className="uppercase tracking-[0.10em] text-neutral-500 text-xs ">
-                    orders
-                  </p>
-                  <span>
-                    <h3 className="text-white text-2xl">328</h3>
-                    <p className="text-neutral-500 text-xs">Active Orders</p>
-                  </span>
+            <div className="relative overflow-hidden rounded-2xl border border-[#252c38] bg-gradient-to-br from-[#131923] via-[#10141b] to-[#0d1117] p-6 shadow-xl shadow-black/20 sm:p-7">
+              <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-cyan-500/[0.06] blur-3xl" />
+
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-400/15 bg-cyan-400/[0.08]">
+                    <SiHackthebox className="text-cyan-300" size={21} />
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-white">
+                      Orders
+                    </h3>
+                    <p className="mt-1 text-xs text-neutral-500">
+                      Order status overview
+                    </p>
+                  </div>
                 </div>
-                <span className="h-8 w-8 rounded-lg border-none bg-cyan-600/50 flex justify-center items-center ">
-                  <SiHackthebox className="text-cyan-300" size={15} />
+
+                <span className="rounded-full border border-cyan-400/20 bg-cyan-400/[0.07] px-3 py-1 text-[10px] font-medium tracking-wider text-cyan-300">
+                  LIVE OVERVIEW
                 </span>
               </div>
 
-              <div className="mt-10 space-y-6">
-                {/* Pending */}
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <p className="text-sm text-gray-400">Pending</p>
-                    <h3 className="text-sm text-white">24</h3>
+              <div className="relative mt-7 rounded-xl border border-cyan-400/15 bg-gradient-to-r from-cyan-400/[0.08] to-transparent p-3">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-[0.13em] text-neutral-400">
+                      Active Orders
+                    </p>
+
+                    <h2 className="mt-2 text-4xl font-semibold tracking-tight text-white">
+                      {activeOrders.toLocaleString("en-IN")}
+                    </h2>
+
+                    <p className="mt-2 text-xs text-neutral-500">
+                      Orders currently in progress
+                    </p>
                   </div>
 
-                  <div className="w-full h-1.5 rounded-full bg-[#252525] overflow-hidden">
-                    <div
-                      className="h-full bg-orange-600 rounded-full"
-                      style={{ width: "24%" }}
-                    />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.08]">
+                    <SiHackthebox className="text-cyan-300" size={22} />
                   </div>
                 </div>
+              </div>
 
-                {/* Processing */}
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <p className="text-sm text-gray-400">Processing</p>
-                    <h3 className="text-sm text-white">24</h3>
-                  </div>
+              <div className="mb-5 mt-8 flex items-center justify-between">
+                <h4 className="text-sm font-medium text-neutral-200">
+                  Status Breakdown
+                </h4>
 
-                  <div className="w-full h-1.5 rounded-full bg-[#252525] overflow-hidden">
-                    <div
-                      className="h-full bg-violet-400 rounded-full"
-                      style={{ width: "24%" }}
-                    />
-                  </div>
-                </div>
+                <span className="text-xs text-neutral-500">
+                  {allOrders.length.toLocaleString("en-IN")} total orders
+                </span>
+              </div>
 
-                {/* Shipped */}
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <p className="text-sm text-gray-400">Shipped</p>
-                    <h3 className="text-sm text-white">24</h3>
-                  </div>
+              <div className="space-y-5">
+                {orderStatuses.map((status) => {
+                  const count = allOrders.filter(
+                    (order) => order.orderStatus === status.name,
+                  ).length;
 
-                  <div className="w-full h-1.5 rounded-full bg-[#252525] overflow-hidden">
-                    <div
-                      className="h-full bg-blue-500 rounded-full"
-                      style={{ width: "24%" }}
-                    />
-                  </div>
-                </div>
+                  const percentage =
+                    allOrders.length > 0 ? (count / allOrders.length) * 100 : 0;
 
-                {/* Delivered */}
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <p className="text-sm text-gray-400">Delivered</p>
-                    <h3 className="text-sm text-white">24</h3>
-                  </div>
+                  return (
+                    <div key={status.name}>
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <div className="flex min-w-0 items-center gap-2.5">
+                          {/* <span
+                            className={`h-2 w-2 shrink-0 rounded-full ${status.dotColor}`}
+                          /> */}
 
-                  <div className="w-full h-1.5 rounded-full bg-[#252525] overflow-hidden">
-                    <div
-                      className="h-full bg-green-400 rounded-full"
-                      style={{ width: "24%" }}
-                    />
-                  </div>
-                </div>
+                          <span className={`truncate text-sm ${status.color}`}>
+                            {status.name}
+                          </span>
+                        </div>
 
-                {/* Cancelled */}
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <p className="text-sm text-gray-400">Cancelled</p>
-                    <h3 className="text-sm text-white">24</h3>
-                  </div>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <span className="text-sm font-medium tabular-nums text-neutral-200">
+                            {count}
+                          </span>
 
-                  <div className="w-full h-1.5 rounded-full bg-[#252525] overflow-hidden">
-                    <div
-                      className="h-full bg-red-600 rounded-full"
-                      style={{ width: "24%" }}
-                    />
-                  </div>
+                          <span className="min-w-[42px] text-right text-xs tabular-nums text-neutral-500">
+                            {Math.round(percentage)}%
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="h-1 overflow-hidden rounded-full bg-[#252b35]">
+                        <div
+                          className={`h-full rounded-full transition-[width] duration-500 ease-out ${status.barColor}`}
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-7 border-t border-[#252b35] pt-4">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-neutral-500">Completed orders</span>
+
+                  <span className="font-medium text-emerald-400">
+                    {allOrders
+                      .filter((order) => order.orderStatus === "Delivered")
+                      .length.toLocaleString("en-IN")}
+                  </span>
                 </div>
               </div>
             </div>
