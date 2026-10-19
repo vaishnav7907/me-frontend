@@ -18,8 +18,10 @@ import { FiTag } from "react-icons/fi";
 import axios from "axios";
 import { useState } from "react";
 import { useEffect } from "react";
+import { UseMe } from "../../context/Meprovider";
 
 const StoreOverview = () => {
+  const { allproducts, setAllProducts } = UseMe();
   const [monthProfitLoss, setMonthProfitLoss] = useState(null);
 
   const monthProfitOrLoss = async () => {
@@ -37,10 +39,6 @@ const StoreOverview = () => {
     }
   };
 
-  // useEffect(() => {
-  //   monthProfitOrLoss();
-  // }, []);
-
   const [allOrders, setAllOrders] = useState([]);
   const getAllOrders = async () => {
     try {
@@ -56,9 +54,32 @@ const StoreOverview = () => {
     }
   };
 
+  const getAllProducts = async () => {
+    try {
+      const getProductsApi = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/getProducts`,
+      );
+
+      setAllProducts(getProductsApi.data.products || []);
+
+      console.log("get all products", getProductsApi.data.products);
+
+      console.log(
+        "IMAGE:",
+        getProductsApi.data.products?.[0]?.variants?.[0]?.images?.[0]?.url,
+      );
+
+      console.log("BRAND:", getProductsApi.data.products?.[0]?.brand);
+    } catch (error) {
+      console.log("error in get products", error);
+      console.log("Server response:", error.response?.data);
+    }
+  };
+
   useEffect(() => {
     monthProfitOrLoss();
     getAllOrders();
+    getAllProducts();
   }, []);
 
   const orderStatuses = [
@@ -82,6 +103,28 @@ const StoreOverview = () => {
   const activeOrders = allOrders.filter(
     (order) => !["Delivered", "Cancelled"].includes(order.orderStatus),
   ).length;
+
+  const lowProducts = allproducts.filter((product) =>
+    product.variants.some((variant) =>
+      variant.sizes?.some((size) => size.stock > 0 && size.stock <= 10),
+    ),
+  );
+
+  console.log("lowstock products", lowProducts);
+
+  const pendingOrders = allproducts.filter(
+    (order) => order.orderStatus === "Pending",
+  ).length;
+
+  const latestArrivalsProducts = allproducts.filter((product) => {
+    const createdDate = new Date(product.createdAt);
+    const today = new Date();
+
+    return (
+      createdDate.getMonth() === today.getMonth() &&
+      createdDate.getFullYear() === today.getFullYear()
+    );
+  }).length;
 
   return (
     <div className="min-h-screen px-6 py-6 ">
@@ -214,6 +257,54 @@ const StoreOverview = () => {
               </div>
             </div>
           </div>
+
+          <div className="grid grid-cols-3 gap-3 mt-7 ">
+            <div className="bg-[#101318] h-[110px] border border-[#242932] rounded-2xl flex gap-3 items-center px-5">
+              <span className="h-10 w-10 rounded-lg border-none bg-orange-400/20 flex justify-center items-center ">
+                <BiError className="text-orange-500" size={20} />
+              </span>
+              <div className="flex flex-col gap-1">
+                <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] ">
+                  low stock
+                </p>
+
+                <h3 className="text-white text-lg">{lowProducts.length}</h3>
+                <p className="text-neutral-500 text-xs">
+                  Products need restocking
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-[#101318] h-[110px] border border-[#242932] rounded-2xl flex gap-3 items-center px-5">
+              <span className="h-10 w-10 rounded-lg border-none bg-blue-400/20 flex justify-center items-center ">
+                <LuClock4 className="text-cyan-500" size={20} />
+              </span>
+              <div className="flex flex-col gap-1">
+                <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] ">
+                  pending orders
+                </p>
+
+                <h3 className="text-white text-lg">{pendingOrders}</h3>
+                <p className="text-neutral-500 text-xs">
+                  Orders waiting for processing
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-[#101318] h-[110px] border border-[#242932] rounded-2xl flex gap-3 items-center px-5">
+              <span className="h-10 w-10 rounded-lg border-none bg-green-400/20 flex justify-center items-center ">
+                <SiTicktick className="text-green-500" size={20} />
+              </span>
+              <div className="flex flex-col gap-1">
+                <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] ">
+                  new arrivals
+                </p>
+
+                <h3 className="text-white text-lg">{latestArrivalsProducts}</h3>
+                <p className="text-neutral-500 text-xs">Added this month</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-6 gap-3">
@@ -336,167 +427,77 @@ const StoreOverview = () => {
             </div>
           </div>
         </div>
-        {/* ///////////////// */}
-        <div className="grid grid-cols-3 gap-3 mt-7 ">
-          <div className="bg-[#101318] h-[110px] border border-[#242932] rounded-2xl flex gap-3 items-center px-5">
-            <span className="h-10 w-10 rounded-lg border-none bg-orange-400/20 flex justify-center items-center ">
-              <BiError className="text-orange-500" size={20} />
-            </span>
-            <div className="flex flex-col gap-1">
-              <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] ">
-                low stock
-              </p>
-
-              <h3 className="text-white text-lg">32</h3>
-              <p className="text-neutral-500 text-xs">
-                Products need restocking
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-[#101318] h-[110px] border border-[#242932] rounded-2xl flex gap-3 items-center px-5">
-            <span className="h-10 w-10 rounded-lg border-none bg-blue-400/20 flex justify-center items-center ">
-              <LuClock4 className="text-cyan-500" size={20} />
-            </span>
-            <div className="flex flex-col gap-1">
-              <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] ">
-                pending orders
-              </p>
-
-              <h3 className="text-white text-lg">32</h3>
-              <p className="text-neutral-500 text-xs">
-                Orders waiting for processing
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-[#101318] h-[110px] border border-[#242932] rounded-2xl flex gap-3 items-center px-5">
-            <span className="h-10 w-10 rounded-lg border-none bg-green-400/20 flex justify-center items-center ">
-              <SiTicktick className="text-green-500" size={20} />
-            </span>
-            <div className="flex flex-col gap-1">
-              <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] ">
-                new arrivals
-              </p>
-
-              <h3 className="text-white text-lg">32</h3>
-              <p className="text-neutral-500 text-xs">Added this month</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-[#101318]  w-full border border-[#242932] rounded-2xl mt-7">
-          <div>
-            <div className=" px-5 py-6  flex justify-between items-end">
-              <div className="flex flex-col gap-1 ">
-                <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] font-medium ">
-                  store activity
-                </p>
-
-                <h3 className="text-white text-2xl">Recent Orders</h3>
-              </div>
-              <div className="uppercase text-blue-400/70 text-xs tracking-wide">
-                view all
-              </div>
-            </div>
-
-            <hr className="bg-[#242932] w-full h-0.5" />
-            <div className="px-5 py-6 flex flex-col justify-center gap-4">
-              <div className="flex justify-between text-white font-semibold bg-gray-900 px-2 rounded-md py-1">
-                <h4>Order</h4>
-                <h4>Customer</h4>
-                <h4>Product</h4>
-                <h4>Amount</h4>
-                <h4>Status</h4>
-                <h4>Action</h4>
-              </div>
-              <div className="text-white flex justify-between">
-                <h4>#ME1024</h4>
-                <p>Arun Kumar</p>
-                <p>Premiun T-Shirt</p>
-                <p>$30</p>
-                <button className="  px-2 bg-green-800/55 rounded-2xl border border-green-600 text-green-600 text-center">
-                  Delivered
-                </button>
-                <span className="flex gap-2">
-                  <button className="py-1 w-7 bg-gray-700/35 flex justify-center items-center rounded-md text-gray-400">
-                    <FaEye />
-                  </button>
-                  <button className="py-1 w-7 bg-gray-700/35 flex justify-center items-center rounded-md text-gray-400">
-                    <BsThreeDots />
-                  </button>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* /////////////////// */}
-        <div className="grid grid-cols-2   gap-3  mt-7">
-          <div className=" bg-[#101318] border border-[#242932] rounded-2xl">
-            <div className="px-5 py-6 flex justify-between w-full">
+
+        <div className="grid grid-cols-1 gap-3 mt-7">
+          <div className="bg-[#101318] border border-[#242932] rounded-2xl">
+            <div className="px-5 py-6 flex justify-between items-center">
               <div>
-                <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] font-medium ">
-                  inventory
+                <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] font-medium">
+                  Inventory
                 </p>
 
                 <h3 className="text-white text-2xl">Low Stock Products</h3>
               </div>
 
-              <button className=" text-gray-400">
-                <BsThreeDots />
-              </button>
-            </div>
-            <hr className="w-full bg-[#242932]" />
-
-            <div className="flex justify-between items-center px-5 py-6">
-              <div className="flex items-center gap-2">
-                <span className="h-10 w-10 rounded-lg border border-orange-400/20 text-orange-500 bg-orange-400/15 flex justify-center items-center">
-                  <LuShoppingBag size={20} />
-                </span>
-                <div>
-                  <h4 className="text-white font-semibold">Premium Shirts</h4>
-                  <p className="text-neutral-500 text-xs ">Shirts</p>
-                </div>
-              </div>
-
-              <span className="text-orange-500 flex flex-col justify-center items-center">
-                <p>2</p>
-                <p className="uppercase text-neutral-500 text-[10px]">Left</p>
+              <span className="text-orange-400 text-sm">
+                {lowProducts.length} products
               </span>
             </div>
-          </div>
 
-          <div className=" bg-[#101318] border border-[#242932] rounded-2xl">
-            <div className="px-5 py-6 flex justify-between w-full">
-              <div>
-                <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] font-medium ">
-                  collection
-                </p>
+            <hr className="border-[#242932]" />
 
-                <h3 className="text-white text-2xl">Latest New Arrivals</h3>
-              </div>
+            <div className="divide-y divide-[#242932]/70">
+              {lowProducts.length > 0 ? (
+                lowProducts.map((lowstockproduct) => (
+                  <div
+                    key={lowstockproduct._id}
+                    className="group flex items-center justify-between gap-4 px-5 py-4 transition-all duration-200 hover:bg-white/[0.025]"
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-orange-400/15 bg-orange-400/[0.08] text-orange-400 transition-colors duration-200 group-hover:border-orange-400/30 group-hover:bg-orange-400/[0.14]">
+                        <LuShoppingBag size={19} />
+                      </div>
 
-              <button className=" text-gray-400">
-                <BsThreeDots />
-              </button>
-            </div>
-            <hr className="w-full bg-[#242932]" />
+                      <div className="min-w-0">
+                        <h4 className="truncate text-sm font-semibold text-gray-100 transition-colors group-hover:text-white">
+                          {lowstockproduct.name}
+                        </h4>
 
-            <div className="flex justify-between items-center px-5 py-6">
-              <div className="flex items-center gap-2">
-                <span className="h-10 w-10 rounded-lg border border-blue-400/20 text-cyan-500 bg-blue-400/15 flex justify-center items-center">
-                  <SiHackthebox size={20} />
-                </span>
-                <div>
-                  <h4 className="text-white font-semibold">Premium Shirts</h4>
-                  <p className="text-neutral-500 text-xs ">Shirts</p>
+                        <p className="mt-1 text-xs text-neutral-500">
+                          {lowstockproduct.category}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex shrink-0 flex-col items-end gap-2">
+                      <span className="text-sm font-semibold tracking-tight text-gray-100">
+                        ₹{lowstockproduct.price}
+                      </span>
+
+                      <span className="inline-flex items-center gap-1.5 rounded-md border border-orange-400/15 bg-orange-400/[0.08] px-2 py-1 text-[10px] font-medium text-orange-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+                        {lowstockproduct.stock} left
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center px-5 py-12 text-center">
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.06] text-emerald-400">
+                    <icon name="check-circle" size={22} />
+                  </div>
+
+                  <p className="text-sm font-medium text-gray-200">
+                    Inventory looks good
+                  </p>
+
+                  <p className="mt-1 text-xs text-neutral-500">
+                    No low-stock products need attention.
+                  </p>
                 </div>
-              </div>
-
-              <span className="text-white ">
-                <p>$30</p>
-              </span>
+              )}
             </div>
           </div>
         </div>
