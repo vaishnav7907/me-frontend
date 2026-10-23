@@ -20,7 +20,10 @@ const Signup = () => {
     setPassword,
     Phone,
     setPhone,
+    userId,
+    setUserId,
   } = UseMe();
+  const [Age, setAge] = useState("");
 
   const onchangeFullName = (e) => {
     setFullName(e.target.value);
@@ -34,12 +37,17 @@ const Signup = () => {
     setPassword(e.target.value);
   };
 
+  const onchangeAge = (e) => {
+    setAge(e.target.value);
+  };
+
   const onchangePhone = (e) => {
     setPhone(e.target.value);
   };
 
   const userSingnupFn = async (e) => {
     e.preventDefault();
+
     try {
       const userSignupApi = await axios.post(
         `${import.meta.env.VITE_API_URL}/Me/userSignup`,
@@ -47,25 +55,33 @@ const Signup = () => {
           Email,
           FullName,
           Phone,
+          Age: Number(Age),
           Password,
         },
       );
 
-      console.log("user signup", userSignupApi.data);
+      console.log("User signup:", userSignupApi.data);
 
-      alert(" successfully joined ✅");
+      const createdUser = userSignupApi.data.user;
 
-      navigate("/mainpage");
+      if (createdUser?._id || createdUser?.id) {
+        setUserId(createdUser._id || createdUser.id);
+      }
+
+      alert("Successfully joined ✅");
 
       setEmail("");
       setFullName("");
       setPhone("");
       setPassword("");
-    } catch (error) {
-      console.log("Error in user signup:", error);
-      console.log("Server response:", error.response?.data);
+      setAge("");
 
-      alert(error.response?.data?.message || "user signup failed");
+      navigate("/mainpage");
+    } catch (error) {
+      console.error("Error in user signup:", error);
+      console.error("Server response:", error.response?.data);
+
+      alert(error.response?.data?.message || "User signup failed");
     }
   };
 
@@ -208,6 +224,23 @@ const Signup = () => {
                 placeholder:text-gray-600
                 focus:border-white
                 transition"
+              />
+            </div>
+
+            <div className="space-y-4">
+              <label className="uppercase tracking-[0.35em] text-xs text-gray-500">
+                Age
+              </label>
+
+              <input
+                type="number"
+                min="1"
+                max="120"
+                placeholder="Enter your Age"
+                value={Age}
+                onChange={onchangeAge}
+                required
+                className="w-full bg-transparent border-b border-white/20 pb-4 outline-none text-lg placeholder:text-gray-600 focus:border-white transition"
               />
             </div>
 

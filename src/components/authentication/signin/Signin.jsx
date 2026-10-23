@@ -10,7 +10,8 @@ import axios from "axios";
 const Signin = () => {
   const navigate = useNavigate();
 
-  const { FullName, setFullName, Password, setPassword } = UseMe();
+  const { FullName, setFullName, Password, setPassword, userId, setUserId } =
+    UseMe();
 
   const onchangeFullname = (e) => {
     setFullName(e.target.value);
@@ -43,14 +44,21 @@ const Signin = () => {
         return;
       }
 
+      if (!user.id) {
+        alert("User ID is missing");
+        return;
+      }
+
       localStorage.setItem("userToken", token);
       localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("userId", user.id);
+
+      setUserId(user.id);
 
       setFullName("");
       setPassword("");
 
       alert("Successfully joined ✅");
-
       navigate("/mainpage");
     } catch (error) {
       console.log("Error in user sign in:", error);

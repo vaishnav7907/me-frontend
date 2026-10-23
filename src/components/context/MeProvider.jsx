@@ -65,6 +65,11 @@ export const MeProvider = ({ children }) => {
 
   // frontend
   const [getProductCategory, setGetProductCategory] = useState("");
+
+
+  // userid
+
+  const [userId,setUserId]=useState(null)
   return (
     <MeContext.Provider
       value={{
@@ -174,6 +179,8 @@ export const MeProvider = ({ children }) => {
 
         getProductCategory,
         setGetProductCategory,
+
+        userId,setUserId,
       }}
     >
       {children}

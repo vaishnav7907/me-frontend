@@ -26,8 +26,41 @@ import AnalyticsCompleteChart from "../charts/AnalyticsCompleteChart";
 import { RxPeople } from "react-icons/rx";
 import { PiCurrencyDollarBold } from "react-icons/pi";
 import { tableFeatures, useTable } from "@tanstack/react-table";
+import axios from "axios";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const StoreSales = () => {
+  const [completeBusinessAnalysis, setCompleteBusinessAnalysis] = useState([]);
+  const [tableBusinessAnalysis, setTableBusinessAnalysis] = useState([]);
+  const businessAnalysis = async () => {
+    try {
+      const adminToken = localStorage.getItem("token");
+      const getBusinessAnalysisApi = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/getBussinessAnalysis`,
+        { headers: { Authorization: `Bearer ${adminToken}` } },
+      );
+      setCompleteBusinessAnalysis(getBusinessAnalysisApi.data);
+      setTableBusinessAnalysis(getBusinessAnalysisApi.data.yearlyData);
+
+      console.log(
+        "get complete business analysis",
+        getBusinessAnalysisApi.data,
+      );
+
+      console.log(
+        "get table business analysis",
+        getBusinessAnalysisApi.data.yearlyData,
+      );
+    } catch (error) {
+      console.log("error in get complete business analysis", error.message);
+    }
+  };
+
+  useEffect(() => {
+    businessAnalysis();
+  }, []);
+
   const salesData = [
     { month: "Jan", revenue: 42000, profit: 17000 },
     { month: "Feb", revenue: 51000, profit: 22000 },
@@ -157,65 +190,27 @@ const StoreSales = () => {
     },
   ];
 
-  const yearlyData = [
-    {
-      year: 2022,
-      revenue: 1250000,
-      profit: 285000,
-      loss: 72000,
-      orders: 1180,
-      customers: 840,
-      productsSold: 1640,
-    },
-    {
-      year: 2023,
-      revenue: 1680000,
-      profit: 410000,
-      loss: 85000,
-      orders: 1650,
-      customers: 1240,
-      productsSold: 2310,
-    },
-    {
-      year: 2024,
-      revenue: 2150000,
-      profit: 570000,
-      loss: 92000,
-      orders: 2240,
-      customers: 1780,
-      productsSold: 3180,
-    },
-    {
-      year: 2025,
-      revenue: 2380000,
-      profit: 640000,
-      loss: 108000,
-      orders: 2460,
-      customers: 2040,
-      productsSold: 3520,
-    },
-    {
-      year: 2026,
-      revenue: 2745000,
-      profit: 780000,
-      loss: 95000,
-      orders: 2890,
-      customers: 2410,
-      productsSold: 4210,
-    },
-  ];
+  const yearlyData = tableBusinessAnalysis.map((businessAnalysis) => ({
+    year: businessAnalysis.year,
+    revenue: businessAnalysis.revenue,
+    profit: businessAnalysis.profit,
+    loss: businessAnalysis.loss,
+    orders: businessAnalysis.orders,
+    customers: businessAnalysis.orders,
+    productsSold: businessAnalysis.productsSold,
+  }));
 
   const columns = [
     { accessorKey: "year", header: "year" },
     { accessorKey: "revenue", header: "revenue" },
     { accessorKey: "profit", header: "profit" },
     { accessorKey: "loss", header: "loss" },
-    { accessorKey: "margin", header: "margin" },
+    // { accessorKey: "margin", header: "margin" },
     { accessorKey: "orders", header: "orders" },
     { accessorKey: "customers", header: "customers" },
     { accessorKey: "productsSold", header: "products" },
-    { accessorKey: "revenueGrowth", header: "Revenue Growth" },
-    { accessorKey: "profitGrowth", header: "Profit Growth" },
+    // { accessorKey: "revenueGrowth", header: "Revenue Growth" },
+    // { accessorKey: "profitGrowth", header: "Profit Growth" },
   ];
 
   const table = useTable({
@@ -318,6 +313,31 @@ const StoreSales = () => {
     },
   ];
 
+  const sortedYearlyData = [...yearlyData].sort((a, b) => a.year - b.year);
+
+  const currentYearData = sortedYearlyData[sortedYearlyData.length - 1];
+
+  const previousYearData = sortedYearlyData[sortedYearlyData.length - 2];
+
+  const calculateGrowth = (current, previous) => {
+    if (!previous || previous === 0) {
+      return null;
+    }
+
+    return Number((((current - previous) / previous) * 100).toFixed(2));
+  };
+
+  const revenueGrowth = previousYearData
+    ? calculateGrowth(currentYearData.revenue, previousYearData.revenue)
+    : null;
+
+  const profitGrowth = previousYearData
+    ? calculateGrowth(currentYearData.profit, previousYearData.profit)
+    : null;
+
+  const bestPerformingYear = [...yearlyData].sort(
+    (a, b) => b.profit - a.profit,
+  )[0];
   const topProductTable = useTable({
     data: products,
     columns: columnn,
@@ -448,7 +468,9 @@ const StoreSales = () => {
                         Business Since
                       </p>
 
-                      <h3 className="text-white text-lg text-right">2002</h3>
+                      <h3 className="text-white text-lg text-right">
+                        {completeBusinessAnalysis.businessSince}
+                      </h3>
                     </div>
 
                     <div className="w-[1px] h-10 bg-white/20 text-white/70" />
@@ -457,7 +479,9 @@ const StoreSales = () => {
                         current year
                       </p>
 
-                      <h3 className="text-white text-lg text-right">2026</h3>
+                      <h3 className="text-white text-lg text-right">
+                        {completeBusinessAnalysis.currentYear}
+                      </h3>
                     </div>
                   </div>
                 </div>
@@ -470,14 +494,16 @@ const StoreSales = () => {
                             lifetime Revenue
                           </p>
 
-                          <h3 className="text-white text-lg">$367</h3>
+                          <h3 className="text-white text-lg">
+                            {completeBusinessAnalysis.lifetimeRevenue}
+                          </h3>
                           <p className="text-neutral-500 text-xs">
                             since launch
                           </p>
                         </div>
-                        <div className="flex items-center gap-1 text-green-400/70">
+                        {/* <div className="flex items-center gap-1 text-green-400/70">
                           <MdOutlineArrowOutward /> <p>12.2%</p>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
 
@@ -488,12 +514,14 @@ const StoreSales = () => {
                             lifetime Profit
                           </p>
 
-                          <h3 className="text-white text-lg">$2345</h3>
+                          <h3 className="text-white text-lg">
+                            {completeBusinessAnalysis.lifetimeProfit}
+                          </h3>
                           <p className="text-neutral-500 text-xs">Net profit</p>
                         </div>
-                        <div className="flex items-center gap-1 text-green-400/70">
+                        {/* <div className="flex items-center gap-1 text-green-400/70">
                           <MdOutlineArrowOutward /> <p>12.2%</p>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
 
@@ -504,14 +532,16 @@ const StoreSales = () => {
                             lifetime loss
                           </p>
 
-                          <h3 className="text-white text-lg">$8</h3>
+                          <h3 className="text-white text-lg">
+                            {completeBusinessAnalysis.lifetimeLoss}
+                          </h3>
                           <p className="text-neutral-500 text-xs">
                             recorded loss
                           </p>
                         </div>
-                        <div className="flex items-center gap-1 text-green-400/70">
+                        {/* <div className="flex items-center gap-1 text-green-400/70">
                           <MdOutlineArrowOutward /> <p>12.2%</p>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
 
@@ -522,14 +552,17 @@ const StoreSales = () => {
                             total orders
                           </p>
 
-                          <h3 className="text-white text-lg">$14</h3>
+                          <h3 className="text-white text-lg">
+                            {completeBusinessAnalysis.totalOrders}
+                          </h3>
+
                           <p className="text-neutral-500 text-xs">
                             completed orders
                           </p>
                         </div>
-                        <div className="flex items-center gap-1 text-orange-400/70">
+                        {/* <div className="flex items-center gap-1 text-orange-400/70">
                           <FiArrowDownRight size={20} /> <p>12.2%</p>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>
@@ -542,7 +575,9 @@ const StoreSales = () => {
                             profit margin
                           </p>
 
-                          <h3 className="text-white text-lg">26%</h3>
+                          <h3 className="text-white text-lg">
+                            {completeBusinessAnalysis.profitMargin}%
+                          </h3>
                         </div>
                       </div>
                     </div>
@@ -553,7 +588,9 @@ const StoreSales = () => {
                             loss ratio
                           </p>
 
-                          <h3 className="text-white text-lg">4%</h3>
+                          <h3 className="text-white text-lg">
+                            {completeBusinessAnalysis.lossRatio}%
+                          </h3>
                         </div>
                       </div>
                     </div>
@@ -564,7 +601,9 @@ const StoreSales = () => {
                             Average Order
                           </p>
 
-                          <h3 className="text-white text-lg">$231</h3>
+                          <h3 className="text-white text-lg">
+                            {completeBusinessAnalysis.averageOrder}
+                          </h3>
                         </div>
                       </div>
                     </div>
@@ -575,7 +614,9 @@ const StoreSales = () => {
                             customers
                           </p>
 
-                          <h3 className="text-white text-lg">$22</h3>
+                          <h3 className="text-white text-lg">
+                            {completeBusinessAnalysis.customers}
+                          </h3>
                         </div>
                       </div>
                     </div>
@@ -586,18 +627,33 @@ const StoreSales = () => {
                             products sold
                           </p>
 
-                          <h3 className="text-white text-lg">1,554</h3>
+                          <h3 className="text-white text-lg">
+                            {completeBusinessAnalysis.productsSold}
+                          </h3>
                         </div>
                       </div>
                     </div>
-                    <div className="bg-[#101318] h-[90px] border border-[#242932] rounded-2xl flex gap-3 items-center  px-5">
-                      <div className="flex justify-between items-center w-full ">
+                    <div className="bg-[#101318] h-[90px] border border-[#242932] rounded-2xl flex items-center px-5">
+                      <div className="flex justify-between items-center w-full">
                         <div className="flex flex-col gap-1">
-                          <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px] ">
-                            best profit year
+                          <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px]">
+                            Best Profit Year
                           </p>
 
-                          <h3 className="text-white text-lg">$14</h3>
+                          <div className="flex items-center gap-3">
+                            <h3 className="text-white text-lg font-semibold">
+                              {completeBusinessAnalysis?.bestProfitYear?.year ??
+                                "—"}
+                            </h3>
+
+                            <span className="text-emerald-400 text-sm font-medium">
+                              ₹
+                              {Number(
+                                completeBusinessAnalysis?.bestProfitYear
+                                  ?.profit ?? 0,
+                              ).toLocaleString("en-IN")}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -768,44 +824,97 @@ const StoreSales = () => {
                   </tbody>
                 </table>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-5">
-                  <div className="border border-[#242932] rounded-xl p-4">
+                <div className="grid grid-cols-1 gap-3 mt-5 md:grid-cols-3">
+                  <div className="rounded-xl border border-[#242932] bg-[#101318] p-4 transition-colors hover:border-[#343b45]">
                     <p className="text-[10px] uppercase tracking-[0.1em] text-neutral-500">
                       Revenue Growth
                     </p>
 
-                    <div className="flex items-center gap-2 mt-2">
-                      <MdOutlineArrowOutward className="text-green-400/80" />
-                      <span className="text-white font-semibold">22%</span>
-                      <span className="text-neutral-500 text-xs">
-                        since 666
+                    <div className="mt-2 flex items-center gap-2">
+                      {revenueGrowth !== null && (
+                        <MdOutlineArrowOutward
+                          className={
+                            revenueGrowth >= 0
+                              ? "text-green-400"
+                              : "rotate-90 text-rose-400"
+                          }
+                        />
+                      )}
+
+                      <span
+                        className={`font-semibold ${
+                          revenueGrowth === null
+                            ? "text-neutral-400"
+                            : revenueGrowth >= 0
+                              ? "text-green-400"
+                              : "text-rose-400"
+                        }`}
+                      >
+                        {revenueGrowth === null
+                          ? "N/A"
+                          : `${revenueGrowth > 0 ? "+" : ""}${revenueGrowth}%`}
+                      </span>
+
+                      <span className="text-xs text-neutral-500">
+                        {previousYearData
+                          ? `vs. ${previousYearData.year}`
+                          : "Previous year unavailable"}
                       </span>
                     </div>
                   </div>
 
-                  <div className="border border-[#242932] rounded-xl p-4">
+                  <div className="rounded-xl border border-[#242932] bg-[#101318] p-4 transition-colors hover:border-[#343b45]">
                     <p className="text-[10px] uppercase tracking-[0.1em] text-neutral-500">
                       Profit Growth
                     </p>
 
-                    <div className="flex items-center gap-2 mt-2">
-                      <MdOutlineArrowOutward className="text-green-400/80" />
-                      <span className="text-white font-semibold">45%</span>
-                      <span className="text-neutral-500 text-xs">
-                        since 2001
+                    <div className="mt-2 flex items-center gap-2">
+                      {profitGrowth !== null && (
+                        <MdOutlineArrowOutward
+                          className={
+                            profitGrowth >= 0
+                              ? "text-green-400"
+                              : "rotate-90 text-rose-400"
+                          }
+                        />
+                      )}
+
+                      <span
+                        className={`font-semibold ${
+                          profitGrowth === null
+                            ? "text-neutral-400"
+                            : profitGrowth >= 0
+                              ? "text-green-400"
+                              : "text-rose-400"
+                        }`}
+                      >
+                        {profitGrowth === null
+                          ? "N/A"
+                          : `${profitGrowth > 0 ? "+" : ""}${profitGrowth}%`}
+                      </span>
+
+                      <span className="text-xs text-neutral-500">
+                        {previousYearData
+                          ? `vs. ${previousYearData.year}`
+                          : "Previous year unavailable"}
                       </span>
                     </div>
                   </div>
 
-                  <div className="border border-[#242932] rounded-xl p-4">
+                  <div className="rounded-xl border border-[#242932] bg-[#101318] p-4 transition-colors hover:border-[#343b45]">
                     <p className="text-[10px] uppercase tracking-[0.1em] text-neutral-500">
                       Best Performing Year
                     </p>
 
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-white font-semibold">45678</span>
-                      <span className="text-neutral-500 text-xs">
-                        2552 profit
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <span className="text-lg font-semibold text-white">
+                        {bestPerformingYear?.year ?? "—"}
+                      </span>
+
+                      <span className="text-xs text-emerald-400">
+                        {bestPerformingYear
+                          ? `₹${Number(bestPerformingYear.profit ?? 0).toLocaleString("en-IN")} profit`
+                          : "No data available"}
                       </span>
                     </div>
                   </div>

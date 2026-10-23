@@ -11,7 +11,8 @@ import {
   FaSignOutAlt,
   FaChevronRight,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { GrUpdate } from "react-icons/gr";
+import { Link, useNavigate } from "react-router-dom";
 
 const settings = [
   // {
@@ -24,11 +25,11 @@ const settings = [
     title: "Notifications",
     subtitle: "Manage alerts and updates",
   },
-  // {
-  //   icon: <FaMoon />,
-  //   title: "Appearance",
-  //   subtitle: "Dark theme preferences",
-  // },
+  {
+    icon: <GrUpdate />,
+    title: "Update User",
+    subtitle: "Manage personal information",
+  },
   // {
   //   icon: <FaShieldAlt />,
   //   title: "Privacy",
@@ -66,7 +67,7 @@ const Settings = () => {
       </button>
 
       {/* Heading */}
-       <motion.div
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -76,33 +77,34 @@ const Settings = () => {
           Preferences
         </p>
 
-        <h2 className="text-5xl font-light mt-3">
-          Settings
-        </h2>
+        <h2 className="text-5xl font-light mt-3">Settings</h2>
 
         <p className="text-white/60 mt-5 leading-8">
-          Customize your shopping experience, manage your account,
-          and personalize the ME luxury store.
+          Customize your shopping experience, manage your account, and
+          personalize the ME luxury store.
         </p>
       </motion.div>
 
       <div className="mt-10 p-3 flex flex-col space-y-5">
         {settings.map((items, index) => (
+
+
+<Link>
           <motion.div
             className="rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/10 hover:border-white/30 transition-all  w-4xl py-5 px-5 flex items-center justify-between group"
             key={index}
             initial={{ opacity: 0, x: 60 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{
-              delay: index * 0.10,
+              delay: index * 0.1,
               duration: 0.45,
             }}
           >
             <div>
               <div className="flex items-center gap-4 rounded-xl   text-white transition-all duration-300 ">
-                 <div className="h-14 w-14 rounded-full bg-white/10 flex items-center justify-center text-xl group-hover:bg-white group-hover:text-black transition duration-300">
-                {items.icon}
-              </div>
+                <div className="h-14 w-14 rounded-full bg-white/10 flex items-center justify-center text-xl group-hover:bg-white group-hover:text-black transition duration-300">
+                  {items.icon}
+                </div>
                 <div>
                   <h3 className="text-white text-lg">{items.title}</h3>
                   <p className="text-gray-400">{items.subtitle}</p>
@@ -113,6 +115,7 @@ const Settings = () => {
               <FaChevronRight />
             </div>
           </motion.div>
+          </Link>
         ))}
       </div>
 
