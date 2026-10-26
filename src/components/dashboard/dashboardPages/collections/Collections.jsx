@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { RiArrowRightLongFill } from "react-icons/ri";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 const MenCollection = () => {
   const categories = [
     "All",
@@ -12,6 +13,8 @@ const MenCollection = () => {
     "InnerWear",
     "Shorts",
   ];
+
+  const navigate=useNavigate()
 
   const [selectedCategory, setSelectedCategory] = useState("All");
 
@@ -184,7 +187,13 @@ const MenCollection = () => {
                       </p>
                     </div>
 
-                    <button className="flex items-center gap-2 uppercase tracking-[0.25em] text-[11px] opacity-0 translate-y-3 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0">
+                    <button className="flex items-center gap-2 uppercase tracking-[0.25em] text-[11px] opacity-0 translate-y-3 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0"
+                     onClick={() =>
+                          navigate("/productInfo", {
+                            state: { product: data },
+                          })
+                        }
+                    >
                       View
                       <span>
                         <RiArrowRightLongFill size={16} />

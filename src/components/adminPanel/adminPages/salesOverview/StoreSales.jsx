@@ -61,6 +61,33 @@ const StoreSales = () => {
     businessAnalysis();
   }, []);
 
+  const [getUsersByAgeData, setGetUsersByAgeData] = useState([]);
+
+  const getUsersByAge = async () => {
+    try {
+      const adminToken = localStorage.getItem("token");
+      const getUsersbyAgeApi = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/getUsersByAge`,
+        { headers: { Authorization: `Bearer ${adminToken}` } },
+      );
+      console.log(
+        "get users by age",
+        getUsersbyAgeApi.data.getUsersByAgeAndOtherDetails,
+      );
+      setGetUsersByAgeData(getUsersbyAgeApi.data.getUsersByAgeAndOtherDetails);
+    } catch (error) {
+      console.log("error in get complete business analysis", error.message);
+    }
+  };
+
+  useEffect(() => {
+    getUsersByAge();
+  }, []);
+
+  const maxOrders = Math.max(
+    1,
+    ...getUsersByAgeData.map((data) => Number(data.orders) || 0),
+  );
   const salesData = [
     { month: "Jan", revenue: 42000, profit: 17000 },
     { month: "Feb", revenue: 51000, profit: 22000 },
@@ -219,72 +246,55 @@ const StoreSales = () => {
     features: tableFeatures(),
   });
 
-  const products = [
-    {
-      id: 1,
-      name: "Classic White Shirt",
-      category: "Shirts",
-      sold: 1240,
-      revenue: 97960,
-      profit: 31200,
-    },
-    {
-      id: 2,
-      name: "Slim Fit Jeans",
-      category: "Pants",
-      sold: 1085,
-      revenue: 107415,
-      profit: 35800,
-    },
-    {
-      id: 3,
-      name: "Oversized T-Shirt",
-      category: "T-Shirts",
-      sold: 980,
-      revenue: 44100,
-      profit: 16400,
-    },
-    {
-      id: 4,
-      name: "Essential Hoodie",
-      category: "T-Shirts",
-      sold: 865,
-      revenue: 82175,
-      profit: 28900,
-    },
-    {
-      id: 5,
-      name: "Tailored Blazer",
-      category: "Jackets",
-      sold: 720,
-      revenue: 128880,
-      profit: 42700,
-    },
-    {
-      id: 6,
-      name: "Leather Jacket",
-      category: "Jackets",
-      sold: 615,
-      revenue: 122385,
-      profit: 39600,
-    },
-    {
-      id: 7,
-      name: "Classic Chinos",
-      category: "Pants",
-      sold: 580,
-      revenue: 57420,
-      profit: 18900,
-    },
-    {
-      id: 8,
-      name: "Premium Polo",
-      category: "Shirts",
-      sold: 510,
-      revenue: 40290,
-      profit: 14100,
-    },
-  ];
+  const [getTopProductsState, setGetTopProductsState] = useState([]);
+
+  const getTopProducts = async () => {
+    try {
+      const adminToken = localStorage.getItem("token");
+
+      const getTopProductsApi = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/getTopProducts`,
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        },
+      );
+
+      console.log("get top products", getTopProductsApi.data.topProducts);
+
+      setGetTopProductsState(getTopProductsApi.data.topProducts);
+    } catch (error) {
+      console.log(
+        "error in get top products",
+        error.response?.data || error.message,
+      );
+    }
+  };
+
+  useEffect(() => {
+    getTopProducts();
+  }, []);
+
+  useEffect(() => {
+    getTopProducts();
+  }, []);
+
+  const products = getTopProductsState.map((productData, index) => {
+    const revenue = Number(productData.revenue) || 0;
+    const profit = Number(productData.profit) || 0;
+
+    return {
+      id: index + 1,
+      name: productData.name,
+      category: productData.category,
+      sold: Number(productData.sold) || 0,
+      revenue,
+      profit,
+      profitMargin:
+        revenue > 0 ? Number(((profit / revenue) * 100).toFixed(2)) : 0,
+    };
+  });
 
   const columnn = [
     {
@@ -304,12 +314,8 @@ const StoreSales = () => {
       header: "Profit",
     },
     {
-      id: "profitMargin",
+      accessorKey: "profitMargin",
       header: "Profit Margin",
-      // accessorFn: (row) =>
-      //   row.revenue > 0
-      //     ? Number(((row.profit / row.revenue) * 100).toFixed(1))
-      //     : 0,
     },
   ];
 
@@ -1016,13 +1022,16 @@ const StoreSales = () => {
                     <hr className="border-[#242932]" />
 
                     <div className="p-4 space-y-1">
-                      {ageGroups.slice(0, 5).map((ageData) => {
-                        const maxOrders = Math.max(
-                          ...ageGroups.map((data) => data.orders),
+                      {getUsersByAgeData.slice(0, 5).map((ageData) => {
+                        const totalCustomers = getUsersByAgeData.reduce(
+                          (total, age) => total + age.customers,
+                          0,
                         );
 
-                        const orderPercentage =
-                          (ageData.orders / maxOrders) * 100;
+                        const customerPercentage =
+                          totalCustomers > 0
+                            ? (ageData.customers / totalCustomers) * 100
+                            : 0;
 
                         return (
                           <div key={ageData.id} className="py-2">
@@ -1043,7 +1052,7 @@ const StoreSales = () => {
                             <div className="w-full h-[3px] bg-white/5 rounded-full mt-3 overflow-hidden">
                               <div
                                 className="bg-white h-full rounded-full transition-all duration-500"
-                                style={{ width: `${orderPercentage}%` }}
+                                style={{ width: `${customerPercentage}%` }}
                               />
                             </div>
 
@@ -1343,33 +1352,18 @@ const StoreSales = () => {
                                       )}
 
                                       {cell.column.id === "profitMargin" && (
-                                        <div className="flex items-center gap-3">
-                                          <div
-                                            className="
-                      h-1.5
-                      w-16
-                      overflow-hidden
-                      rounded-full
-                      bg-[#252a31]
-                    "
-                                          >
-                                            <div
-                                              className="
-                          h-full
-                          rounded-full
-                          bg-neutral-400
-                          transition-all
-                        "
-                                              style={{
-                                                width: `${Math.min(Number(value), 100)}%`,
-                                              }}
-                                            />
-                                          </div>
-
-                                          <span className="text-sm font-medium text-neutral-300">
-                                            {value}%
-                                          </span>
-                                        </div>
+                                        <span className="text-sm font-semibold text-neutral-100">
+                                          {Number(row.original.revenue) > 0
+                                            ? (
+                                                (Number(row.original.profit) /
+                                                  Number(
+                                                    row.original.revenue,
+                                                  )) *
+                                                100
+                                              ).toFixed(2)
+                                            : "0.00"}
+                                          %
+                                        </span>
                                       )}
                                     </td>
                                   );

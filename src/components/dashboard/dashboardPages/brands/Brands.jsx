@@ -28,6 +28,14 @@ const Brands = () => {
     getAllBrands();
   }, []);
 
+const handleBrandClick = (brand) => {
+  navigate("/BrandSubpage", {
+    state: {
+      brandProducts: brand,
+    },
+  });
+};
+
   const defaultBackground =
     "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1000&q=85";
 
@@ -118,7 +126,7 @@ const Brands = () => {
                     duration: 0.6,
                     delay: index * 0.06,
                   }}
-                  onClick={() => navigate(`/BrandSubpage/${brand._id}`)}
+                  onClick={()=>handleBrandClick(brand)}
                   className="group relative h-[295px] cursor-pointer overflow-hidden rounded-xl border border-zinc-700/70"
                 >
                   <img
