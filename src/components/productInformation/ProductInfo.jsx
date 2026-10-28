@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "motion/react";
 import { IoArrowBack, IoStar, IoAdd, IoRemove } from "react-icons/io5";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const ProductInfo = () => {
   const navigate = useNavigate();
@@ -143,6 +144,33 @@ const ProductInfo = () => {
     console.log("Buy Now:", buyNowProduct);
 
     navigate("/productInfo/Checkout", { state: { products: buyNowProduct } });
+  };
+
+  const addToCart = async () => {
+    try {
+      const userToken = localStorage.getItem("userToken");
+
+      const addToCartApi = await axios.post(
+        `${import.meta.env.VITE_API_URL}/Me/addToCart/${product._id}`,
+        {
+          color: selectedVariant.color.name,
+          size: selectedSize,
+          quantity,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        },
+      );
+       console.log(addToCartApi.data);
+    alert("Product added to cart successfully");
+    } catch (error) {
+       console.log(
+      "Error in add to cart:",
+      error.response?.data?.message || error.message,
+    );
+    }
   };
   return (
     <section className="min-h-screen bg-black text-white">
@@ -317,7 +345,7 @@ const ProductInfo = () => {
             <div className="flex gap-5 mt-12">
               <button
                 className="flex-1 bg-white text-black py-4 rounded-full text-lg font-medium hover:bg-gray-200 transition"
-                onClick={handleCartItems}
+                onClick={addToCart }
               >
                 Add to Cart
               </button>
