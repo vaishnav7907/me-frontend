@@ -107,6 +107,7 @@ const Cart = () => {
           ) : (
             cartData.map((item, index) => {
               const product = item.product;
+console.log(" cart product",product);
 
               const selectedVariant = product?.variants?.find(
                 (variant) =>
@@ -119,6 +120,9 @@ const Cart = () => {
                   String(sizeData.size).toLowerCase() ===
                   String(item.size).toLowerCase(),
               );
+
+              const brandIcon = product?.brand?.brandIcon?.url;
+              console.log("brand image in cart", brandIcon);
 
               const image =
                 selectedVariant?.color?.mainImage?.url ||
@@ -163,12 +167,23 @@ const Cart = () => {
                       <div>
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <p className="text-xs uppercase tracking-[3px] text-gray-500">
-                              {product?.brand?.name ||
-                                product?.brandName ||
-                                product?.category ||
-                                "ME Collection"}
-                            </p>
+                            <div className="flex items-center gap-3">
+                              {brandIcon && (
+                                <img
+                                  src={brandIcon}
+                                  alt={product.brand.brandName || "Brand"}
+                                  className="h-8 w-8 rounded-full border border-zinc-800 bg-white object-contain p-1"
+                                />
+                              )}
+
+                              <p className="text-xs uppercase tracking-[3px] text-gray-500">
+                                {product?.brand?.brandName ||
+                                  product?.brand?.name ||
+                                  product?.brandName ||
+                                  product?.category ||
+                                  "ME Collection"}
+                              </p>
+                            </div>
 
                             <h3 className="mt-3 font-serif text-2xl leading-tight sm:text-3xl">
                               {product?.name || "Product"}
@@ -262,11 +277,13 @@ const Cart = () => {
                         </div>
 
                         <button
-                          onClick={() =>
+                          onClick={() => {
                             navigate("/productInfo", {
-                              state: { product: product?._id },
-                            })
-                          }
+                              state: { product: product },
+                            });
+
+                            console.log("product details cart to buy", product);
+                          }}
                           className="flex items-center gap-2 border-b border-zinc-600 pb-1 text-xs uppercase tracking-[2px] text-gray-300 transition hover:border-white hover:text-white"
                         >
                           order now
