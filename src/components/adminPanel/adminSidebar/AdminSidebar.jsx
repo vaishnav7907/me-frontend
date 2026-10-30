@@ -9,13 +9,13 @@ import {
   FiDollarSign,
   FiSettings,
   FiLogOut,
+  
 } from "react-icons/fi";
+import { LuClipboardList } from "react-icons/lu";
 import { NavLink } from "react-router-dom";
 import { UseMe } from "../../context/Meprovider";
 
 const AdminSidebar = () => {
- 
-
   const navigation = [
     {
       title: "Overview",
@@ -45,6 +45,11 @@ const AdminSidebar = () => {
           name: "Brands",
           icon: <FiTag />,
           path: "/adminDash/storeBrands",
+        },
+        {
+          name:"Offer",
+          icon: <LuClipboardList  />,
+          path:"/adminDash/offerSales"
         },
         {
           name: "Orders",
@@ -77,16 +82,12 @@ const AdminSidebar = () => {
     },
   ];
 
-  
   const [navigationBtn, setNavigationBtn] = useState("Dashboard");
   return (
     <aside className="fixed top-0 left-0 z-50 h-screen w-[260px] bg-[#0B0D10] border-r border-[#242932] flex flex-col">
-
       {/* ================= LOGO ================= */}
       <div className="h-[90px] px-7 flex flex-col items-start justify-center border-b border-[#242932]">
-        <h1 className="text-3xl font-bold tracking-[0.35em] text-white">
-          ME
-        </h1>
+        <h1 className="text-3xl font-bold tracking-[0.35em] text-white">ME</h1>
 
         <p className="text-[8px] tracking-[0.35em] text-[#666D78] mt-1">
           MEN'S FASHION
@@ -95,13 +96,8 @@ const AdminSidebar = () => {
 
       {/* ================= NAVIGATION ================= */}
       <div className="flex-1 overflow-y-auto admin-sidebar-scroll px-5 py-6">
-
         {navigation.map((service, index) => (
-          <div
-            key={index}
-            className="mt-4"
-          >
-
+          <div key={index} className="mt-4">
             {/* Section Title */}
             <p
               className="
@@ -119,13 +115,13 @@ const AdminSidebar = () => {
 
             {/* Navigation Items */}
             <div className="space-y-1 ">
-
               {service.items.map((item, itemIndex) => (
-
                 <NavLink
                   key={itemIndex}
                   to={item.path}
-                  onClick={() => {setNavigationBtn(item.name)}}
+                  onClick={() => {
+                    setNavigationBtn(item.name);
+                  }}
                   className={({ isActive }) => `
                     group
                     w-full
@@ -146,7 +142,6 @@ const AdminSidebar = () => {
                     }
                   `}
                 >
-
                   {({ isActive }) => (
                     <>
                       {/* ================= ICON ================= */}
@@ -167,9 +162,7 @@ const AdminSidebar = () => {
                       </span>
 
                       {/* ================= NAME ================= */}
-                      <span className="flex-1 text-left">
-                        {item.name}
-                      </span>
+                      <span className="flex-1 text-left">{item.name}</span>
 
                       {/* ================= BADGE ================= */}
                       {item.badge && (
@@ -197,20 +190,15 @@ const AdminSidebar = () => {
                       )}
                     </>
                   )}
-
                 </NavLink>
-
               ))}
-
             </div>
           </div>
         ))}
-
       </div>
 
       {/* ================= LOGOUT ================= */}
       <div className="p-5 border-t border-[#242932]">
-
         <button
           className="
             group
@@ -229,7 +217,6 @@ const AdminSidebar = () => {
             duration-200
           "
         >
-
           <FiLogOut
             className="
               text-[17px]
@@ -238,14 +225,9 @@ const AdminSidebar = () => {
             "
           />
 
-          <span>
-            Logout
-          </span>
-
+          <span>Logout</span>
         </button>
-
       </div>
-
     </aside>
   );
 };

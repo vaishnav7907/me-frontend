@@ -42,6 +42,9 @@ import AdminSignup from "./components/adminPanel/adminAuthentication/adminSignup
 import AdminLogin from "./components/adminPanel/adminAuthentication/adminLogin/AdminLogin";
 import Checkout from "./components/buyProducts/Checkout";
 import OrderSuccess from "./components/buyProducts/OrderSuccess";
+// import OfferSales from "./components/adminPanel/adminPages/offer/offerSales";
+import GetOfferSales from "./components/adminPanel/adminPages/offer/GetOfferSales";
+// import OfferSales from "./components/adminPanel/adminPages/offer/offerSales";
 // import AdminWelcomePage from "./components/adminPanel/adminAuthentication/adminWelcomePage/AdminWelcomePage";
 
 function App() {
@@ -111,6 +114,7 @@ function App() {
               <Route path="storeNewArrivals" element={<StoreNewArrivals />} />
               <Route path="storeBrands" element={<StoreBrands />} />
               <Route path="storeOrders" element={<StoreOrders />} />
+              <Route path="offerSales" element={<GetOfferSales/>}/>
               <Route path="storeCustomers" element={<StoreCustomers />} />
               <Route path="storeSales" element={<StoreSales />} />
               <Route path="settings" element={<AdminSettings />} />

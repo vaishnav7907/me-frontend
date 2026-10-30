@@ -10,13 +10,13 @@ const Sales = () => {
 const offers = [
   {
     title: "Summer Sale",
-    offer: "Up to 50% Off",
+    offer: "Up to 50% - 79% Off",
     description:
       "Discover timeless pieces at exclusive seasonal prices for a limited time.",
   },
   {
     title: "Buy 2 Get 1",
-    offer: "Free Item",
+    offer: "Up to 80% Off",
     description:
       "Purchase any two selected outfits and receive one additional item at no extra cost.",
   },

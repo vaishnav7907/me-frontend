@@ -45,6 +45,9 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
   const [variants, setVariants] = useState([createEmptyVariant()]);
   const [details, setDetails] = useState([{ key: "", value: "" }]);
   const [costPrice, setCostPrice] = useState("");
+  const [isHandPicked, setIsHandPicked] = useState(false);
+  const [handPickedLabel, setHandPickedLabel] = useState("");
+  const [handPickedDescription, setHandPickedDescription] = useState("");
   useEffect(() => {
     const getBrands = async () => {
       try {
@@ -291,6 +294,9 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
     setSku("");
     setStatus("Active");
     setDiscount(0);
+    setIsHandPicked(false);
+    setHandPickedLabel("");
+    setHandPickedDescription("");
     setSelectedBrand(null);
     setBrandSearchOpen(false);
     setVariants([createEmptyVariant()]);
@@ -368,10 +374,12 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
     const missingMainImage = variants.some(
       (variant) => !variant.color.mainImage,
     );
+
     if (missingMainImage) {
       alert("Please upload a main image for every color variant");
       return;
     }
+
     const totalStock = getTotalStock();
     if (totalStock <= 0) {
       alert("Product stock must be greater than 0");
@@ -384,6 +392,11 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
     );
     if (incompleteDetails) {
       alert("Please complete every product detail");
+      return;
+    }
+
+    if (isHandPicked && !handPickedLabel.trim()) {
+      alert("Please enter a Handpicked label");
       return;
     }
     const detailKeys = details
@@ -421,6 +434,9 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
       formData.append("sku", sku.trim().toUpperCase());
       formData.append("status", status);
       formData.append("details", JSON.stringify(detailsObject));
+      formData.append("isHandPicked", isHandPicked);
+      formData.append("handPickedLabel", handPickedLabel);
+      formData.append("handPickedDescription", handPickedDescription);
       const variantsForBackend = variants.map((variant) => ({
         color: {
           name: variant.color.name.trim(),
@@ -680,6 +696,94 @@ const AddProductOverDisplay = ({ setAddProduct, onClose }) => {
               </div>
             )}
           </section>
+
+          <section className="border-t border-neutral-800 pt-8">
+            <div className="mb-5">
+              <h3 className="text-base font-medium">Handpicked for You</h3>
+              <p className="mt-1 text-xs text-neutral-500">
+                Feature this product in your curated Handpicked collection
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-neutral-800 bg-[#111419] p-5">
+              <label className="flex cursor-pointer items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-white">
+                    Feature as Handpicked Product
+                  </p>
+                  <p className="mt-1 text-xs text-neutral-500">
+                    Display this product in the Handpicked for You section
+                  </p>
+                </div>
+
+                <input
+                  type="checkbox"
+                  checked={isHandPicked}
+                  onChange={(e) => {
+                    setIsHandPicked(e.target.checked);
+
+                    if (!e.target.checked) {
+                      setHandPickedLabel("");
+                      setHandPickedDescription("");
+                    }
+                  }}
+                  className="h-5 w-5 cursor-pointer accent-white"
+                />
+              </label>
+
+              {isHandPicked && (
+                <div className="mt-5 space-y-4 border-t border-neutral-800 pt-5">
+                  <div>
+                    <label className="mb-2 block text-sm text-neutral-300">
+                      Handpicked Label <span className="text-red-400">*</span>
+                    </label>
+
+                    <input
+                      type="text"
+                      value={handPickedLabel}
+                      onChange={(e) => setHandPickedLabel(e.target.value)}
+                      placeholder="Example: Timeless Essential"
+                      className="h-11 w-full rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                    />
+
+                    <p className="mt-2 text-xs text-neutral-600">
+                      Give this product a unique collection label
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm text-neutral-300">
+                      Handpicked Description
+                    </label>
+
+                    <textarea
+                      value={handPickedDescription}
+                      onChange={(e) => setHandPickedDescription(e.target.value)}
+                      placeholder="Explain why this product was specially selected..."
+                      rows={3}
+                      className="w-full resize-none rounded-lg border border-neutral-800 bg-[#0d0f12] px-4 py-3 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+                    />
+                  </div>
+
+                  <div className="rounded-lg border border-neutral-700 bg-[#0d0f12] p-4">
+                    <p className="text-xs font-medium text-neutral-400">
+                      Preview
+                    </p>
+
+                    <p className="mt-2 text-sm font-semibold text-white">
+                      {handPickedLabel || "Your Handpicked Label"}
+                    </p>
+
+                    <p className="mt-1 text-xs text-neutral-500">
+                      {handPickedDescription ||
+                        "Your Handpicked description will appear here."}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
           <section className="border-t border-neutral-800 pt-8">
             <div className="mb-5">
               <h3 className="text-base font-medium">Pricing & Inventory</h3>

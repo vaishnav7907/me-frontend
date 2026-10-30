@@ -73,7 +73,7 @@ const StoreProducts = () => {
   };
 
   useEffect(() => {
-    getProductsFn;
+    getProductsFn();
   }, []);
   return (
     <div className="min-h-screen bg-[#0B0D10] text-white">
