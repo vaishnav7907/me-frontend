@@ -288,183 +288,186 @@ const AddOffer = ({ oncloseOfferModal }) => {
           )}
 
           {applicableTo === "Products" && (
-  <div className="space-y-3">
-    <label className="text-sm font-medium text-white">
-      Select Products
-    </label>
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-white">
+                Select Products
+              </label>
 
-    <div className="relative">
-      <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <div className="relative">
+                <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
-      <input
-        type="text"
-        value={searchProduct}
-        onChange={(e) => setSearchProduct(e.target.value)}
-        placeholder="Search by product name, brand or category..."
-        className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] py-3 pl-10 pr-4 text-sm text-white outline-none placeholder:text-gray-500 focus:border-purple-500"
-      />
-
-      {searchProduct && (
-        <button
-          type="button"
-          onClick={() => setSearchProduct("")}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
-        >
-          <FiX size={16} />
-        </button>
-      )}
-    </div>
-
-    <div className="max-h-80 space-y-3 overflow-y-auto rounded-lg border border-[#303641] bg-[#0B0D10] p-4">
-      {allProducts.filter((product) => {
-        const brandName =
-          typeof product.brand === "object"
-            ? product.brand?.brandName || product.brand?.name
-            : product.brandName || product.brand;
-
-        const searchText = searchProduct.toLowerCase();
-
-        return (
-          product.name?.toLowerCase().includes(searchText) ||
-          brandName?.toLowerCase().includes(searchText) ||
-          product.category?.toLowerCase().includes(searchText)
-        );
-      }).length > 0 ? (
-        allProducts
-          .filter((product) => {
-            const brandName =
-              typeof product.brand === "object"
-                ? product.brand?.brandName || product.brand?.name
-                : product.brandName || product.brand;
-
-            const searchText = searchProduct.toLowerCase();
-
-            return (
-              product.name?.toLowerCase().includes(searchText) ||
-              brandName?.toLowerCase().includes(searchText) ||
-              product.category?.toLowerCase().includes(searchText)
-            );
-          })
-          .map((product) => {
-            const isSelected = products.includes(product._id);
-
-            const image =
-              product.variants?.[0]?.color?.mainImage?.url ||
-              product.variants?.[0]?.color?.subImages?.[0]?.url ||
-              "";
-
-            const brandName =
-              typeof product.brand === "object"
-                ? product.brand?.brandName || product.brand?.name
-                : product.brandName || product.brand;
-
-            const totalStock =
-              product.variants?.reduce(
-                (total, variant) =>
-                  total +
-                  (variant.sizes?.reduce(
-                    (sum, size) => sum + Number(size.stock || 0),
-                    0,
-                  ) || 0),
-                0,
-              ) || 0;
-
-            return (
-              <label
-                key={product._id}
-                className={`flex cursor-pointer items-center gap-4 rounded-lg border p-3 transition ${
-                  isSelected
-                    ? "border-purple-500 bg-purple-500/10"
-                    : "border-[#303641] bg-[#12151A] hover:border-gray-500"
-                }`}
-              >
                 <input
-                  type="checkbox"
-                  checked={isSelected}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setProducts((prev) => [...prev, product._id]);
-                    } else {
-                      setProducts((prev) =>
-                        prev.filter((id) => id !== product._id),
-                      );
-                    }
-                  }}
-                  className="h-4 w-4 shrink-0 accent-purple-500"
+                  type="text"
+                  value={searchProduct}
+                  onChange={(e) => setSearchProduct(e.target.value)}
+                  placeholder="Search by product name, brand or category..."
+                  className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] py-3 pl-10 pr-4 text-sm text-white outline-none placeholder:text-gray-500 focus:border-purple-500"
                 />
 
-                <div className="h-16 w-14 shrink-0 overflow-hidden rounded-md bg-[#242932]">
-                  {image ? (
-                    <img
-                      src={image}
-                      alt={product.name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-xs text-gray-500">
-                      No Image
-                    </div>
-                  )}
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <h4 className="truncate text-sm font-semibold text-white">
-                    {product.name}
-                  </h4>
-
-                  <p className="mt-1 text-xs text-gray-400">
-                    {brandName || "No Brand"} · {product.category || "Uncategorized"}
-                  </p>
-
-                  <div className="mt-2 flex flex-wrap items-center gap-3">
-                    <span className="text-sm font-semibold text-white">
-                      ₹{product.price}
-                    </span>
-
-                    {product.realPrice > product.price && (
-                      <span className="text-xs text-gray-500 line-through">
-                        ₹{product.realPrice}
-                      </span>
-                    )}
-
-                    {product.discount > 0 && (
-                      <span className="rounded bg-green-500/10 px-2 py-1 text-[10px] font-medium text-green-400">
-                        {product.discount}% OFF
-                      </span>
-                    )}
-                  </div>
-
-                  <p
-                    className={`mt-1 text-xs ${
-                      totalStock === 0 ? "text-red-400" : "text-green-400"
-                    }`}
+                {searchProduct && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchProduct("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
                   >
-                    {totalStock === 0
-                      ? "Out of Stock"
-                      : `${totalStock} items available`}
-                  </p>
-                </div>
-
-                {isSelected && (
-                  <span className="shrink-0 text-xs font-medium text-purple-400">
-                    Selected
-                  </span>
+                    <FiX size={16} />
+                  </button>
                 )}
-              </label>
-            );
-          })
-      ) : (
-        <p className="py-6 text-center text-sm text-gray-500">
-          No products found
-        </p>
-      )}
-    </div>
+              </div>
 
-    <p className="text-xs text-gray-400">
-      {products.length} products selected
-    </p>
-  </div>
-)}
+              <div className="max-h-80 space-y-3 overflow-y-auto rounded-lg border border-[#303641] bg-[#0B0D10] p-4">
+                {allProducts.filter((product) => {
+                  const brandName =
+                    typeof product.brand === "object"
+                      ? product.brand?.brandName || product.brand?.name
+                      : product.brandName || product.brand;
+
+                  const searchText = searchProduct.toLowerCase();
+
+                  return (
+                    product.name?.toLowerCase().includes(searchText) ||
+                    brandName?.toLowerCase().includes(searchText) ||
+                    product.category?.toLowerCase().includes(searchText)
+                  );
+                }).length > 0 ? (
+                  allProducts
+                    .filter((product) => {
+                      const brandName =
+                        typeof product.brand === "object"
+                          ? product.brand?.brandName || product.brand?.name
+                          : product.brandName || product.brand;
+
+                      const searchText = searchProduct.toLowerCase();
+
+                      return (
+                        product.name?.toLowerCase().includes(searchText) ||
+                        brandName?.toLowerCase().includes(searchText) ||
+                        product.category?.toLowerCase().includes(searchText)
+                      );
+                    })
+                    .map((product) => {
+                      const isSelected = products.includes(product._id);
+
+                      const image =
+                        product.variants?.[0]?.color?.mainImage?.url ||
+                        product.variants?.[0]?.color?.subImages?.[0]?.url ||
+                        "";
+
+                      const brandName =
+                        typeof product.brand === "object"
+                          ? product.brand?.brandName || product.brand?.name
+                          : product.brandName || product.brand;
+
+                      const totalStock =
+                        product.variants?.reduce(
+                          (total, variant) =>
+                            total +
+                            (variant.sizes?.reduce(
+                              (sum, size) => sum + Number(size.stock || 0),
+                              0,
+                            ) || 0),
+                          0,
+                        ) || 0;
+
+                      return (
+                        <label
+                          key={product._id}
+                          className={`flex cursor-pointer items-center gap-4 rounded-lg border p-3 transition ${
+                            isSelected
+                              ? "border-purple-500 bg-purple-500/10"
+                              : "border-[#303641] bg-[#12151A] hover:border-gray-500"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setProducts((prev) => [...prev, product._id]);
+                              } else {
+                                setProducts((prev) =>
+                                  prev.filter((id) => id !== product._id),
+                                );
+                              }
+                            }}
+                            className="h-4 w-4 shrink-0 accent-purple-500"
+                          />
+
+                          <div className="h-16 w-14 shrink-0 overflow-hidden rounded-md bg-[#242932]">
+                            {image ? (
+                              <img
+                                src={image}
+                                alt={product.name}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-full items-center justify-center text-xs text-gray-500">
+                                No Image
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <h4 className="truncate text-sm font-semibold text-white">
+                              {product.name}
+                            </h4>
+
+                            <p className="mt-1 text-xs text-gray-400">
+                              {brandName || "No Brand"} ·{" "}
+                              {product.category || "Uncategorized"}
+                            </p>
+
+                            <div className="mt-2 flex flex-wrap items-center gap-3">
+                              <span className="text-sm font-semibold text-white">
+                                ₹{product.price}
+                              </span>
+
+                              {product.realPrice > product.price && (
+                                <span className="text-xs text-gray-500 line-through">
+                                  ₹{product.realPrice}
+                                </span>
+                              )}
+
+                              {product.discount > 0 && (
+                                <span className="rounded bg-green-500/10 px-2 py-1 text-[10px] font-medium text-green-400">
+                                  {product.discount}% OFF
+                                </span>
+                              )}
+                            </div>
+
+                            <p
+                              className={`mt-1 text-xs ${
+                                totalStock === 0
+                                  ? "text-red-400"
+                                  : "text-green-400"
+                              }`}
+                            >
+                              {totalStock === 0
+                                ? "Out of Stock"
+                                : `${totalStock} items available`}
+                            </p>
+                          </div>
+
+                          {isSelected && (
+                            <span className="shrink-0 text-xs font-medium text-purple-400">
+                              Selected
+                            </span>
+                          )}
+                        </label>
+                      );
+                    })
+                ) : (
+                  <p className="py-6 text-center text-sm text-gray-500">
+                    No products found
+                  </p>
+                )}
+              </div>
+
+              <p className="text-xs text-gray-400">
+                {products.length} products selected
+              </p>
+            </div>
+          )}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-300">

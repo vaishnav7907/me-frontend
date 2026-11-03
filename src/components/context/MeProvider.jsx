@@ -66,10 +66,12 @@ export const MeProvider = ({ children }) => {
   // frontend
   const [getProductCategory, setGetProductCategory] = useState("");
 
-
   // userid
 
-  const [userId,setUserId]=useState(null)
+  const [userId, setUserId] = useState(null);
+
+  // offer id
+  const [offerId, setOfferId] = useState(null);
   return (
     <MeContext.Provider
       value={{
@@ -79,7 +81,6 @@ export const MeProvider = ({ children }) => {
 
         // Authentication
 
-        
         FullName,
         setFullName,
         Email,
@@ -180,7 +181,11 @@ export const MeProvider = ({ children }) => {
         getProductCategory,
         setGetProductCategory,
 
-        userId,setUserId,
+        userId,
+        setUserId,
+
+        offerId,
+        setOfferId,
       }}
     >
       {children}
