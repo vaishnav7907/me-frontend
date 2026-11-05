@@ -11,7 +11,7 @@ import { UseMe } from "../../../context/Meprovider";
 
 const GetOfferSales = () => {
   const { offerId, setOfferId } = UseMe();
-  const context = UseMe();
+  // const context = UseMe();
 
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +36,7 @@ const GetOfferSales = () => {
       );
 
       setOffers(response.data.getOfferData || []);
+      console.log("get offers", response.data.getOfferData);
     } catch (error) {
       console.error(error);
     } finally {
@@ -60,6 +61,14 @@ const GetOfferSales = () => {
       alert("Offer Deleted Successfully ");
       setShowDltOfferModal(false);
       setDltOfferId(null);
+
+      if (dltOfferApi.data.success) {
+        // Refresh offers
+        await getOffers();
+
+        // Refresh products and recalculate offer prices
+        await getProducts();
+      }
     } catch (error) {
       console.error(error);
       alert(error.response?.data?.message || "Failed to delete offer");
