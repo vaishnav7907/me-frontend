@@ -20,6 +20,7 @@ const GetOfferSales = () => {
   const [showDltOfferModal, setShowDltOfferModal] = useState(false);
   const [selectedDltOffer, setSelectedDltOffer] = useState(null);
   const [dltOfferId, setDltOfferId] = useState(null);
+  const [productModal, setProductModal] = useState(null);
   const openUpdateModal = (id) => {
     setOfferId(id);
 
@@ -182,9 +183,19 @@ const GetOfferSales = () => {
                       </td>
 
                       <td className="px-5 py-4 text-sm text-gray-300">
-                        {offer.applicableTo === "Category"
-                          ? offer.category
-                          : "All Products"}
+                        <button
+                          onClick={() =>
+                            offer.applicableTo === "Products" &&
+                            setProductModal(offer)
+                          }
+                          className="text-purple-400 transition hover:text-purple-300"
+                        >
+                          {offer.applicableTo === "Category"
+                            ? offer.category
+                            : offer.applicableTo === "Products"
+                              ? "Products"
+                              : "All Products"}
+                        </button>
                       </td>
 
                       <td className="px-5 py-4 text-sm text-gray-400">
@@ -255,6 +266,117 @@ const GetOfferSales = () => {
             oncloseUpdateOfferModal={() => setShowUpdateOfferModal(false)}
           />
         )}
+
+       {productModal && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+    onClick={() => setProductModal(null)}
+  >
+    <div
+      className="w-full max-w-lg rounded-2xl border border-[#303641] bg-[#12151A] p-6 shadow-2xl"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Header */}
+      <div className="mb-5 flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-white">
+            Selected Products
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-400">
+            {productModal.products?.length || 0} products in this offer
+          </p>
+        </div>
+
+        <button
+          onClick={() => setProductModal(null)}
+          className="rounded-lg p-2 text-gray-400 transition hover:bg-[#242932] hover:text-white"
+        >
+          <FiX size={20} />
+        </button>
+      </div>
+
+      {/* Products */}
+      <div className="max-h-[400px] space-y-3 overflow-y-auto">
+        {productModal.products?.length > 0 ? (
+          productModal.products.map((product) => {
+            const productData =
+              typeof product === "object" ? product : null;
+
+            const pricing = productModal.productPricing?.find(
+              (item) =>
+                String(item.product?._id || item.product) ===
+                String(productData?._id || product)
+            );
+
+            const image =
+              productData?.variants?.[0]?.color?.mainImage?.url ||
+              productData?.images?.[0]?.url;
+
+            return (
+              <div
+                key={productData?._id || product}
+                className="flex items-center gap-3 rounded-xl border border-[#303641] bg-[#0B0D10] p-3"
+              >
+                <img
+                  src={image || "/placeholder.png"}
+                  alt={productData?.name || "Product"}
+                  className="h-16 w-14 rounded-lg bg-[#242932] object-cover"
+                />
+
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate text-sm font-medium text-white">
+                    {productData?.name || "Product details unavailable"}
+                  </h3>
+
+                  <p className="mt-1 text-xs text-gray-400">
+                    {productData?.brand?.brandName || "No Brand"}
+                  </p>
+
+                  {productData && (
+                    <p className="mt-1 text-xs text-gray-500">
+                      SKU: {productData.sku || "N/A"}
+                    </p>
+                  )}
+                </div>
+
+                {pricing && (
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500 line-through">
+                      ₹{pricing.originalPrice}
+                    </p>
+
+                    <p className="text-sm font-semibold text-green-400">
+                      ₹{pricing.finalPrice}
+                    </p>
+
+                    <p className="text-xs text-purple-400">
+                      {pricing.discountPercentage}% OFF
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        ) : (
+          <p className="py-8 text-center text-sm text-gray-400">
+            No products found for this offer.
+          </p>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-5 flex justify-end border-t border-[#303641] pt-4">
+        <button
+          onClick={() => setProductModal(null)}
+          className="rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-purple-500"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
         {showDltOfferModal && selectedDltOffer && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
