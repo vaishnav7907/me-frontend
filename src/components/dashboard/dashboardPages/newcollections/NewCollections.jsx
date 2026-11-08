@@ -43,11 +43,8 @@ const NewCollections = () => {
   //   },
   // ];
 
-
-
-  const{setGetProductCategory}=UseMe()
+  const { setGetProductCategory } = UseMe();
   const [getArrivalsbyCategory, setGetArrivalsbyCategory] = useState([]);
-
 
   const getAllLatestArrivals = async () => {
     try {
@@ -95,7 +92,11 @@ const NewCollections = () => {
                   ? "/luxuryJackets"
                   : data.category === "T-Shirts"
                     ? "/Tshirts"
-                    : "#"
+                    : data.category === "Innerwear"
+                      ? "/latestInnerwears"
+                      : data.category === "Shorts"
+                        ? "/latestShorts"
+                        : "#"
           }
           className={`flex flex-col lg:flex-row items-center gap-16 mb-32 ${
             index % 2 !== 0 ? "lg:flex-row-reverse" : ""
@@ -154,9 +155,9 @@ const NewCollections = () => {
               <div
                 className={`mt-10 ${index % 2 !== 0 ? "flex justify-end" : ""}`}
               >
-                <button className="border border-white/20 px-8 py-3 uppercase tracking-[4px] hover:bg-white hover:text-black transition"
-                
-                onClick={()=>setGetProductCategory(data.category)}
+                <button
+                  className="border border-white/20 px-8 py-3 uppercase tracking-[4px] hover:bg-white hover:text-black transition"
+                  onClick={() => setGetProductCategory(data.category)}
                 >
                   Explore Collection
                 </button>

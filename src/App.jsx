@@ -44,6 +44,8 @@ import Checkout from "./components/buyProducts/Checkout";
 import OrderSuccess from "./components/buyProducts/OrderSuccess";
 // import OfferSales from "./components/adminPanel/adminPages/offer/offerSales";
 import GetOfferSales from "./components/adminPanel/adminPages/offer/GetOfferSales";
+import Shorts from "./components/dashboard/dashboardPages/newcollections/newcollectionpages/shorts/Shorts";
+import Innerwears from "./components/dashboard/dashboardPages/newcollections/newcollectionpages/innerwears/Innerwears";
 // import OfferSales from "./components/adminPanel/adminPages/offer/offerSales";
 // import AdminWelcomePage from "./components/adminPanel/adminAuthentication/adminWelcomePage/AdminWelcomePage";
 
@@ -77,6 +79,8 @@ function App() {
             <Route path="/luxuryJackets" element={<LuxurJackets />} />
             <Route path="/Tshirts" element={<Tshirts />} />
             <Route path="/PremiumPants" element={<PremiumPants />} />
+            <Route path="/latestShorts" element={<Shorts/>}/>
+            <Route path="/latestInnerwears" element={<Innerwears/>}/>
             {/* end new collections */}
 
             {/* brand subpage*/}

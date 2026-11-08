@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { IoArrowBack } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,8 @@ import { PiMinusLight } from "react-icons/pi";
 import jacket1 from "../../../../../../assets/premjackets/jacket1.jpg";
 import jacket2 from "../../../../../../assets/premjackets/jacket3.webp";
 import jacket3 from "../../../../../../assets/premjackets/jacket4.webp";
+import { UseMe } from "../../../../../context/Meprovider";
+import axios from "axios";
 const LuxurJackets = () => {
   const navigate = useNavigate();
   const jackets = [
@@ -68,15 +70,42 @@ const LuxurJackets = () => {
     },
   ];
 
+  // const getAllJackets= async ()=>{
+  //   try {
+  //     const getAllJacketsApi=
+  //   } catch (error) {
 
+  //   }
+  // }
 
-// const getAllJackets= async ()=>{
-//   try {
-//     const getAllJacketsApi= 
-//   } catch (error) {
-    
-//   }
-// }
+  const { getProductCategory } = UseMe();
+  const [latestArrivalsJackets, setLatestArrivalsJackets] = useState([]);
+
+  const getLatestArrivalsJackets = async () => {
+    try {
+      const latestArrivalsJacketsApi = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/getProductsByCategory/${getProductCategory}`,
+      );
+
+      setLatestArrivalsJackets(latestArrivalsJacketsApi.data.products);
+
+      console.log(
+        "get Latest Arrivals shirts",
+        latestArrivalsJacketsApi.data.products,
+      );
+    } catch (error) {
+      console.log("error in get latest Arrivals shirts", error.message);
+    }
+  };
+
+  const handPickedJackets = latestArrivalsJackets.filter(
+    (product) => product.isHandPicked === true,
+  );
+  useEffect(() => {
+    if (getProductCategory) {
+      getLatestArrivalsJackets();
+    }
+  }, [getProductCategory]);
 
   return (
     <section className="bg-black  text-white min-h-screen overflow-hidden ">
@@ -98,7 +127,7 @@ const LuxurJackets = () => {
 
         <div className="max-w-7xl mx-auto px-6  py-10 ">
           <motion.div
-            className="text-center py-23 "
+            className="text-center py-23"
             initial={{ opacity: 0, y: 70 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -152,7 +181,7 @@ const LuxurJackets = () => {
             </motion.div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-14 ">
-            {jackets.map((data, index) => (
+            {latestArrivalsJackets.map((data, index) => (
               <motion.div
                 key={data.id}
                 initial={{ opacity: 0, y: 50 }}
@@ -176,14 +205,14 @@ const LuxurJackets = () => {
                 {/* Image */}
                 <div className="overflow-hidden rounded-sm">
                   <img
-                    src={data.image}
+                    src={data.variants?.[0]?.color?.mainImage?.url}
                     alt={data.name}
                     className="w-full h-[430px] object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                   />
                 </div>
 
                 {/* Overlay */}
-                 {/* <div className="absolute inset-0 bg-gradient-to-b from-black/95 via-black/5 to-transparent " /> */}
+                {/* <div className="absolute inset-0 bg-gradient-to-b from-black/95 via-black/5 to-transparent " /> */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent transition-all duration-700 group-hover:from-black group-hover:via-black/50" />
 
                 {/* Badge */}
@@ -202,7 +231,17 @@ const LuxurJackets = () => {
                   </h3>
 
                   <div className="mt-6 flex items-center justify-between">
-                    <span className="text-lg text-white">{data.price}</span>
+                    <p className="text-sm font-semibold text-white">
+                      ₹{data.price}
+                    </p>
+
+                    <p className="text-sm text-green-500">
+                      {data.discount}% OFF
+                    </p>
+
+                    <p className="text-sm text-neutral-500 line-through ">
+                      ₹{data.realPrice}
+                    </p>
 
                     <button className="flex items-center gap-2 uppercase tracking-[0.25em] text-[11px] opacity-0 translate-y-3 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0">
                       View
@@ -223,55 +262,69 @@ const LuxurJackets = () => {
             Where modern design meets lasting quality
           </h2>
         </div>
-        <div className=" max-w-7xl mx-auto px-6  py-32 ">
-          <div>
-            <p className="uppercase tracking-[0.45em] text-neutral-500 text-sm">
-              trending now
-            </p>
-            <h2 className="font-serif text-4xl mt-3">Handpicked For You</h2>
-          </div>
 
-          <div className="flex gap-6 overflow-x-auto pt-6 pb-6 snap-x snap-mandatory scrollbar-thin">
-            {jackets.map((data, index) => (
-              <motion.div
-                key={data.id}
-                initial={{ opacity: 0, x: 80 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{
-                  duration: 0.6,
-                  delay: index * 0.1,
-                }}
-                viewport={{ once: true }}
-                whileHover={{
-                  y: -10,
-                }}
-                className="min-w-[320px] snap-center group cursor-pointer"
-              >
-                <div className="relative overflow-hidden rounded-sm">
-                  <img
-                    src={data.image}
-                    alt=""
-                    className="w-full h-[450px] object-cover duration-700 group-hover:scale-110"
-                  />
+        {handPickedJackets.length > 0 && (
+          <div className=" max-w-7xl mx-auto px-6  py-32 ">
+            <div>
+              <p className="uppercase tracking-[0.45em] text-neutral-500 text-sm">
+                trending now
+              </p>
+              <h2 className="font-serif text-4xl mt-3">Handpicked For You</h2>
+            </div>
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+            <div className="flex gap-6 overflow-x-auto pt-6 pb-6 snap-x snap-mandatory scrollbar-thin">
+              {handPickedJackets.map((data, index) => (
+                <motion.div
+                  key={data.id}
+                  initial={{ opacity: 0, x: 80 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{
+                    duration: 0.6,
+                    delay: index * 0.1,
+                  }}
+                  viewport={{ once: true }}
+                  whileHover={{
+                    y: -10,
+                  }}
+                  className="min-w-[320px] snap-center group cursor-pointer"
+                >
+                  <div className="relative overflow-hidden rounded-sm">
+                    <img
+                      src={data.variants?.[0]?.color?.mainImage?.url}
+                      alt={data.name}
+                      className="w-full h-[450px] object-cover duration-700 group-hover:scale-110"
+                    />
 
-                  <div className="absolute bottom-7 left-7">
-                    <p className="uppercase tracking-[0.25em] text-xs text-neutral-300">
-                      {data.category}
-                    </p>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
-                    <h3 className="font-serif text-2xl mt-2">{data.name}</h3>
+                    <div className="absolute bottom-7 left-7">
+                      <p className="uppercase tracking-[0.25em] text-xs text-neutral-300">
+                        {data.category}
+                      </p>
 
-                    <p className="text-neutral-300 mt-2">{data.price}</p>
+                      <h3 className="font-serif text-2xl mt-2">{data.name}</h3>
+
+                      <div className="flex items-center gap-3">
+                        <p className="text-sm font-semibold text-white">
+                          ₹{data.price}
+                        </p>
+
+                        <p className="text-sm text-green-500">
+                          {data.discount}% OFF
+                        </p>
+
+                        <p className="text-sm text-neutral-500 line-through ">
+                          ₹{data.realPrice}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                {/* <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent" />
+                  {/* <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-l from-black via-black/20 to-transparent" /> */}
-              </motion.div>
-            ))}
-          </div>
-          {/* <div className="flex flex-col justify-center items-center pt-17 ">
+                </motion.div>
+              ))}
+            </div>
+            {/* <div className="flex flex-col justify-center items-center pt-17 ">
             <div className="flex gap-3 justify-center items-center">
               <AiOutlineClose className="text-white" size={27} />{" "}
               <span className="bg-white w-2xl h-1"></span>{" "}
@@ -279,12 +332,12 @@ const LuxurJackets = () => {
             </div>
             <h3 className="uppercase text-3xl font-serif ">me</h3>
           </div> */}
-        </div>
+          </div>
+        )}
         <div>
-        <h3 className="uppercase text-3xl font-serif tracking-widest">me</h3>
+          <h3 className="uppercase text-3xl font-serif tracking-widest">me</h3>
+        </div>
       </div>
-      </div>
-      
     </section>
   );
 };

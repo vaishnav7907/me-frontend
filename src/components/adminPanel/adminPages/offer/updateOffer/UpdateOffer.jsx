@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   FiX,
@@ -56,7 +55,6 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
   const { offerId } = UseMe();
 
   const [form, setForm] = useState(initialForm);
-
   const [allProducts, setAllProducts] = useState([]);
   const [searchProduct, setSearchProduct] = useState("");
 
@@ -71,36 +69,9 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
       ...prev,
       [field]: value,
     }));
+
+    setError("");
   };
-
-  // Product selection
-  const handleProductChange = (productId) => {
-    const selectedId = String(productId);
-
-    setForm((prev) => ({
-      ...prev,
-      products: prev.products.includes(selectedId)
-        ? prev.products.filter((id) => id !== selectedId)
-        : [...prev.products, selectedId],
-    }));
-  };
-
-  // Selected products
-  const selectedProducts = allProducts.filter((product) =>
-    form.products.includes(String(product._id))
-  );
-
-  // Product search
-  const filteredProducts = allProducts.filter((product) => {
-    const search = searchProduct.toLowerCase().trim();
-
-    return (
-      product.name?.toLowerCase().includes(search) ||
-      product.brand?.brandName?.toLowerCase().includes(search) ||
-      product.sku?.toLowerCase().includes(search) ||
-      product.category?.toLowerCase().includes(search)
-    );
-  });
 
   // Product image
   const getProductImage = (product) => {
@@ -108,6 +79,13 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
       product.variants?.[0]?.color?.mainImage?.url ||
       product.images?.[0]?.url ||
       ""
+    );
+  };
+
+  // Product name
+  const getProductName = (product) => {
+    return (
+      product.name || product.productName || product.title || "Unnamed Product"
     );
   };
 
@@ -120,29 +98,105 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
     }).format(Number(price) || 0);
   };
 
+  // Product stock information
+  const getProductStockInfo = (product) => {
+    const variantSizes =
+      product.variants?.flatMap((variant) =>
+        (variant.sizes || []).map((size) => ({
+          stock: Math.max(0, Number(size.stock) || 0),
+        })),
+      ) || [];
+
+    const totalStock = variantSizes.length
+      ? variantSizes.reduce((total, size) => total + size.stock, 0)
+      : Math.max(0, Number(product.stock) || 0);
+
+    const buy = Number(form.buyQuantity);
+    const get = Number(form.getQuantity);
+    const bundleSize = buy + get;
+
+    const bundleCapacity =
+      bundleSize > 0
+        ? variantSizes.length
+          ? variantSizes.reduce(
+              (total, size) => total + Math.floor(size.stock / bundleSize),
+              0,
+            )
+          : Math.floor(totalStock / bundleSize)
+        : 0;
+
+    return {
+      totalStock,
+      bundleCapacity,
+    };
+  };
+
+  // Product search
+  const filteredProducts = allProducts.filter((product) => {
+    const search = searchProduct.toLowerCase().trim();
+
+    if (!search) return true;
+
+    const productName = getProductName(product).toLowerCase();
+    const brandName = (product.brand?.brandName || "").toLowerCase();
+    const sku = (product.sku || "").toLowerCase();
+    const category = (product.category || "").toLowerCase();
+
+    return (
+      productName.includes(search) ||
+      brandName.includes(search) ||
+      sku.includes(search) ||
+      category.includes(search)
+    );
+  });
+
+  // Selected products
+  const selectedProducts = allProducts.filter((product) =>
+    form.products.includes(String(product._id)),
+  );
+
+  // Product selection
+  const handleProductChange = (productId) => {
+    const selectedId = String(productId);
+
+    setForm((prev) => ({
+      ...prev,
+      products: prev.products.includes(selectedId)
+        ? prev.products.filter((id) => id !== selectedId)
+        : [...prev.products, selectedId],
+    }));
+
+    setError("");
+  };
+
   // Calculate discounted price preview
   const calculateFinalPrice = (product) => {
     const price = Number(product.price);
     const discount = Number(form.discountValue);
 
-    if (
-      !Number.isFinite(price) ||
-      !Number.isFinite(discount) ||
-      discount <= 0 ||
-      discount > 100
-    ) {
+    if (!Number.isFinite(price)) return 0;
+
+    if (!Number.isFinite(discount) || discount <= 0) {
       return price;
     }
 
-    return Number(
-      (price - (price * discount) / 100).toFixed(2)
-    );
+    if (form.discountType === "percentage") {
+      if (discount > 100) return price;
+
+      return Number((price - (price * discount) / 100).toFixed(2));
+    }
+
+    if (form.discountType === "fixed") {
+      return Number(Math.max(0, price - discount).toFixed(2));
+    }
+
+    return price;
   };
 
   const showProductPreview =
-    form.discountType === "percentage" &&
+    (form.discountType === "percentage" || form.discountType === "fixed") &&
     Number(form.discountValue) > 0 &&
-    Number(form.discountValue) <= 100;
+    (form.discountType !== "percentage" || Number(form.discountValue) <= 100);
 
   // Get existing offer
   const getOffers = async () => {
@@ -152,16 +206,25 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
       const offerData =
         response.data.getOfferData ||
         response.data.offers ||
+        response.data.data?.getOfferData ||
+        response.data.data?.offers ||
+        response.data.data ||
         [];
 
-      const offer = offerData.find(
-        (item) => String(item._id) === String(offerId)
-      );
+      const offer = Array.isArray(offerData)
+        ? offerData.find((item) => String(item._id) === String(offerId))
+        : null;
 
       if (!offer) {
         setError("Offer not found");
         return;
       }
+
+      const offerProducts = Array.isArray(offer.products)
+        ? offer.products.map((item) =>
+            String(typeof item === "object" ? item._id : item),
+          )
+        : [];
 
       setForm({
         title: offer.title || "",
@@ -170,15 +233,14 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
         discountValue: offer.discountValue ?? "",
         buyQuantity: offer.buyQuantity ?? "",
         getQuantity: offer.getQuantity ?? "",
-        applicableTo: offer.applicableTo || "All Products",
-        category: offer.category || "",
 
-        products:
-          offer.products?.map((item) =>
-            String(
-              typeof item === "object" ? item._id : item
-            )
-          ) || [],
+        applicableTo:
+          offer.applicableTo === "All"
+            ? "All Products"
+            : offer.applicableTo || "All Products",
+
+        category: offer.category || "",
+        products: offerProducts,
 
         startDate: formatDateForInput(offer.startDate),
         endDate: formatDateForInput(offer.endDate),
@@ -186,10 +248,8 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
       });
     } catch (error) {
       console.error("Get Offer Error:", error);
-      setError(
-        error.response?.data?.message ||
-          "Failed to load offer details"
-      );
+
+      setError(error.response?.data?.message || "Failed to load offer details");
     } finally {
       setLoadingOffer(false);
     }
@@ -200,25 +260,23 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
     try {
       setLoadingProducts(true);
 
-      const response = await axios.get(
-        `${API}/Me/getProducts`
-      );
+      const response = await axios.get(`${API}/Me/getProducts`);
 
       const productData =
         response.data.getProductsData ||
         response.data.getProductData ||
         response.data.products ||
+        response.data.data?.getProductsData ||
+        response.data.data?.getProductData ||
+        response.data.data?.products ||
+        response.data.data ||
         [];
 
-      setAllProducts(
-        Array.isArray(productData) ? productData : []
-      );
+      setAllProducts(Array.isArray(productData) ? productData : []);
     } catch (error) {
       console.error("Get Products Error:", error);
-      setError(
-        error.response?.data?.message ||
-          "Failed to load products"
-      );
+
+      setError(error.response?.data?.message || "Failed to load products");
     } finally {
       setLoadingProducts(false);
     }
@@ -235,92 +293,104 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
     }
   }, [offerId]);
 
+  // Validate offer
+  const validateOffer = () => {
+    if (!offerId) {
+      return "Offer ID not found";
+    }
+
+    if (!form.title.trim() || !form.description.trim()) {
+      return "Please provide offer title and description";
+    }
+
+    if (!["percentage", "fixed", "buy_x_get_y"].includes(form.discountType)) {
+      return "Invalid discount type";
+    }
+
+    if (!["All Products", "Category", "Products"].includes(form.applicableTo)) {
+      return "Invalid offer applicability";
+    }
+
+    // Selected products validation
+    if (form.applicableTo === "Products" && form.products.length === 0) {
+      return "Please select at least one product";
+    }
+
+    // Category validation
+    if (
+      form.applicableTo === "Category" &&
+      !categories.includes(form.category)
+    ) {
+      return "Please select a valid category";
+    }
+
+    // Percentage validation
+    if (form.discountType === "percentage") {
+      const discount = Number(form.discountValue);
+
+      if (!Number.isFinite(discount) || discount <= 0 || discount > 100) {
+        return "Percentage must be between 1 and 100";
+      }
+    }
+
+    // Fixed discount validation
+    if (form.discountType === "fixed") {
+      const discount = Number(form.discountValue);
+
+      if (!Number.isFinite(discount) || discount <= 0) {
+        return "Please provide a valid discount amount";
+      }
+    }
+
+    // Buy X Get Y validation
+    if (form.discountType === "buy_x_get_y") {
+      const buy = Number(form.buyQuantity);
+      const get = Number(form.getQuantity);
+
+      if (
+        !Number.isInteger(buy) ||
+        !Number.isInteger(get) ||
+        buy <= 0 ||
+        get <= 0
+      ) {
+        return "Buy and get quantities must be positive integers";
+      }
+    }
+
+    // Date validation
+    if (!form.startDate || !form.endDate) {
+      return "Please select offer start and end dates";
+    }
+
+    const start = new Date(`${form.startDate}T00:00:00+05:30`);
+
+    const end = new Date(`${form.endDate}T23:59:59.999+05:30`);
+
+    if (
+      Number.isNaN(start.getTime()) ||
+      Number.isNaN(end.getTime()) ||
+      end <= start
+    ) {
+      return "End date must be after the start date";
+    }
+
+    if (!["Active", "Inactive"].includes(form.status)) {
+      return "Invalid offer status";
+    }
+
+    return "";
+  };
+
   // Update offer
   const updateOfferFn = async (e) => {
     e.preventDefault();
 
     setError("");
 
-    if (!offerId) {
-      setError("Offer ID not found");
-      return;
-    }
+    const validationError = validateOffer();
 
-    if (!form.title.trim() || !form.description.trim()) {
-      setError("Please provide offer title and description");
-      return;
-    }
-
-    if (
-      form.applicableTo === "Products" &&
-      form.discountType !== "percentage"
-    ) {
-      setError(
-        "Selected Products currently supports percentage discounts only"
-      );
-      return;
-    }
-
-    if (
-      form.applicableTo === "Products" &&
-      form.products.length === 0
-    ) {
-      setError("Please select at least one product");
-      return;
-    }
-
-    if (
-      form.applicableTo === "Category" &&
-      !form.category
-    ) {
-      setError("Please select a category");
-      return;
-    }
-
-    if (
-      form.discountType === "percentage" &&
-      (
-        !Number.isFinite(Number(form.discountValue)) ||
-        Number(form.discountValue) <= 0 ||
-        Number(form.discountValue) > 100
-      )
-    ) {
-      setError("Percentage must be between 1 and 100");
-      return;
-    }
-
-    if (
-      form.discountType === "fixed" &&
-      (
-        !Number.isFinite(Number(form.discountValue)) ||
-        Number(form.discountValue) <= 0
-      )
-    ) {
-      setError("Please provide a valid discount amount");
-      return;
-    }
-
-    if (
-      form.discountType === "buy_x_get_y" &&
-      (
-        !Number.isInteger(Number(form.buyQuantity)) ||
-        !Number.isInteger(Number(form.getQuantity)) ||
-        Number(form.buyQuantity) <= 0 ||
-        Number(form.getQuantity) <= 0
-      )
-    ) {
-      setError(
-        "Buy and get quantities must be positive integers"
-      );
-      return;
-    }
-
-    if (
-      !form.startDate ||
-      !form.endDate ||
-      form.endDate < form.startDate
-    ) {
-      setError("Please select valid offer dates");
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -328,8 +398,7 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
       setUpdatingOffer(true);
 
       const adminToken =
-        localStorage.getItem("token") ||
-        localStorage.getItem("userToken");
+        localStorage.getItem("token") || localStorage.getItem("userToken");
 
       const payload = {
         title: form.title.trim(),
@@ -338,39 +407,23 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
         discountType: form.discountType,
 
         discountValue:
-          form.discountType === "buy_x_get_y"
-            ? 0
-            : Number(form.discountValue),
+          form.discountType === "buy_x_get_y" ? 0 : Number(form.discountValue),
 
         buyQuantity:
-          form.discountType === "buy_x_get_y"
-            ? Number(form.buyQuantity)
-            : 0,
+          form.discountType === "buy_x_get_y" ? Number(form.buyQuantity) : 0,
 
         getQuantity:
-          form.discountType === "buy_x_get_y"
-            ? Number(form.getQuantity)
-            : 0,
+          form.discountType === "buy_x_get_y" ? Number(form.getQuantity) : 0,
 
         applicableTo: form.applicableTo,
 
-        category:
-          form.applicableTo === "Category"
-            ? form.category
-            : "",
+        category: form.applicableTo === "Category" ? form.category : "",
 
-        products:
-          form.applicableTo === "Products"
-            ? form.products
-            : [],
+        products: form.applicableTo === "Products" ? form.products : [],
 
-        startDate: new Date(
-          `${form.startDate}T00:00:00+05:30`
-        ).toISOString(),
+        startDate: new Date(`${form.startDate}T00:00:00+05:30`).toISOString(),
 
-        endDate: new Date(
-          `${form.endDate}T23:59:59+05:30`
-        ).toISOString(),
+        endDate: new Date(`${form.endDate}T23:59:59.999+05:30`).toISOString(),
 
         status: form.status,
       };
@@ -382,22 +435,16 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-        }
+        },
       );
 
-      alert(
-        response.data.message ||
-          "Offer updated successfully"
-      );
+      alert(response.data.message || "Offer updated successfully");
 
       oncloseUpdateOfferModal();
     } catch (error) {
       console.error("Update Offer Error:", error);
 
-      setError(
-        error.response?.data?.message ||
-          "Failed to update offer"
-      );
+      setError(error.response?.data?.message || "Failed to update offer");
     } finally {
       setUpdatingOffer(false);
     }
@@ -417,7 +464,6 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
       <div className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-[#303641] bg-[#12151A] shadow-2xl">
-
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#303641] px-6 py-5">
           <div className="flex items-center gap-3">
@@ -426,9 +472,7 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-white">
-                Update Offer
-              </h2>
+              <h2 className="text-xl font-semibold text-white">Update Offer</h2>
 
               <p className="mt-1 text-xs text-gray-400">
                 Update discounts and promotional campaigns
@@ -465,9 +509,7 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                 type="text"
                 required
                 value={form.title}
-                onChange={(e) =>
-                  updateField("title", e.target.value)
-                }
+                onChange={(e) => updateField("title", e.target.value)}
                 placeholder="Example: Summer Special Sale"
                 className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
               />
@@ -482,9 +524,7 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                 rows="3"
                 required
                 value={form.description}
-                onChange={(e) =>
-                  updateField("description", e.target.value)
-                }
+                onChange={(e) => updateField("description", e.target.value)}
                 placeholder="Describe your offer..."
                 className="w-full resize-none rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
               />
@@ -506,22 +546,14 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
 
               <select
                 value={form.discountType}
-                onChange={(e) =>
-                  updateField("discountType", e.target.value)
-                }
+                onChange={(e) => updateField("discountType", e.target.value)}
                 className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
               >
-                <option value="percentage">
-                  Percentage Discount
-                </option>
+                <option value="percentage">Percentage Discount</option>
 
-                <option value="fixed">
-                  Fixed Amount Discount
-                </option>
+                <option value="fixed">Fixed Amount Discount</option>
 
-                <option value="buy_x_get_y">
-                  Buy X Get Y
-                </option>
+                <option value="buy_x_get_y">Buy X Get Y</option>
               </select>
             </div>
 
@@ -538,9 +570,7 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                   max="100"
                   step="0.01"
                   value={form.discountValue}
-                  onChange={(e) =>
-                    updateField("discountValue", e.target.value)
-                  }
+                  onChange={(e) => updateField("discountValue", e.target.value)}
                   placeholder="Example: 20"
                   className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
                 />
@@ -559,9 +589,7 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                   min="0.01"
                   step="0.01"
                   value={form.discountValue}
-                  onChange={(e) =>
-                    updateField("discountValue", e.target.value)
-                  }
+                  onChange={(e) => updateField("discountValue", e.target.value)}
                   placeholder="Example: 500"
                   className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
                 />
@@ -581,9 +609,7 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                     min="1"
                     step="1"
                     value={form.buyQuantity}
-                    onChange={(e) =>
-                      updateField("buyQuantity", e.target.value)
-                    }
+                    onChange={(e) => updateField("buyQuantity", e.target.value)}
                     placeholder="Example: 2"
                     className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
                   />
@@ -600,23 +626,13 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                     min="1"
                     step="1"
                     value={form.getQuantity}
-                    onChange={(e) =>
-                      updateField("getQuantity", e.target.value)
-                    }
+                    onChange={(e) => updateField("getQuantity", e.target.value)}
                     placeholder="Example: 1"
                     className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
                   />
                 </div>
               </div>
             )}
-
-            {form.applicableTo === "Products" &&
-              form.discountType !== "percentage" && (
-                <p className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-400">
-                  Selected Products currently supports percentage
-                  discounts only. Choose percentage to update this offer.
-                </p>
-              )}
           </section>
 
           <div className="h-px bg-[#303641]" />
@@ -640,17 +656,11 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                 }}
                 className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
               >
-                <option value="All Products">
-                  All Products
-                </option>
+                <option value="All Products">All Products</option>
 
-                <option value="Category">
-                  Specific Category
-                </option>
+                <option value="Category">Specific Category</option>
 
-                <option value="Products">
-                  Selected Products
-                </option>
+                <option value="Products">Selected Products</option>
               </select>
             </div>
 
@@ -664,9 +674,7 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                 <select
                   required
                   value={form.category}
-                  onChange={(e) =>
-                    updateField("category", e.target.value)
-                  }
+                  onChange={(e) => updateField("category", e.target.value)}
                   className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
                 >
                   <option value="">Choose Category</option>
@@ -693,7 +701,6 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                   </span>
                 </div>
 
-                {/* Search */}
                 <div className="relative">
                   <FiSearch
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
@@ -703,9 +710,7 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                   <input
                     type="text"
                     value={searchProduct}
-                    onChange={(e) =>
-                      setSearchProduct(e.target.value)
-                    }
+                    onChange={(e) => setSearchProduct(e.target.value)}
                     placeholder="Search product, brand, SKU..."
                     className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] py-3 pl-11 pr-4 text-sm text-white outline-none focus:border-purple-500"
                   />
@@ -724,13 +729,11 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                           key={product._id}
                           className="flex items-center gap-2 rounded-md bg-[#242932] px-2 py-1 text-xs text-white"
                         >
-                          {product.name}
+                          {getProductName(product)}
 
                           <button
                             type="button"
-                            onClick={() =>
-                              handleProductChange(product._id)
-                            }
+                            onClick={() => handleProductChange(product._id)}
                             className="text-gray-400 hover:text-red-400"
                           >
                             <FiX size={13} />
@@ -755,11 +758,12 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                   ) : (
                     filteredProducts.map((product) => {
                       const isSelected = form.products.includes(
-                        String(product._id)
+                        String(product._id),
                       );
 
-                      const finalPrice =
-                        calculateFinalPrice(product);
+                      const finalPrice = calculateFinalPrice(product);
+
+                      const stockInfo = getProductStockInfo(product);
 
                       return (
                         <label
@@ -773,21 +777,19 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                           <input
                             type="checkbox"
                             checked={isSelected}
-                            onChange={() =>
-                              handleProductChange(product._id)
-                            }
+                            onChange={() => handleProductChange(product._id)}
                             className="h-4 w-4 accent-purple-500"
                           />
 
                           <img
                             src={getProductImage(product)}
-                            alt={product.name || "Product"}
+                            alt={getProductName(product)}
                             className="h-16 w-14 rounded-md bg-[#242932] object-cover"
                           />
 
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-medium text-white">
-                              {product.name}
+                              {getProductName(product)}
                             </p>
 
                             <p className="mt-1 text-xs text-gray-400">
@@ -801,6 +803,12 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                             <p className="mt-1 text-xs text-gray-400">
                               Current Price: {formatPrice(product.price)}
                             </p>
+
+                            <div className="mt-2">
+                              <span className="rounded-md bg-[#242932] px-2 py-1 text-xs text-gray-300">
+                                Stock: {stockInfo.totalStock}
+                              </span>
+                            </div>
                           </div>
 
                           <div className="min-w-24 text-right">
@@ -834,35 +842,54 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
           </section>
 
           {/* All Products Preview */}
-          {form.applicableTo === "All Products" &&
-            showProductPreview && (
-              <div className="rounded-xl border border-purple-500/30 bg-purple-500/5 p-4">
-                <p className="mb-2 text-sm font-semibold text-purple-300">
-                  Discount Preview
-                </p>
+          {form.applicableTo === "All Products" && showProductPreview && (
+            <div className="rounded-xl border border-purple-500/30 bg-purple-500/5 p-4">
+              <p className="mb-2 text-sm font-semibold text-purple-300">
+                Discount Preview
+              </p>
 
-                <p className="text-xs text-gray-400">
-                  The discount will be calculated individually for
-                  every eligible product using its current price.
-                </p>
-              </div>
-            )}
+              <p className="text-xs text-gray-400">
+                The discount will be calculated individually for every eligible
+                product using its current price.
+              </p>
+            </div>
+          )}
 
           {/* Category Preview */}
-          {form.applicableTo === "Category" &&
-            showProductPreview && (
-              <div className="rounded-xl border border-purple-500/30 bg-purple-500/5 p-4">
-                <p className="mb-2 text-sm font-semibold text-purple-300">
-                  Category Discount Preview
-                </p>
+          {form.applicableTo === "Category" && showProductPreview && (
+            <div className="rounded-xl border border-purple-500/30 bg-purple-500/5 p-4">
+              <p className="mb-2 text-sm font-semibold text-purple-300">
+                Category Discount Preview
+              </p>
 
-                <p className="text-xs text-gray-400">
-                  The discount will apply to eligible products in
-                  the selected category:{" "}
-                  {form.category || "Not selected"}.
+              <p className="text-xs text-gray-400">
+                The discount will apply to eligible products in the selected
+                category: {form.category || "Not selected"}.
+              </p>
+            </div>
+          )}
+
+          {/* BOGO Information */}
+          {form.discountType === "buy_x_get_y" && (
+            <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
+              <p className="text-sm font-semibold text-yellow-300">
+                Buy X Get Y Information
+              </p>
+
+              <p className="mt-1 text-xs text-gray-400">
+                Customers buy {form.buyQuantity || 0} quantity and receive{" "}
+                {form.getQuantity || 0} additional quantity free. Actual stock
+                must be validated during checkout for the selected color and
+                size.
+              </p>
+
+              {form.applicableTo === "Products" && (
+                <p className="mt-2 text-xs text-yellow-300">
+                  This offer applies only to the products selected above.
                 </p>
-              </div>
-            )}
+              )}
+            </div>
+          )}
 
           <div className="h-px bg-[#303641]" />
 
@@ -883,9 +910,7 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                   type="date"
                   required
                   value={form.startDate}
-                  onChange={(e) =>
-                    updateField("startDate", e.target.value)
-                  }
+                  onChange={(e) => updateField("startDate", e.target.value)}
                   className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
                 />
               </div>
@@ -901,9 +926,7 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
                   required
                   min={form.startDate || undefined}
                   value={form.endDate}
-                  onChange={(e) =>
-                    updateField("endDate", e.target.value)
-                  }
+                  onChange={(e) => updateField("endDate", e.target.value)}
                   className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
                 />
               </div>
@@ -918,9 +941,7 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
 
             <select
               value={form.status}
-              onChange={(e) =>
-                updateField("status", e.target.value)
-              }
+              onChange={(e) => updateField("status", e.target.value)}
               className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
             >
               <option value="Active">Active</option>
@@ -948,12 +969,7 @@ const UpdateOffer = ({ oncloseUpdateOfferModal }) => {
 
             <button
               type="submit"
-              disabled={
-                updatingOffer ||
-                loadingProducts ||
-                (form.applicableTo === "Products" &&
-                  form.discountType !== "percentage")
-              }
+              disabled={updatingOffer || loadingProducts}
               className="flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {updatingOffer ? (

@@ -6,6 +6,7 @@ import {
   FiCalendar,
   FiLoader,
   FiCheck,
+  FiGift,
 } from "react-icons/fi";
 import axios from "axios";
 
@@ -44,7 +45,9 @@ const AddOffer = ({ oncloseOfferModal }) => {
   const [error, setError] = useState("");
 
   const token =
-    localStorage.getItem("token") 
+   localStorage.getItem("token");
+
+  const isBuyOffer = form.discountType === "buy_x_get_y";
 
   // Update form fields
   const updateField = (field, value) => {
@@ -122,6 +125,11 @@ const AddOffer = ({ oncloseOfferModal }) => {
     });
   }, [allProducts, search]);
 
+  // Selected products
+  const selectedProducts = useMemo(() => {
+    return allProducts.filter((product) => form.products.includes(product._id));
+  }, [allProducts, form.products]);
+
   // Product selection
   const handleProductChange = (productId) => {
     setForm((prev) => ({
@@ -158,6 +166,64 @@ const AddOffer = ({ oncloseOfferModal }) => {
     return price;
   };
 
+  // Get product stock and Buy X Get Y bundle capacity
+  const getProductStockInfo = (product) => {
+    let totalStock = 0;
+    let bundleCapacity = 0;
+
+    const buy = Number(form.buyQuantity);
+    const get = Number(form.getQuantity);
+
+    const unitsPerBundle = buy + get;
+
+    if (product.variants?.length > 0) {
+      product.variants.forEach((variant) => {
+        if (variant.sizes?.length > 0) {
+          variant.sizes.forEach((size) => {
+            const stock = Math.max(0, Number(size.stock) || 0);
+
+            totalStock += stock;
+
+            if (
+              isBuyOffer &&
+              Number.isInteger(buy) &&
+              Number.isInteger(get) &&
+              buy > 0 &&
+              get > 0
+            ) {
+              bundleCapacity += Math.floor(stock / unitsPerBundle);
+            }
+          });
+        }
+      });
+    } else {
+      // Fallback if the product uses product-level stock
+      totalStock = Math.max(0, Number(product.stock) || 0);
+
+      if (
+        isBuyOffer &&
+        Number.isInteger(buy) &&
+        Number.isInteger(get) &&
+        buy > 0 &&
+        get > 0
+      ) {
+        bundleCapacity = Math.floor(totalStock / unitsPerBundle);
+      }
+    }
+
+    return {
+      totalStock,
+      bundleCapacity,
+    };
+  };
+
+  // Currency formatting
+  const formatPrice = (price) =>
+    `₹${Number(price).toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+
   // Validate form
   const validateForm = () => {
     if (!form.title.trim()) {
@@ -168,6 +234,7 @@ const AddOffer = ({ oncloseOfferModal }) => {
       return "Offer description is required.";
     }
 
+    // Percentage validation
     if (form.discountType === "percentage") {
       const value = Number(form.discountValue);
 
@@ -181,15 +248,21 @@ const AddOffer = ({ oncloseOfferModal }) => {
       }
     }
 
+    // Fixed discount validation
     if (form.discountType === "fixed") {
       const value = Number(form.discountValue);
 
       if (!form.discountValue || !Number.isFinite(value) || value <= 0) {
         return "Fixed discount must be greater than zero.";
       }
+
+      if (form.applicableTo === "Products") {
+        return "Fixed discounts are not supported for selected products.";
+      }
     }
 
-    if (form.discountType === "buy_x_get_y") {
+    // Buy X Get Y validation
+    if (isBuyOffer) {
       const buy = Number(form.buyQuantity);
       const get = Number(form.getQuantity);
 
@@ -203,13 +276,7 @@ const AddOffer = ({ oncloseOfferModal }) => {
       }
     }
 
-    if (
-      form.applicableTo === "Products" &&
-      form.discountType !== "percentage"
-    ) {
-      return "Selected Products currently supports percentage discounts only.";
-    }
-
+    // Date validation
     if (!form.startDate || !form.endDate) {
       return "Please select both offer dates.";
     }
@@ -218,6 +285,7 @@ const AddOffer = ({ oncloseOfferModal }) => {
       return "End date must be after start date.";
     }
 
+    // Category validation
     if (
       form.applicableTo === "Category" &&
       !categories.includes(form.category)
@@ -225,10 +293,27 @@ const AddOffer = ({ oncloseOfferModal }) => {
       return "Please select a valid category.";
     }
 
+    // Selected products validation
     if (form.applicableTo === "Products" && form.products.length === 0) {
       return "Please select at least one product.";
     }
 
+    // Check Buy X Get Y stock for selected products
+    if (isBuyOffer && form.applicableTo === "Products") {
+      const unavailableProducts = selectedProducts.filter((product) => {
+        const { bundleCapacity } = getProductStockInfo(product);
+
+        return bundleCapacity < 1;
+      });
+
+      if (unavailableProducts.length > 0) {
+        return `Insufficient stock to create an offer for: ${unavailableProducts
+          .map((product) => product.name)
+          .join(", ")}.`;
+      }
+    }
+
+    // Status validation
     if (!["Active", "Inactive"].includes(form.status)) {
       return "Invalid offer status.";
     }
@@ -258,14 +343,11 @@ const AddOffer = ({ oncloseOfferModal }) => {
 
       discountType: form.discountType,
 
-      discountValue:
-        form.discountType === "buy_x_get_y" ? 0 : Number(form.discountValue),
+      discountValue: isBuyOffer ? 0 : Number(form.discountValue),
 
-      buyQuantity:
-        form.discountType === "buy_x_get_y" ? Number(form.buyQuantity) : 0,
+      buyQuantity: isBuyOffer ? Number(form.buyQuantity) : 0,
 
-      getQuantity:
-        form.discountType === "buy_x_get_y" ? Number(form.getQuantity) : 0,
+      getQuantity: isBuyOffer ? Number(form.getQuantity) : 0,
 
       applicableTo: form.applicableTo,
 
@@ -306,19 +388,7 @@ const AddOffer = ({ oncloseOfferModal }) => {
     }
   };
 
-  // Selected products
-  const selectedProducts = allProducts.filter((product) =>
-    form.products.includes(product._id),
-  );
-
-  // Currency formatting
-  const formatPrice = (price) =>
-    `₹${Number(price).toLocaleString("en-IN", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-
-  // Whether to show individual product preview
+  // Preview conditions
   const showProductPreview =
     ["percentage", "fixed"].includes(form.discountType) &&
     form.discountValue !== "";
@@ -419,6 +489,7 @@ const AddOffer = ({ oncloseOfferModal }) => {
               </select>
             </div>
 
+            {/* Percentage */}
             {form.discountType === "percentage" && (
               <div>
                 <label className="mb-2 block text-sm text-gray-300">
@@ -438,6 +509,7 @@ const AddOffer = ({ oncloseOfferModal }) => {
               </div>
             )}
 
+            {/* Fixed Discount */}
             {form.discountType === "fixed" && (
               <div>
                 <label className="mb-2 block text-sm text-gray-300">
@@ -456,54 +528,79 @@ const AddOffer = ({ oncloseOfferModal }) => {
               </div>
             )}
 
-            {form.discountType === "buy_x_get_y" && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="mb-2 block text-sm text-gray-300">
-                    Buy Quantity
-                  </label>
+            {/* Buy X Get Y */}
+            {isBuyOffer && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="mb-2 block text-sm text-gray-300">
+                      Buy Quantity
+                    </label>
 
-                  <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    value={form.buyQuantity}
-                    onChange={(e) => updateField("buyQuantity", e.target.value)}
-                    placeholder="Example: 2"
-                    className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
-                  />
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={form.buyQuantity}
+                      onChange={(e) =>
+                        updateField("buyQuantity", e.target.value)
+                      }
+                      placeholder="Example: 1"
+                      className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm text-gray-300">
+                      Get Quantity
+                    </label>
+
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={form.getQuantity}
+                      onChange={(e) =>
+                        updateField("getQuantity", e.target.value)
+                      }
+                      placeholder="Example: 1"
+                      className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="mb-2 block text-sm text-gray-300">
-                    Get Quantity
-                  </label>
-
-                  <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    value={form.getQuantity}
-                    onChange={(e) => updateField("getQuantity", e.target.value)}
-                    placeholder="Example: 1"
-                    className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
+                <div className="flex items-start gap-3 rounded-lg border border-green-500/20 bg-green-500/10 p-4">
+                  <FiGift
+                    size={20}
+                    className="mt-0.5 shrink-0 text-green-400"
                   />
+
+                  <div>
+                    <p className="text-sm font-semibold text-green-400">
+                      Buy X Get Y Free
+                    </p>
+
+                    <p className="mt-1 text-xs leading-5 text-gray-300">
+                      Customers buy the specified quantity and receive
+                      additional units of the same product, color and size for
+                      free.
+                    </p>
+
+                    {Number(form.buyQuantity) > 0 &&
+                      Number(form.getQuantity) > 0 && (
+                        <p className="mt-2 text-sm font-semibold text-white">
+                          Buy {form.buyQuantity} Get {form.getQuantity} Free
+                        </p>
+                      )}
+                  </div>
                 </div>
               </div>
             )}
-
-            {form.applicableTo === "Products" &&
-              form.discountType !== "percentage" && (
-                <p className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-400">
-                  Selected Products currently supports percentage discounts
-                  only. Choose percentage to create this offer.
-                </p>
-              )}
           </section>
 
           <div className="h-px bg-[#303641]" />
 
-          {/* Applicability */}
+          {/* Offer Applicability */}
           <section className="space-y-4">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-purple-400">
               Offer Applicability
@@ -530,9 +627,7 @@ const AddOffer = ({ oncloseOfferModal }) => {
                 className="w-full rounded-lg border border-[#303641] bg-[#0B0D10] px-4 py-3 text-sm text-white outline-none focus:border-purple-500"
               >
                 <option value="All Products">All Products</option>
-
                 <option value="Category">Specific Category</option>
-
                 <option value="Products">Selected Products</option>
               </select>
             </div>
@@ -560,7 +655,7 @@ const AddOffer = ({ oncloseOfferModal }) => {
               </div>
             )}
 
-            {/* Products */}
+            {/* Selected Products */}
             {form.applicableTo === "Products" && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -573,6 +668,7 @@ const AddOffer = ({ oncloseOfferModal }) => {
                   </span>
                 </div>
 
+                {/* Search */}
                 <div className="relative">
                   <FiSearch
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
@@ -588,7 +684,7 @@ const AddOffer = ({ oncloseOfferModal }) => {
                   />
                 </div>
 
-                {/* Selected products */}
+                {/* Selected Product Tags */}
                 {selectedProducts.length > 0 && (
                   <div className="rounded-lg border border-purple-500/20 bg-purple-500/5 p-3">
                     <p className="mb-2 text-xs text-purple-300">
@@ -616,7 +712,18 @@ const AddOffer = ({ oncloseOfferModal }) => {
                   </div>
                 )}
 
-                {/* Product list */}
+                {/* Buy X Get Y Explanation */}
+                {isBuyOffer && (
+                  <div className="rounded-lg border border-green-500/20 bg-green-500/10 p-3">
+                    <p className="text-xs leading-5 text-green-400">
+                      The offer applies only to selected products. Free units
+                      must be the same product, color and size as the purchased
+                      units.
+                    </p>
+                  </div>
+                )}
+
+                {/* Product List */}
                 <div className="max-h-96 space-y-2 overflow-y-auto rounded-lg border border-[#303641] bg-[#0B0D10] p-3">
                   {loadingProducts ? (
                     <div className="flex items-center justify-center gap-2 py-8 text-sm text-gray-400">
@@ -632,8 +739,11 @@ const AddOffer = ({ oncloseOfferModal }) => {
                       const isSelected = form.products.includes(product._id);
 
                       const finalPrice = calculateFinalPrice(product);
-
                       const hasDiscount = showProductPreview;
+
+                      const stockInfo = getProductStockInfo(product);
+
+                      const hasEnoughBundle = stockInfo.bundleCapacity > 0;
 
                       return (
                         <label
@@ -673,6 +783,30 @@ const AddOffer = ({ oncloseOfferModal }) => {
                             <p className="mt-1 text-xs text-gray-400">
                               Current Price: {formatPrice(product.price)}
                             </p>
+
+                            <p className="mt-1 text-xs text-gray-400">
+                              Available Stock:{" "}
+                              <span className="font-semibold text-green-400">
+                                {stockInfo.totalStock} units
+                              </span>
+                            </p>
+
+                            {isBuyOffer &&
+                              Number(form.buyQuantity) > 0 &&
+                              Number(form.getQuantity) > 0 && (
+                                <p className="mt-1 text-xs text-gray-400">
+                                  Available Offer Bundles:{" "}
+                                  <span
+                                    className={`font-semibold ${
+                                      hasEnoughBundle
+                                        ? "text-green-400"
+                                        : "text-red-400"
+                                    }`}
+                                  >
+                                    {stockInfo.bundleCapacity}
+                                  </span>
+                                </p>
+                              )}
                           </div>
 
                           <div className="min-w-24 text-right">
@@ -688,6 +822,17 @@ const AddOffer = ({ oncloseOfferModal }) => {
 
                                 <p className="text-xs text-green-400">
                                   Final Price
+                                </p>
+                              </>
+                            ) : isBuyOffer ? (
+                              <>
+                                <p className="text-sm font-semibold text-white">
+                                  {formatPrice(product.price)}
+                                </p>
+
+                                <p className="mt-1 text-xs text-green-400">
+                                  Buy {form.buyQuantity || "X"} Get{" "}
+                                  {form.getQuantity || "Y"}
                                 </p>
                               </>
                             ) : (
@@ -809,12 +954,7 @@ const AddOffer = ({ oncloseOfferModal }) => {
 
             <button
               type="submit"
-              disabled={
-                creatingOffer ||
-                loadingProducts ||
-                (form.applicableTo === "Products" &&
-                  form.discountType !== "percentage")
-              }
+              disabled={creatingOffer || loadingProducts}
               className="flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {creatingOffer ? (

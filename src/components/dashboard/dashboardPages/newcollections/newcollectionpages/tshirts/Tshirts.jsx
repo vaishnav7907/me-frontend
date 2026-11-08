@@ -1,71 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
 import tshirt1 from "../../../../../../assets/tshirts/tshirt1.webp";
 import tshirt2 from "../../../../../../assets/tshirts/tshirt2.jpg";
 import tshirt3 from "../../../../../../assets/tshirts/tshirt3.jpg";
+import { UseMe } from "../../../../../context/Meprovider";
+import axios from "axios";
 const Tshirts = () => {
   const navigate = useNavigate();
 
-  const Tshirts = [
-    {
-      id: 1,
-      name: "Oxford White",
-      price: "$89",
-      image: tshirt1,
-      category: "Essential",
-    },
-    {
-      id: 2,
-      name: "Midnight Black",
-      price: "$94",
-      image: tshirt2,
-      category: "Premium",
-    },
-    {
-      id: 3,
-      name: "Stone Linen",
-      price: "$86",
-      image: tshirt3,
-      category: "Linen",
-    },
-    {
-      id: 4,
-      name: "Classic Blue",
-      price: "$91",
-      image: tshirt1,
-      category: "Formal",
-    },
-    {
-      id: 5,
-      name: "Modern Fit",
-      price: "$88",
-      image: tshirt2,
-      category: "Casual",
-    },
-    {
-      id: 6,
-      name: "Minimal Grey",
-      price: "$90",
-      image: tshirt3,
-      category: "Luxury",
-    },
-    {
-      id: 6,
-      name: "Minimal Grey",
-      price: "$90",
-      image: tshirt1,
-      category: "Luxury",
-    },
-    {
-      id: 6,
-      name: "Minimal Grey",
-      price: "$90",
-      image: tshirt2,
-      category: "Luxury",
-    },
-  ];
+  const { getProductCategory } = UseMe();
+  const [latestTshirts, setLatestTshirts] = useState([]);
+
+  const getLatestArrivalsTshirts = async () => {
+    try {
+      const latestArrivalsTshirtApi = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/getProductsByCategory/${getProductCategory}`,
+      );
+
+      setLatestTshirts(latestArrivalsTshirtApi.data.products);
+
+      console.log(
+        "get Latest Arrivals shirts",
+        latestArrivalsTshirtApi.data.products,
+      );
+    } catch (error) {
+      console.log("error in get latest Arrivals shirts", error.message);
+    }
+  };
+
+  const handPickedTshirts = latestTshirts.filter(
+    (product) => product.isHandPicked === true,
+  );
+  useEffect(() => {
+    if (getProductCategory) {
+      getLatestArrivalsTshirts();
+    }
+  }, [getProductCategory]);
   return (
     <section className="bg-black text-white min-h-screen overflow-hidden">
       <h1 className="absolute top-24 left-0 text-[180px] lg:text-[260px] font-bold text-white/[0.03] uppercase pointer-events-none select-none">
@@ -114,7 +86,7 @@ const Tshirts = () => {
         </motion.div>
       </div>
       <div className="grid grid-cols-4 py-20">
-        {Tshirts.map((items, index) => (
+        {latestTshirts.map((items, index) => (
           <motion.div
             key={items.id}
             initial={{ opacity: 0, y: 40 }}
@@ -124,8 +96,8 @@ const Tshirts = () => {
           >
             <div className="h-4/5 overflow-hidden relative">
               <img
-                src={items.image}
-                alt=""
+                src={items.variants?.[0]?.color?.mainImage?.url}
+                alt={items.name}
                 className="h-full w-full object-cover  "
               />
               {/* <div className="absolute inset-0 bg-gradient-to-l from-black via-black/5 to-transparent" /> */}
@@ -138,63 +110,85 @@ const Tshirts = () => {
                 </p>
                 <h3 className="font-serif tracking-wide">{items.name}</h3>
               </div>
+              <div className="flex items-center gap-3">
+                <p className="text-sm font-semibold text-white">
+                  ₹{items.price}
+                </p>
 
-              <p className="uppercase tracking-[0.04em] text-neutral-500 text-sm">
-                {items.price}
-              </p>
+                <p className="text-sm text-green-500">{items.discount}% OFF</p>
+
+                <p className="text-sm text-neutral-500 line-through ">
+                  ₹{items.realPrice}
+                </p>
+              </div>
             </div>
           </motion.div>
         ))}
       </div>
-      <div className=" max-w-7xl mx-auto px-6  py-10 ">
-        <div>
-          <p className="uppercase tracking-[0.45em] text-neutral-500 text-sm">
-            trending now
-          </p>
-          <h2 className="font-serif text-4xl mt-3">Handpicked For You</h2>
-        </div>
 
-        <div className="flex gap-6 overflow-x-auto pt-6 pb-6 snap-x snap-mandatory scrollbar-thin">
-          {Tshirts.map((data, index) => (
-            <motion.div
-              key={data.id}
-              initial={{ opacity: 0, x: 80 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{
-                duration: 0.6,
-                delay: index * 0.1,
-              }}
-              viewport={{ once: true }}
-              whileHover={{
-                y: -10,
-              }}
-              className="min-w-[320px] snap-center group cursor-pointer"
-            >
-              <div className="relative overflow-hidden rounded-sm">
-                <img
-                  src={data.image}
-                  alt=""
-                  className="w-full h-[450px] object-cover duration-700 group-hover:scale-110"
-                />
+      {handPickedTshirts.length > 0 && (
+        <div className=" max-w-7xl mx-auto px-6  py-10 ">
+          <div>
+            <p className="uppercase tracking-[0.45em] text-neutral-500 text-sm">
+              trending now
+            </p>
+            <h2 className="font-serif text-4xl mt-3">Handpicked For You</h2>
+          </div>
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+          <div className="flex gap-6 overflow-x-auto pt-6 pb-6 snap-x snap-mandatory scrollbar-thin">
+            {handPickedTshirts.map((data, index) => (
+              <motion.div
+                key={data.id}
+                initial={{ opacity: 0, x: 80 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{
+                  duration: 0.6,
+                  delay: index * 0.1,
+                }}
+                viewport={{ once: true }}
+                whileHover={{
+                  y: -10,
+                }}
+                className="min-w-[320px] snap-center group cursor-pointer"
+              >
+                <div className="relative overflow-hidden rounded-sm">
+                  <img
+                    src={data.variants?.[0]?.color?.mainImage?.url}
+                    alt={data.name}
+                    className="w-full h-[450px] object-cover duration-700 group-hover:scale-110"
+                  />
 
-                <div className="absolute bottom-7 left-7">
-                  <p className="uppercase tracking-[0.25em] text-xs text-neutral-300">
-                    {data.category}
-                  </p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
-                  <h3 className="font-serif text-2xl mt-2">{data.name}</h3>
+                  <div className="absolute bottom-7 left-7">
+                    <p className="uppercase tracking-[0.25em] text-xs text-neutral-300">
+                      {data.category}
+                    </p>
 
-                  <p className="text-neutral-300 mt-2">{data.price}</p>
+                    <h3 className="font-serif text-2xl mt-2">{data.name}</h3>
+
+                    <div className="flex items-center gap-3">
+                      <p className="text-sm font-semibold text-white">
+                        ₹{data.price}
+                      </p>
+
+                      <p className="text-sm text-green-500">
+                        {data.discount}% OFF
+                      </p>
+
+                      <p className="text-sm text-neutral-500 line-through ">
+                        ₹{data.realPrice}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              {/* <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent" />
+                {/* <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent" />
                     <div className="absolute inset-0 bg-gradient-to-l from-black via-black/20 to-transparent" /> */}
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 };
