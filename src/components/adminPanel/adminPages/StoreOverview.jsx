@@ -112,19 +112,21 @@ const StoreOverview = () => {
 
   console.log("lowstock products", lowProducts);
 
-  const pendingOrders = allproducts.filter(
+  const pendingOrders = allOrders.filter(
     (order) => order.orderStatus === "Pending",
   ).length;
 
+  console.log("pending orders",pendingOrders);
+  
   const latestArrivalsProducts = allproducts.filter((product) => {
-    const createdDate = new Date(product.createdAt);
-    const today = new Date();
+  const createdDate = new Date(product.createdAt);
+  const today = new Date();
 
-    return (
-      createdDate.getMonth() === today.getMonth() &&
-      createdDate.getFullYear() === today.getFullYear()
-    );
-  }).length;
+  return (
+    createdDate.getMonth() === today.getMonth() &&
+    createdDate.getFullYear() === today.getFullYear()
+  );
+}).length;
 
   return (
     <div className="min-h-screen px-6 py-6 ">

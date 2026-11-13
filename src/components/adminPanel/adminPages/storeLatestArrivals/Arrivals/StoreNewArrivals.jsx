@@ -135,7 +135,7 @@ const StoreNewArrivals = () => {
                 />
               </div>
               <div className="flex items-center gap-3">
-                <div>
+                {/* <div>
                   <select
                     value={categoryy}
                     onChange={(e) => setCategoryy(e.target.value)}
@@ -149,8 +149,8 @@ const StoreNewArrivals = () => {
                     <option value="Innerwear">Innerwear</option>
                     <option value="Shorts">Shorts</option>
                   </select>
-                </div>
-                <div className="border border-[#292d33] bg-[#151719] text-gray-300 transition hover:bg-[#1b1e21] rounded-lg h-10 py-0.5 px-2 flex justify-center items-center ">
+                </div> */}
+                {/* <div className="border border-[#292d33] bg-[#151719] text-gray-300 transition hover:bg-[#1b1e21] rounded-lg h-10 py-0.5 px-2 flex justify-center items-center ">
                   <div className="flex justify-evenly items-center gap-2 ">
                     <button
                       className={` h-6 w-6 flex justify-center items-center rounded-md transition-all duration-500`}
@@ -165,7 +165,7 @@ const StoreNewArrivals = () => {
                       <CiCircleList />
                     </button>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

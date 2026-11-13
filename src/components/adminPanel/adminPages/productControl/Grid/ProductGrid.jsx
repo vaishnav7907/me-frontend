@@ -6,7 +6,7 @@ import { FiPackage, FiShoppingBag, FiTrendingUp } from "react-icons/fi";
 import axios from "axios";
 import { UseMe } from "../../../../context/Meprovider";
 
-const ProductGrid = () => {
+const ProductGrid = ({ products }) => {
   const {
     allproducts,
     setAllProducts,
@@ -76,13 +76,12 @@ const ProductGrid = () => {
   return (
     <div className="w-full">
       <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-        {allproducts.map((productData) => {
+        {products.map((productData) => {
           const totalStock = getTotalStock(productData);
 
           const productStatus = getProductStatus(totalStock);
 
-         const productImage =
-  productData.variants?.[0]?.color?.mainImage?.url;
+          const productImage = productData.variants?.[0]?.color?.mainImage?.url;
 
           const totalVariants = productData.variants?.length || 0;
 

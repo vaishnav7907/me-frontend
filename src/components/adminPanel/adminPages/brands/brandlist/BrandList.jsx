@@ -5,10 +5,13 @@ import { BsThreeDots } from "react-icons/bs";
 import { tableFeatures, useTable } from "@tanstack/react-table";
 import BrandGrid from "../brandgrid/BrandGrid";
 import axios from "axios";
+import { UseMe } from "../../../../context/Meprovider";
 
 const BrandList = () => {
+
+  const {brandSearch,setBrandSearch}=UseMe()
   const [viewMode, setViewMode] = useState("list");
-  const [search, setSearch] = useState("");
+
   const [getBrands, setGetBrands] = useState([]);
 
   const getAllBrands = async () => {
@@ -31,10 +34,10 @@ const BrandList = () => {
   }, []);
 
   const filteredBrands = getBrands.filter((brand) =>
-    brand.brandName
-      ?.toLowerCase()
-      .includes(search.toLowerCase()),
-  );
+  brand.brandName
+    ?.toLowerCase()
+    .includes(brandSearch.toLowerCase()),
+);
 
   const tableData = filteredBrands.map((brand) => {
     return {
@@ -77,6 +80,8 @@ const BrandList = () => {
     features: tableFeatures(),
   });
 
+ 
+
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-[#252a31] bg-[#111418] shadow-[0_15px_50px_rgba(0,0,0,0.22)]">
       <div className="flex items-center justify-between gap-4 border-b border-[#252a31] bg-[#121519] px-5 py-4">
@@ -88,26 +93,14 @@ const BrandList = () => {
 
           <input
             type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={brandSearch}
+            onChange={(e) => setBrandSearch(e.target.value)}
             placeholder="Search brands..."
             className="h-10 w-full rounded-xl border border-[#2a3037] bg-[#0c0f12] pl-10 pr-4 text-sm text-white outline-none placeholder:text-gray-600 transition-all duration-200 focus:border-[#4a5058] focus:bg-[#0e1114]"
           />
         </div>
 
         <div className="flex items-center gap-1 rounded-xl border border-[#2a3037] bg-[#0c0f12] p-1">
-          <button
-            type="button"
-            onClick={() => setViewMode("grid")}
-            className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 ${
-              viewMode === "grid"
-                ? "bg-white text-black shadow-sm"
-                : "text-gray-500 hover:bg-white/[0.06] hover:text-white"
-            }`}
-          >
-            <CiGrid41 size={19} />
-          </button>
-
           <button
             type="button"
             onClick={() => setViewMode("list")}
@@ -118,6 +111,17 @@ const BrandList = () => {
             }`}
           >
             <CiCircleList size={19} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("grid")}
+            className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 ${
+              viewMode === "grid"
+                ? "bg-white text-black shadow-sm"
+                : "text-gray-500 hover:bg-white/[0.06] hover:text-white"
+            }`}
+          >
+            <CiGrid41 size={19} />
           </button>
         </div>
       </div>
@@ -153,10 +157,7 @@ const BrandList = () => {
                     const value = tableCell.getValue();
 
                     return (
-                      <td
-                        key={tableCell.id}
-                        className="px-5 py-4 align-middle"
-                      >
+                      <td key={tableCell.id} className="px-5 py-4 align-middle">
                         {tableCell.column.id === "checkbox" && (
                           <div className="h-4 w-4 rounded border border-[#343a42]" />
                         )}
@@ -262,9 +263,7 @@ const BrandList = () => {
         </div>
       )}
 
-      {viewMode === "grid" && (
-        <BrandGrid brands={filteredBrands} />
-      )}
+      {viewMode === "grid" && <BrandGrid brands={filteredBrands} />}
     </div>
   );
 };

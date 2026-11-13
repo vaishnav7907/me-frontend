@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useTable, tableFeatures } from "@tanstack/react-table";
-import {
-  RiArrowRightWideLine,
-  RiArrowLeftWideLine,
-} from "react-icons/ri";
+import { RiArrowRightWideLine, RiArrowLeftWideLine } from "react-icons/ri";
 import { BsThreeDots } from "react-icons/bs";
 import axios from "axios";
+import { UseMe } from "../../../../context/Meprovider";
 
-const ProductList = () => {
+const ProductList = ({ products }) => {
+  const { bulkDeleteProducts, setBulkDeleteProducts } = UseMe();
   const [allProducts, setAllProducts] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState([]);
+  // const [selectedProducts, setSelectedProducts] = useState([]);
   const [page, setPage] = useState(1);
 
   const perPage = 10;
@@ -26,10 +25,7 @@ const ProductList = () => {
 
       console.log("get all products", products);
 
-      console.log(
-        "IMAGE:",
-        products[0]?.variants?.[0]?.images?.[0]?.url,
-      );
+      console.log("IMAGE:", products[0]?.variants?.[0]?.images?.[0]?.url);
 
       console.log("BRAND:", products[0]?.brand);
     } catch (error) {
@@ -55,8 +51,7 @@ const ProductList = () => {
       return (
         total +
         variant.sizes.reduce(
-          (sizeTotal, size) =>
-            sizeTotal + Number(size.stock || 0),
+          (sizeTotal, size) => sizeTotal + Number(size.stock || 0),
           0,
         )
       );
@@ -83,12 +78,10 @@ const ProductList = () => {
       return 0;
     }
 
-    return Math.round(
-      ((original - selling) / original) * 100,
-    );
+    return Math.round(((original - selling) / original) * 100);
   };
 
-  const tableData = allProducts.map((product) => {
+const tableData = (products || []).map((product) => {
     const stock = getTotalStock(product);
 
     const price = Number(product.price || 0);
@@ -100,11 +93,10 @@ const ProductList = () => {
       id: product._id,
       name: product.name || "Unnamed Product",
 
-      image:
-        product.variants?.[0]?.images?.[0]?.url|| "",
+      image: product.variants?.[0]?.color?.mainImage?.url,
 
       brandName: product.brand?.brandName || "",
-      brandIcon: product.brand?.brandIcon || "",
+      brandIcon: product.brand?.brandIcon?.url || "",
 
       category: product.category || "-",
 
@@ -126,17 +118,11 @@ const ProductList = () => {
     };
   });
 
-  const totalPage = Math.max(
-    1,
-    Math.ceil(tableData.length / perPage),
-  );
+  const totalPage = Math.max(1, Math.ceil(tableData.length / perPage));
 
   const startIndex = (page - 1) * perPage;
 
-  const currentProducts = tableData.slice(
-    startIndex,
-    startIndex + perPage,
-  );
+  const currentProducts = tableData.slice(startIndex, startIndex + perPage);
 
   useEffect(() => {
     if (page > totalPage) {
@@ -197,14 +183,21 @@ const ProductList = () => {
     features: tableFeatures(),
   });
 
-  const toggleProduct = (id) => {
-    setSelectedProducts((prev) =>
-      prev.includes(id)
-        ? prev.filter((productId) => productId !== id)
-        : [...prev, id],
-    );
-  };
+  // const toggleProduct = (id) => {
+  //   setSelectedProducts((prev) =>
+  //     prev.includes(id)
+  //       ? prev.filter((productId) => productId !== id)
+  //       : [...prev, id],
+  //   );
+  // };
 
+  const toggleProduct = (id) => {
+  setBulkDeleteProducts((prev) =>
+    prev.includes(id)
+      ? prev.filter((productId) => productId !== id)
+      : [...prev, id]
+  );
+};
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0d0d0d] shadow-2xl shadow-black/20">
       <div className="overflow-x-auto">
@@ -219,9 +212,7 @@ const ProductList = () => {
                   <th
                     key={header.id}
                     className={`whitespace-nowrap px-5 py-4 text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500 ${
-                      index === 1
-                        ? "text-left"
-                        : "text-center"
+                      index === 1 ? "text-left" : "text-center"
                     }`}
                   >
                     {header.column.columnDef.header}
@@ -236,16 +227,13 @@ const ProductList = () => {
               table.getRowModel().rows.map((row) => {
                 const product = row.original;
 
-                const isSelected =
-                  selectedProducts.includes(product.id);
+                const isSelected = bulkDeleteProducts.includes(product.id);
 
                 return (
                   <tr
                     key={row.id}
                     className={`group border-b border-white/[0.055] transition-all duration-200 hover:bg-white/[0.025] ${
-                      isSelected
-                        ? "bg-white/[0.025]"
-                        : ""
+                      isSelected ? "bg-white/[0.025]" : ""
                     }`}
                   >
                     {row.getAllCells().map((cell) => {
@@ -263,10 +251,8 @@ const ProductList = () => {
                           {cell.column.id === "checkBox" ? (
                             <input
                               type="checkbox"
-                              checked={isSelected}
-                              onChange={() =>
-                                toggleProduct(product.id)
-                              }
+                              checked={bulkDeleteProducts.includes(product.id)}
+                              onChange={() => toggleProduct(product.id)}
                               className="h-4 w-4 cursor-pointer accent-white"
                             />
                           ) : cell.column.id === "name" ? (
@@ -295,12 +281,8 @@ const ProductList = () => {
                                     <div className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-md border border-white/[0.08] bg-white">
                                       {product.brandIcon ? (
                                         <img
-                                          src={
-                                            product.brandIcon
-                                          }
-                                          alt={
-                                            product.brandName
-                                          }
+                                          src={product.brandIcon}
+                                          alt={product.brandName}
                                           className="h-full w-full object-contain p-1"
                                         />
                                       ) : (
@@ -340,19 +322,13 @@ const ProductList = () => {
                           ) : cell.column.id === "price" ? (
                             <div className="flex flex-col items-center">
                               <span className="font-medium text-white">
-                                ₹{" "}
-                                {Number(
-                                  value,
-                                ).toLocaleString("en-IN")}
+                                ₹ {Number(value).toLocaleString("en-IN")}
                               </span>
 
-                              {product.realPrice >
-                                product.price && (
+                              {product.realPrice > product.price && (
                                 <span className="mt-0.5 text-[11px] text-gray-600 line-through">
                                   ₹
-                                  {Number(
-                                    product.realPrice,
-                                  ).toLocaleString(
+                                  {Number(product.realPrice).toLocaleString(
                                     "en-IN",
                                   )}
                                 </span>
@@ -364,9 +340,7 @@ const ProductList = () => {
                                 {value}% OFF
                               </span>
                             ) : (
-                              <span className="text-xs text-gray-600">
-                                —
-                              </span>
+                              <span className="text-xs text-gray-600">—</span>
                             )
                           ) : cell.column.id === "variants" ? (
                             <span className="text-gray-400">
@@ -410,10 +384,7 @@ const ProductList = () => {
                             </span>
                           ) : cell.column.id === "revenue" ? (
                             <span className="font-medium text-white">
-                              ₹{" "}
-                              {Number(
-                                value,
-                              ).toLocaleString("en-IN")}
+                              ₹ {Number(value).toLocaleString("en-IN")}
                             </span>
                           ) : cell.column.id === "status" ? (
                             <span
@@ -445,9 +416,7 @@ const ProductList = () => {
                               <BsThreeDots size={18} />
                             </button>
                           ) : (
-                            <span className="text-gray-400">
-                              {value}
-                            </span>
+                            <span className="text-gray-400">{value}</span>
                           )}
                         </td>
                       );
@@ -457,13 +426,8 @@ const ProductList = () => {
               })
             ) : (
               <tr>
-                <td
-                  colSpan={11}
-                  className="py-16 text-center"
-                >
-                  <p className="text-sm text-gray-600">
-                    No products found
-                  </p>
+                <td colSpan={11} className="py-16 text-center">
+                  <p className="text-sm text-gray-600">No products found</p>
                 </td>
               </tr>
             )}
@@ -474,35 +438,21 @@ const ProductList = () => {
       <div className="flex items-center justify-between border-t border-white/[0.06] bg-[#101010] px-5 py-3.5">
         <p className="flex gap-1 text-[11px] text-gray-600">
           Showing
-
           <span className="text-gray-400">
-            {tableData.length === 0
-              ? 0
-              : startIndex + 1}
+            {tableData.length === 0 ? 0 : startIndex + 1}
           </span>
-
           -
-
           <span className="text-gray-400">
-            {Math.min(
-              startIndex + perPage,
-              tableData.length,
-            )}
+            {Math.min(startIndex + perPage, tableData.length)}
           </span>
-
           of
-
-          <span className="text-gray-300">
-            {tableData.length}
-          </span>
+          <span className="text-gray-300">{tableData.length}</span>
         </p>
 
         <div className="flex items-center gap-1.5">
           <button
             type="button"
-            onClick={() =>
-              setPage((prev) => Math.max(1, prev - 1))
-            }
+            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
             disabled={page === 1}
             className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.07] bg-white/[0.02] text-gray-500 transition hover:border-white/[0.12] hover:bg-white/[0.06] hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
           >
@@ -518,15 +468,8 @@ const ProductList = () => {
 
           <button
             type="button"
-            onClick={() =>
-              setPage((prev) =>
-                Math.min(totalPage, prev + 1),
-              )
-            }
-            disabled={
-              page === totalPage ||
-              tableData.length === 0
-            }
+            onClick={() => setPage((prev) => Math.min(totalPage, prev + 1))}
+            disabled={page === totalPage || tableData.length === 0}
             className="ml-1 flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.07] bg-white/[0.02] text-gray-500 transition hover:border-white/[0.12] hover:bg-white/[0.06] hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
           >
             <RiArrowRightWideLine size={18} />

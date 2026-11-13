@@ -44,7 +44,7 @@ const BrandGrid = () => {
             key={brand._id}
             className="group overflow-hidden rounded-2xl border border-[#252a30] bg-[#0d0f11] shadow-[0_8px_30px_rgba(0,0,0,0.18)] transition-all duration-300 hover:-translate-y-1 hover:border-[#3a4048]"
           >
-            <div className="relative h-40 w-full overflow-hidden bg-[#15181c]">
+            <div className="relative h-36 w-full overflow-hidden bg-[#15181c]">
               {brand.brandImage?.url ? (
                 <img
                   src={brand.brandImage.url}

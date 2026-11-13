@@ -9,6 +9,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { IoClose, IoLayersOutline, IoChevronDown } from "react-icons/io5";
 import { FiPackage, FiTruck, FiCheckCircle, FiClock } from "react-icons/fi";
 import { IoCloseOutline } from "react-icons/io5";
+import { FiTag, FiRefreshCw } from "react-icons/fi";
 import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
@@ -236,57 +237,66 @@ const StoreOrders = () => {
               </span>
             </div>
 
-            <button className="flex items-center gap-2 h-9 px-2.5 bg-white font-semibold text-sm rounded-lg  transition hover:bg-[#e8e8e8]">
-              <p>Export</p>
-            </button>
+            <div className="flex gap-3 ">
+              <button
+                onClick={getAllOrders}
+                className="flex items-center gap-2 rounded-lg border border-[#242932] px-4 py-2 text-sm transition hover:bg-[#181C23] text-white"
+              >
+                <FiRefreshCw size={16} />
+                Refresh
+              </button>
+              <button className="flex items-center gap-2 h-9 px-2.5 bg-white font-semibold text-sm rounded-lg  transition hover:bg-[#e8e8e8]">
+                <p>Export</p>
+              </button>
+            </div>
           </div>
         </div>
         {/* overview */}
         <div className="mb-6 mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-  <div className="rounded-xl border border-[#242932] bg-[#12151A] p-5">
-    <div className="flex items-center justify-between">
-      <p className="text-sm text-gray-400">Total Orders</p>
-      <FiPackage className="text-purple-400" size={20} />
-    </div>
-    <h2 className="mt-3 text-2xl font-semibold">{orders.length}</h2>
-  </div>
+          <div className="rounded-xl border border-[#242932] bg-[#12151A] p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-400">Total Orders</p>
+              <FiPackage className="text-purple-400" size={20} />
+            </div>
+            <h2 className="mt-3 text-2xl font-semibold">{orders.length}</h2>
+          </div>
 
-  <div className="rounded-xl border border-[#242932] bg-[#12151A] p-5">
-    <div className="flex items-center justify-between">
-      <p className="text-sm text-gray-400">Pending</p>
-      <FiClock className="text-yellow-400" size={20} />
-    </div>
-    <h2 className="mt-3 text-2xl font-semibold">
-      {orders.filter((order) => order.status === "Pending").length}
-    </h2>
-  </div>
+          <div className="rounded-xl border border-[#242932] bg-[#12151A] p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-400">Pending</p>
+              <FiClock className="text-yellow-400" size={20} />
+            </div>
+            <h2 className="mt-3 text-2xl font-semibold">
+              {orders.filter((order) => order.status === "Pending").length}
+            </h2>
+          </div>
 
-  <div className="rounded-xl border border-[#242932] bg-[#12151A] p-5">
-    <div className="flex items-center justify-between">
-      <p className="text-sm text-gray-400">Shipped</p>
-      <FiTruck className="text-blue-400" size={20} />
-    </div>
-    <h2 className="mt-3 text-2xl font-semibold">
-      {
-        orders.filter(
-          (order) =>
-            order.status === "Shipped" ||
-            order.status === "Out for Delivery",
-        ).length
-      }
-    </h2>
-  </div>
+          <div className="rounded-xl border border-[#242932] bg-[#12151A] p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-400">Shipped</p>
+              <FiTruck className="text-blue-400" size={20} />
+            </div>
+            <h2 className="mt-3 text-2xl font-semibold">
+              {
+                orders.filter(
+                  (order) =>
+                    order.status === "Shipped" ||
+                    order.status === "Out for Delivery",
+                ).length
+              }
+            </h2>
+          </div>
 
-  <div className="rounded-xl border border-[#242932] bg-[#12151A] p-5">
-    <div className="flex items-center justify-between">
-      <p className="text-sm text-gray-400">Delivered</p>
-      <FiCheckCircle className="text-green-400" size={20} />
-    </div>
-    <h2 className="mt-3 text-2xl font-semibold">
-      {orders.filter((order) => order.status === "Delivered").length}
-    </h2>
-  </div>
-</div>
+          <div className="rounded-xl border border-[#242932] bg-[#12151A] p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-400">Delivered</p>
+              <FiCheckCircle className="text-green-400" size={20} />
+            </div>
+            <h2 className="mt-3 text-2xl font-semibold">
+              {orders.filter((order) => order.status === "Delivered").length}
+            </h2>
+          </div>
+        </div>
 
         <div className="w-full overflow-hidden rounded-2xl border border-[#23272d] bg-[#111417] shadow-[0_10px_40px_rgba(0,0,0,0.18)]  mt-5">
           <div className="flex items-center justify-between gap-4 border-b border-[#23272d] px-5 py-4">
@@ -305,7 +315,6 @@ const StoreOrders = () => {
             {/* View Toggle */}
 
             <div className="flex items-center gap-5">
-             
               <div className="relative w-[160px]">
                 <select
                   className="h-10 w-full appearance-none rounded-lg border border-[#292f36] bg-[#0b0e10]  px-3  pr-9 text-sm text-gray-400 outline-none focus:border-gray-500 "
@@ -325,7 +334,7 @@ const StoreOrders = () => {
                 />
               </div>
 
-               <div className="relative w-[160px]">
+              <div className="relative w-[160px]">
                 <select
                   value={orderStatusFilter}
                   onChange={(e) => setOrderStatusFilter(e.target.value)}

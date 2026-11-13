@@ -12,7 +12,7 @@ import Profile from "./components/authentication/profile/Profile";
 import Settings from "./components/authentication/settings/Settings";
 import Signin from "./components/authentication/signin/Signin";
 import Signup from "./components/authentication/signup/Signup";
-import { MeProvider } from "./components/context/Meprovider";
+// import { MeProvider } from "./components/context/Meprovider";
 import Brands from "./components/dashboard/dashboardPages/brands/Brands";
 import BrandSubpage from "./components/dashboard/dashboardPages/brands/brandsSubpages/BrandSubpage";
 import Cart from "./components/dashboard/dashboardPages/cart/Cart";
@@ -53,7 +53,7 @@ function App() {
   const [isAuth, setIsAuth] = useState(false);
   return (
     <>
-      <MeProvider>
+      
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Welcomepage />} />
@@ -125,7 +125,7 @@ function App() {
             </Route>
           </Routes>
         </BrowserRouter>
-      </MeProvider>
+      
     </>
   );
 }

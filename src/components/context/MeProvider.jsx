@@ -72,6 +72,15 @@ export const MeProvider = ({ children }) => {
 
   // offer id
   const [offerId, setOfferId] = useState(null);
+
+  // search
+
+  const [productSearch, setProductSearch] = useState("");
+  const [brandSearch, setBrandSearch] = useState("");
+  const [search, setSearch] = useState("");
+
+  // delete products
+  const [bulkDeleteProducts, setBulkDeleteProducts] = useState([]);
   return (
     <MeContext.Provider
       value={{
@@ -186,6 +195,18 @@ export const MeProvider = ({ children }) => {
 
         offerId,
         setOfferId,
+
+        search,
+        setSearch,
+
+        productSearch,
+        setProductSearch,
+
+        brandSearch,
+        setBrandSearch,
+
+        bulkDeleteProducts,
+        setBulkDeleteProducts,
       }}
     >
       {children}
