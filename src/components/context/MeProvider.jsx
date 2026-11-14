@@ -81,6 +81,9 @@ export const MeProvider = ({ children }) => {
 
   // delete products
   const [bulkDeleteProducts, setBulkDeleteProducts] = useState([]);
+
+  // deletebrands
+ 
   return (
     <MeContext.Provider
       value={{
@@ -207,6 +210,9 @@ export const MeProvider = ({ children }) => {
 
         bulkDeleteProducts,
         setBulkDeleteProducts,
+
+        selectedBrandIds,
+        setSelectedBrandIds,
       }}
     >
       {children}

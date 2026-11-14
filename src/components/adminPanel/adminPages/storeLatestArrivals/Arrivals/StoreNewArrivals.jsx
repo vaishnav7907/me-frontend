@@ -12,6 +12,7 @@ import axios from "axios";
 import UpdateLatestArrivals from "../updateLatestArrivals/UpdateLatestArrivals";
 import { UseMe } from "../../../../context/Meprovider";
 import DeleteLatestArrivalsModal from "../deleteLatestArrivalsModal/DeleteLatestArrivalsModal";
+import { useNavigate } from "react-router-dom";
 const StoreNewArrivals = () => {
   const {
     updateLatestArrivalsModal,
@@ -25,6 +26,7 @@ const StoreNewArrivals = () => {
     setDltLatestArrivalsCategory,
     setDltLatestArrivalsName,
   } = UseMe();
+  const navigate=useNavigate()
   const [newArrivalsNavi, setNewArrivalsNavi] = useState(false);
   const [categoryy, setCategoryy] = useState("All");
 
@@ -105,7 +107,7 @@ const StoreNewArrivals = () => {
               <h2 className="mt-2 text-2xl font-semibold">2</h2>
             </div>
           </div>
-          <div className="py-7 ">
+          {/* <div className="py-7 ">
             <div className="flex justify-between">
               <div
                 className="   hidden
@@ -135,7 +137,7 @@ const StoreNewArrivals = () => {
                 />
               </div>
               <div className="flex items-center gap-3">
-                {/* <div>
+                <div>
                   <select
                     value={categoryy}
                     onChange={(e) => setCategoryy(e.target.value)}
@@ -149,8 +151,8 @@ const StoreNewArrivals = () => {
                     <option value="Innerwear">Innerwear</option>
                     <option value="Shorts">Shorts</option>
                   </select>
-                </div> */}
-                {/* <div className="border border-[#292d33] bg-[#151719] text-gray-300 transition hover:bg-[#1b1e21] rounded-lg h-10 py-0.5 px-2 flex justify-center items-center ">
+                </div>
+                <div className="border border-[#292d33] bg-[#151719] text-gray-300 transition hover:bg-[#1b1e21] rounded-lg h-10 py-0.5 px-2 flex justify-center items-center ">
                   <div className="flex justify-evenly items-center gap-2 ">
                     <button
                       className={` h-6 w-6 flex justify-center items-center rounded-md transition-all duration-500`}
@@ -165,10 +167,10 @@ const StoreNewArrivals = () => {
                       <CiCircleList />
                     </button>
                   </div>
-                </div> */}
+                </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <div className="py-7 flex gap-3 flex-wrap">
             {getLatestArrivals.map((latestArrivalsData) => (
@@ -247,7 +249,11 @@ const StoreNewArrivals = () => {
                     {latestArrivalsData.description}
                   </p>
 
-                  <button className="mt-6 flex w-full items-center justify-between rounded-xl bg-[#191B1E] px-4 py-3.5 text-sm font-medium text-gray-200 transition-all duration-300 hover:bg-white hover:text-black">
+                  <button className="mt-6 flex w-full items-center justify-between rounded-xl bg-[#191B1E] px-4 py-3.5 text-sm font-medium text-gray-200 transition-all duration-300 hover:bg-white hover:text-black"
+                  onClick={()=>navigate("/adminDash/storeNewArrivals/latestArrivalsProducts",{
+                    state:{latestProducts:latestArrivalsData}
+                  })}
+                  >
                     <span>Explore Collection</span>
 
                     <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#25272A] text-lg transition-all duration-300 group-hover:bg-black group-hover:text-white">

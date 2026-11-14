@@ -6,7 +6,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { UseMe } from "../../../../context/Meprovider";
 
-const BrandGrid = () => {
+const BrandGrid = ({brands=[]}) => {
   const {
     setBrandId,
     setUpdateBrandOpen,
@@ -15,31 +15,12 @@ const BrandGrid = () => {
     setBrandDeleteIcon,
   } = UseMe();
 
-  const [getBrands, setGetBrands] = useState([]);
-
-  const getAllBrands = async () => {
-    try {
-      const getBrandsFn = await axios.get(
-        `${import.meta.env.VITE_API_URL}/Me/getBrand`,
-      );
-
-      setGetBrands(getBrandsFn.data.brand || []);
-
-      console.log("get all brands", getBrandsFn.data.brand);
-    } catch (error) {
-      console.log("error in get brands", error);
-      console.log("Server response:", error.response?.data);
-    }
-  };
-
-  useEffect(() => {
-    getAllBrands();
-  }, []);
+  
 
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 gap-5 px-3 py-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {getBrands.map((brand) => (
+        {brands.map((brand) => (
           <div
             key={brand._id}
             className="group overflow-hidden rounded-2xl border border-[#252a30] bg-[#0d0f11] shadow-[0_8px_30px_rgba(0,0,0,0.18)] transition-all duration-300 hover:-translate-y-1 hover:border-[#3a4048]"

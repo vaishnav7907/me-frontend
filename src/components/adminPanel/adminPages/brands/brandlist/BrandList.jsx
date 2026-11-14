@@ -1,55 +1,35 @@
-import React, { useEffect, useState } from "react";
+
+import React, { useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { CiGrid41, CiCircleList } from "react-icons/ci";
-import { BsThreeDots } from "react-icons/bs";
 import { tableFeatures, useTable } from "@tanstack/react-table";
 import BrandGrid from "../brandgrid/BrandGrid";
-import axios from "axios";
 import { UseMe } from "../../../../context/Meprovider";
 
-const BrandList = () => {
+const BrandList = ({
+  selectedBrandIds,
+  setSelectedBrandIds,
+  brands = [],
+}) => {
+  const { brandSearch, setBrandSearch } = UseMe();
 
-  const {brandSearch,setBrandSearch}=UseMe()
   const [viewMode, setViewMode] = useState("list");
 
-  const [getBrands, setGetBrands] = useState([]);
+  const filteredBrands = (brands || []).filter((brand) =>
+    brand.brandName
+      ?.toLowerCase()
+      .includes((brandSearch || "").toLowerCase()),
+  );
 
-  const getAllBrands = async () => {
-    try {
-      const getBrandsFn = await axios.get(
-        `${import.meta.env.VITE_API_URL}/Me/getBrand`,
-      );
-
-      setGetBrands(getBrandsFn.data.brand);
-
-      console.log("get all brands", getBrandsFn.data.brand);
-    } catch (error) {
-      console.log("error in get brands", error);
-      console.log("Server response:", error.response?.data);
-    }
-  };
-
-  useEffect(() => {
-    getAllBrands();
-  }, []);
-
-  const filteredBrands = getBrands.filter((brand) =>
-  brand.brandName
-    ?.toLowerCase()
-    .includes(brandSearch.toLowerCase()),
-);
-
-  const tableData = filteredBrands.map((brand) => {
-    return {
-      id: brand._id,
-      name: brand.brandName,
-      logo: brand.brandIcon?.url,
-      brandImage: brand.brandImage?.url,
-      products: brand.productCount,
-      status: brand.status,
-      slogan: brand.brandSlogan,
-    };
-  });
+  const tableData = filteredBrands.map((brand) => ({
+    id: brand._id,
+    name: brand.brandName,
+    logo: brand.brandIcon?.url,
+    brandImage: brand.brandImage?.url,
+    products: brand.productCount,
+    status: brand.status,
+    slogan: brand.brandSlogan,
+  }));
 
   const columns = [
     {
@@ -80,8 +60,6 @@ const BrandList = () => {
     features: tableFeatures(),
   });
 
- 
-
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-[#252a31] bg-[#111418] shadow-[0_15px_50px_rgba(0,0,0,0.22)]">
       <div className="flex items-center justify-between gap-4 border-b border-[#252a31] bg-[#121519] px-5 py-4">
@@ -93,7 +71,7 @@ const BrandList = () => {
 
           <input
             type="text"
-            value={brandSearch}
+            value={brandSearch || ""}
             onChange={(e) => setBrandSearch(e.target.value)}
             placeholder="Search brands..."
             className="h-10 w-full rounded-xl border border-[#2a3037] bg-[#0c0f12] pl-10 pr-4 text-sm text-white outline-none placeholder:text-gray-600 transition-all duration-200 focus:border-[#4a5058] focus:bg-[#0e1114]"
@@ -112,6 +90,7 @@ const BrandList = () => {
           >
             <CiCircleList size={19} />
           </button>
+
           <button
             type="button"
             onClick={() => setViewMode("grid")}
@@ -157,9 +136,31 @@ const BrandList = () => {
                     const value = tableCell.getValue();
 
                     return (
-                      <td key={tableCell.id} className="px-5 py-4 align-middle">
+                      <td
+                        key={tableCell.id}
+                        className="px-5 py-4 align-middle"
+                      >
                         {tableCell.column.id === "checkbox" && (
-                          <div className="h-4 w-4 rounded border border-[#343a42]" />
+                          <input
+                            type="checkbox"
+                            checked={selectedBrandIds.includes(
+                              tableRow.original.id,
+                            )}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedBrandIds((prev) => [
+                                  ...prev,
+                                  tableRow.original.id,
+                                ]);
+                              } else {
+                                setSelectedBrandIds((prev) =>
+                                  prev.filter(
+                                    (id) => id !== tableRow.original.id,
+                                  ),
+                                );
+                              }
+                            }}
+                          />
                         )}
 
                         {tableCell.column.id === "name" && (
@@ -195,7 +196,7 @@ const BrandList = () => {
                         {tableCell.column.id === "products" && (
                           <div className="flex items-center">
                             <span className="text-sm font-medium text-gray-300">
-                              {value}
+                              {value ?? 0}
                             </span>
 
                             <span className="ml-2 text-xs text-gray-600">
@@ -222,18 +223,6 @@ const BrandList = () => {
 
                             {value}
                           </span>
-                        )}
-
-                        {tableCell.column.id === "ations" && (
-                          <div className="flex justify-end">
-                            <button
-                              type="button"
-                              title="More actions"
-                              className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-gray-500 transition-all duration-200 hover:border-[#30353c] hover:bg-white/[0.05] hover:text-white"
-                            >
-                              <BsThreeDots size={18} />
-                            </button>
-                          </div>
                         )}
                       </td>
                     );

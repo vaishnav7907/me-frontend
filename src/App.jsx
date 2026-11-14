@@ -46,6 +46,7 @@ import OrderSuccess from "./components/buyProducts/OrderSuccess";
 import GetOfferSales from "./components/adminPanel/adminPages/offer/GetOfferSales";
 import Shorts from "./components/dashboard/dashboardPages/newcollections/newcollectionpages/shorts/Shorts";
 import Innerwears from "./components/dashboard/dashboardPages/newcollections/newcollectionpages/innerwears/Innerwears";
+import LatestArrivalsProductPage from "./components/adminPanel/adminPages/storeLatestArrivals/latestArriavlsProduct/LatestArrivalsProductPage";
 // import OfferSales from "./components/adminPanel/adminPages/offer/offerSales";
 // import AdminWelcomePage from "./components/adminPanel/adminAuthentication/adminWelcomePage/AdminWelcomePage";
 
@@ -53,79 +54,82 @@ function App() {
   const [isAuth, setIsAuth] = useState(false);
   return (
     <>
-      
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Welcomepage />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/signin" element={<Signin />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/dashboard" element={<Maindashboard />} />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Welcomepage />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/signin" element={<Signin />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/dashboard" element={<Maindashboard />} />
 
-            {/* main page navbar */}
-            <Route path="/mainpage" element={<MainPage />}>
-              <Route index element={<NewCollections />} />
-              <Route path="Brands" element={<Brands />} />
-              <Route path="Sales" element={<Sales />} />
-              <Route path="Cart" element={<Cart />} />
-              <Route path="Collections" element={<MenCollection />} />
-              {/* <Route path="DashboardSidebar" element={<MaindashboardSidebar/> } /> */}
-            </Route>
-            {/* main page navbar */}
+          {/* main page navbar */}
+          <Route path="/mainpage" element={<MainPage />}>
+            <Route index element={<NewCollections />} />
+            <Route path="Brands" element={<Brands />} />
+            <Route path="Sales" element={<Sales />} />
+            <Route path="Cart" element={<Cart />} />
+            <Route path="Collections" element={<MenCollection />} />
+            {/* <Route path="DashboardSidebar" element={<MaindashboardSidebar/> } /> */}
+          </Route>
+          {/* main page navbar */}
 
-            {/* new collections */}
-            <Route path="/premiumShirts" element={<PremiumShirts />} />
-            <Route path="/luxuryJackets" element={<LuxurJackets />} />
-            <Route path="/Tshirts" element={<Tshirts />} />
-            <Route path="/PremiumPants" element={<PremiumPants />} />
-            <Route path="/latestShorts" element={<Shorts/>}/>
-            <Route path="/latestInnerwears" element={<Innerwears/>}/>
-            {/* end new collections */}
+          {/* new collections */}
+          <Route path="/premiumShirts" element={<PremiumShirts />} />
+          <Route path="/luxuryJackets" element={<LuxurJackets />} />
+          <Route path="/Tshirts" element={<Tshirts />} />
+          <Route path="/PremiumPants" element={<PremiumPants />} />
+          <Route path="/latestShorts" element={<Shorts />} />
+          <Route path="/latestInnerwears" element={<Innerwears />} />
+          {/* end new collections */}
 
-            {/* brand subpage*/}
-            <Route path="/BrandSubpage" element={<BrandSubpage />} />
-            <Route path="/productInfo" element={<ProductInfo />} />
+          {/* brand subpage*/}
+          <Route path="/BrandSubpage" element={<BrandSubpage />} />
+          <Route path="/productInfo" element={<ProductInfo />} />
 
-            <Route path="/productInfo/Checkout" element={<Checkout />} />
-            <Route path="/orderSuccess" element={<OrderSuccess/>}/>
+          <Route path="/productInfo/Checkout" element={<Checkout />} />
+          <Route path="/orderSuccess" element={<OrderSuccess />} />
 
-            <Route path="/Offers" element={<OfferPage />} />
-            <Route path="/CartOrder" element={<CartOrder />} />
-            {/* end brand subpage */}
+          <Route path="/Offers" element={<OfferPage />} />
+          <Route path="/CartOrder" element={<CartOrder />} />
+          {/* end brand subpage */}
 
-            {/* <Route element={}/> */}
+          {/* <Route element={}/> */}
 
-            <Route
-              path="/AdminSection"
-              element={
-                !isAuth ? (
-                  <AdminWelcomePage adminLoginToDash={setIsAuth} />
-                ) : (
-                  <Navigate to="/adminDash" />
-                )
-              }
-            />
+          <Route
+            path="/AdminSection"
+            element={
+              !isAuth ? (
+                <AdminWelcomePage adminLoginToDash={setIsAuth} />
+              ) : (
+                <Navigate to="/adminDash" />
+              )
+            }
+          />
 
-            <Route
-              path="/adminDash"
-              element={
-                isAuth ? <AdminDashboard /> : <Navigate to={"/AdminSection"} />
-              }
-            >
-              <Route index element={<StoreOverview />} />
-              <Route path="storeProducts" element={<StoreProducts />} />
-              <Route path="storeNewArrivals" element={<StoreNewArrivals />} />
-              <Route path="storeBrands" element={<StoreBrands />} />
-              <Route path="storeOrders" element={<StoreOrders />} />
-              <Route path="offerSales" element={<GetOfferSales/>}/>
-              <Route path="storeCustomers" element={<StoreCustomers />} />
-              <Route path="storeSales" element={<StoreSales />} />
-              <Route path="settings" element={<AdminSettings />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      
+          <Route
+            path="/adminDash"
+            element={
+              isAuth ? <AdminDashboard /> : <Navigate to={"/AdminSection"} />
+            }
+          >
+            <Route index element={<StoreOverview />} />
+            <Route path="storeProducts" element={<StoreProducts />} />
+            <Route path="storeNewArrivals" element={<StoreNewArrivals />} />
+            <Route path="storeBrands" element={<StoreBrands />} />
+            <Route path="storeOrders" element={<StoreOrders />} />
+            <Route path="offerSales" element={<GetOfferSales />} />
+            <Route path="storeCustomers" element={<StoreCustomers />} />
+            <Route path="storeSales" element={<StoreSales />} />
+            <Route path="settings" element={<AdminSettings />} />
+          </Route>
+
+          <Route
+            path="/adminDash/storeNewArrivals/latestArrivalsProducts"
+            element={<LatestArrivalsProductPage />}
+          />
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }
