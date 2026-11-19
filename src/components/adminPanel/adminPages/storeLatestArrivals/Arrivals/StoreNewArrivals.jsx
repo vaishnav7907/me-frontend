@@ -26,7 +26,7 @@ const StoreNewArrivals = () => {
     setDltLatestArrivalsCategory,
     setDltLatestArrivalsName,
   } = UseMe();
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const [newArrivalsNavi, setNewArrivalsNavi] = useState(false);
   const [categoryy, setCategoryy] = useState("All");
 
@@ -51,6 +51,14 @@ const StoreNewArrivals = () => {
       console.log("error in get latest Arrivals", error);
     }
   };
+
+  const filterActiveLatestArrivals = getLatestArrivals.filter(
+    (latestArrivals) => latestArrivals.status === "Active" || 0,
+  ).length;
+
+  const filterInactiveLatestArrivals = getLatestArrivals.filter(
+    (latestArrivals) => latestArrivals.status === "Inactive" || 0,
+  ).length;
 
   useEffect(() => {
     getAllLatestArrivals();
@@ -86,26 +94,32 @@ const StoreNewArrivals = () => {
           </div>
 
           {/* overview of  products */}
-          <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 text-white">
+          <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 text-white">
             <div className="rounded-xl border border-[#24272c] bg-[#151719] p-5">
               <p className="text-sm text-gray-500">Total New Arrivals</p>
-              <h2 className="mt-2 text-2xl font-semibold">24</h2>
+              <h2 className="mt-2 text-2xl font-semibold">
+                {getLatestArrivals.length}
+              </h2>
             </div>
 
             <div className="rounded-xl border border-[#24272c] bg-[#151719] p-5">
               <p className="text-sm text-gray-500">Active</p>
-              <h2 className="mt-2 text-2xl font-semibold">18</h2>
+              <h2 className="mt-2 text-2xl font-semibold">
+                {filterActiveLatestArrivals}
+              </h2>
             </div>
 
             <div className="rounded-xl border border-[#24272c] bg-[#151719] p-5">
-              <p className="text-sm text-gray-500">Scheduled</p>
-              <h2 className="mt-2 text-2xl font-semibold">4</h2>
+              <p className="text-sm text-gray-500">Inactive</p>
+              <h2 className="mt-2 text-2xl font-semibold">
+                {filterInactiveLatestArrivals}
+              </h2>
             </div>
 
-            <div className="rounded-xl border border-[#24272c] bg-[#151719] p-5">
+            {/* <div className="rounded-xl border border-[#24272c] bg-[#151719] p-5">
               <p className="text-sm text-gray-500">Expired</p>
-              <h2 className="mt-2 text-2xl font-semibold">2</h2>
-            </div>
+              <h2 className="mt-2 text-2xl font-semibold"></h2>
+            </div> */}
           </div>
           {/* <div className="py-7 ">
             <div className="flex justify-between">
@@ -249,10 +263,16 @@ const StoreNewArrivals = () => {
                     {latestArrivalsData.description}
                   </p>
 
-                  <button className="mt-6 flex w-full items-center justify-between rounded-xl bg-[#191B1E] px-4 py-3.5 text-sm font-medium text-gray-200 transition-all duration-300 hover:bg-white hover:text-black"
-                  onClick={()=>navigate("/adminDash/storeNewArrivals/latestArrivalsProducts",{
-                    state:{latestProducts:latestArrivalsData}
-                  })}
+                  <button
+                    className="mt-6 flex w-full items-center justify-between rounded-xl bg-[#191B1E] px-4 py-3.5 text-sm font-medium text-gray-200 transition-all duration-300 hover:bg-white hover:text-black"
+                    onClick={() =>
+                      navigate(
+                        "/adminDash/storeNewArrivals/latestArrivalsProducts",
+                        {
+                          state: { latestProducts: latestArrivalsData },
+                        },
+                      )
+                    }
                   >
                     <span>Explore Collection</span>
 

@@ -47,6 +47,8 @@ const AnalyticsCompleteChart = () => {
       );
 
       setGetAnalysis(response.data);
+      console.log("selectedYearData",response.data);
+      
     } catch (error) {
       console.error(
         "Error fetching analytics:",

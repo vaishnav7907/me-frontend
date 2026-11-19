@@ -211,8 +211,7 @@ export const MeProvider = ({ children }) => {
         bulkDeleteProducts,
         setBulkDeleteProducts,
 
-        selectedBrandIds,
-        setSelectedBrandIds,
+       
       }}
     >
       {children}

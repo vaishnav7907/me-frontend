@@ -33,6 +33,36 @@ import { useEffect } from "react";
 const StoreSales = () => {
   const [completeBusinessAnalysis, setCompleteBusinessAnalysis] = useState([]);
   const [tableBusinessAnalysis, setTableBusinessAnalysis] = useState([]);
+
+  const [profitGenerateData, setProfitGenerateData] = useState(null);
+
+  const getProfitGenerate = async () => {
+    try {
+      const adminToken = localStorage.getItem("token");
+
+      const profitGenerateApi = await axios.get(
+        `${import.meta.env.VITE_API_URL}/Me/profitGenerate`,
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        },
+      );
+
+      setProfitGenerateData(profitGenerateApi.data.data);
+      console.log("profit generate analysis", profitGenerateApi.data.data);
+    } catch (error) {
+      console.log(
+        "error in profit generate analysis",
+        error.response?.data || error.message,
+      );
+    }
+  };
+
+  useEffect(() => {
+    getProfitGenerate();
+  }, []);
+  // const [forwardBusinessData,setForwardBusinessData]=useState([])
   const businessAnalysis = async () => {
     try {
       const adminToken = localStorage.getItem("token");
@@ -668,7 +698,7 @@ const StoreSales = () => {
               </div>
 
               <div className="bg-[#101318] border border-[#242932] rounded-2xl  p-4 mt-4">
-                <AnalyticsCompleteChart />
+                <AnalyticsCompleteChart businesData={completeBusinessAnalysis}/>
               </div>
 
               <div className="bg-[#101318] border border-[#242932] rounded-2xl  p-4 mt-4">
@@ -927,6 +957,8 @@ const StoreSales = () => {
                 </div>
               </div>
 
+             
+
               {/* profit strategy */}
               <div className="mt-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -1080,32 +1112,25 @@ const StoreSales = () => {
                       <div className="h-9 w-9 shrink-0 bg-white/10 flex justify-center items-center rounded-md">
                         <FiShoppingBag className="text-white" size={20} />
                       </div>
-
                       <div>
-                        <h4 className="text-sm text-white font-medium">
-                          Top Category
-                        </h4>
-                        <p className="text-[11px] text-neutral-500">
-                          By units sold
-                        </p>
+                        <h4 className="text-sm text-white font-medium">Top Category</h4>
+                        <p className="text-[11px] text-neutral-500">By units sold</p>
                       </div>
                     </div>
-
                     <div className="flex justify-between items-end mt-6">
                       <div>
                         <h3 className="text-xl text-white font-semibold">
-                          T-Shirts
+                          {profitGenerateData?.mostSellingCategory?.category || "N/A"}
                         </h3>
                         <p className="text-xs text-neutral-500 mt-1">
-                          1,845 units sold
+                          {Number(profitGenerateData?.mostSellingCategory?.quantitySold || 0).toLocaleString("en-IN")} units sold
                         </p>
                       </div>
-
                       <div className="text-right">
-                        <p className="text-sm text-white font-medium">27%</p>
-                        <p className="text-[10px] text-neutral-500">
-                          sales share
+                        <p className="text-sm text-white font-medium">
+                          ₹{Number(profitGenerateData?.mostSellingCategory?.revenue || 0).toLocaleString("en-IN")}
                         </p>
+                        <p className="text-[10px] text-neutral-500">Revenue</p>
                       </div>
                     </div>
                   </div>
@@ -1115,30 +1140,25 @@ const StoreSales = () => {
                       <div className="h-9 w-9 shrink-0 bg-white/10 flex justify-center items-center rounded-md">
                         <RxPeople className="text-white" size={20} />
                       </div>
-
                       <div>
-                        <h4 className="text-sm text-white font-medium">
-                          Highest Customer Group
-                        </h4>
-                        <p className="text-[11px] text-neutral-500">
-                          By customer count
-                        </p>
+                        <h4 className="text-sm text-white font-medium">Highest Customer Group</h4>
+                        <p className="text-[11px] text-neutral-500">By customer count</p>
                       </div>
                     </div>
-
                     <div className="flex justify-between items-end mt-6">
                       <div>
                         <h3 className="text-xl text-white font-semibold">
-                          25–34
+                          {profitGenerateData?.mostPurchasingAgeGroup?.ageGroup || "N/A"}
                         </h3>
                         <p className="text-xs text-neutral-500 mt-1">
-                          920 customers
+                          {Number(profitGenerateData?.mostPurchasingAgeGroup?.totalCustomers || 0).toLocaleString("en-IN")} customers
                         </p>
                       </div>
-
                       <div className="text-right">
-                        <p className="text-sm text-white font-medium">1,340</p>
-                        <p className="text-[10px] text-neutral-500">orders</p>
+                        <p className="text-sm text-white font-medium">
+                          {Number(profitGenerateData?.mostPurchasingAgeGroup?.totalOrders || 0).toLocaleString("en-IN")}
+                        </p>
+                        <p className="text-[10px] text-neutral-500">Orders</p>
                       </div>
                     </div>
                   </div>
@@ -1146,35 +1166,27 @@ const StoreSales = () => {
                   <div className="bg-[#101318] border border-[#242932] rounded-2xl overflow-hidden p-4">
                     <div className="flex items-center gap-3">
                       <div className="h-9 w-9 shrink-0 bg-white/10 flex justify-center items-center rounded-md">
-                        <PiCurrencyDollarBold
-                          className="text-white"
-                          size={20}
-                        />
+                        <PiCurrencyDollarBold className="text-white" size={20} />
                       </div>
-
                       <div>
-                        <h4 className="text-sm text-white font-medium">
-                          Highest Value Group
-                        </h4>
-                        <p className="text-[11px] text-neutral-500">
-                          By revenue generated
-                        </p>
+                        <h4 className="text-sm text-white font-medium">Highest Value Group</h4>
+                        <p className="text-[11px] text-neutral-500">By revenue generated</p>
                       </div>
                     </div>
-
                     <div className="flex justify-between items-end mt-6">
                       <div>
                         <h3 className="text-xl text-white font-semibold">
-                          25–34
+                          {profitGenerateData?.highestRevenueAgeGroup?.ageGroup || "N/A"}
                         </h3>
                         <p className="text-xs text-neutral-500 mt-1">
-                          $556K revenue
+                          ₹{Number(profitGenerateData?.highestRevenueAgeGroup?.revenue || 0).toLocaleString("en-IN")} revenue
                         </p>
                       </div>
-
                       <div className="text-right">
-                        <p className="text-sm text-white font-medium">$23</p>
-                        <p className="text-[10px] text-neutral-500">AOV</p>
+                        <p className="text-sm text-white font-medium">
+                          {Number(profitGenerateData?.highestRevenueAgeGroup?.totalOrders || 0).toLocaleString("en-IN")}
+                        </p>
+                        <p className="text-[10px] text-neutral-500">Orders</p>
                       </div>
                     </div>
                   </div>
@@ -1376,155 +1388,96 @@ const StoreSales = () => {
                   </div>
                 </div>
               </div>
-              <div className="mt-4 bg-[#101318] border  border-[#242932]  rounded-2xl overflow-hidden  py-4 px-4">
-                <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 shrink-0 bg-white/10 flex justify-center items-center rounded-md">
-                    <FiActivity className="text-white" size={20} />
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm text-white font-medium">
-                      Bussiness Decision Overview
-                    </h4>
-                    <p className="text-[11px] text-neutral-500">
-                      Key information admin canuse for bussiness planning
-                    </p>
-                  </div>
+               <div className="bg-[#101318] border border-[#242932] rounded-2xl p-4 mt-4">
+                <div className="flex flex-col gap-1">
+                  <p className="uppercase tracking-[0.10em] text-neutral-500 text-[10px]">
+                    sales intelligence
+                  </p>
+                  <h3 className="text-white text-lg">Product, Category & Customer Analysis</h3>
+                  <p className="text-neutral-500 text-xs">
+                    Analysis based on delivered orders
+                  </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-5">
-                  <div className="group bg-[#101318] border border-[#242932] rounded-2xl p-5 hover:border-[#343941] transition-all duration-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.06] flex items-center justify-center">
-                          <BsBoxSeam className="text-neutral-300" size={18} />
-                        </div>
-
-                        <span className="text-sm font-medium text-neutral-400">
-                          Best Selling Product
-                        </span>
-                      </div>
-
-                      <span className="text-[10px] uppercase tracking-wider text-neutral-600">
-                        Product
-                      </span>
-                    </div>
-
-                    <div className="mt-7">
-                      <h3 className="text-xl font-semibold text-white tracking-tight">
-                        T-Shirts
-                      </h3>
-
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-sm text-neutral-300">1,845</span>
-
-                        <span className="text-xs text-neutral-600">
-                          units sold
-                        </span>
-                      </div>
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mt-5">
+                  <div className="rounded-xl border border-[#242932] p-4">
+                    <p className="text-xs text-neutral-500">Top-Selling Product</p>
+                    <h4 className="text-white font-semibold mt-3">
+                      {profitGenerateData?.topSellingProduct?.productName || "—"}
+                    </h4>
+                    <p className="text-xs text-neutral-400 mt-2">
+                      {Number(profitGenerateData?.topSellingProduct?.quantitySold || 0).toLocaleString("en-IN")} units sold
+                    </p>
                   </div>
 
-                  <div className="group bg-[#101318] border border-[#242932] rounded-2xl p-5 hover:border-[#343941] transition-all duration-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.06] flex items-center justify-center">
-                          <RxPeople className="text-neutral-300" size={19} />
-                        </div>
-
-                        <span className="text-sm font-medium text-neutral-400">
-                          Largest Customer Segment
-                        </span>
-                      </div>
-
-                      <span className="text-[10px] uppercase tracking-wider text-neutral-600">
-                        Customers
-                      </span>
-                    </div>
-
-                    <div className="mt-7">
-                      <h3 className="text-xl font-semibold text-white tracking-tight">
-                        25–34
-                      </h3>
-
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-sm text-neutral-300">920</span>
-
-                        <span className="text-xs text-neutral-600">
-                          customers
-                        </span>
-                      </div>
-                    </div>
+                  <div className="rounded-xl border border-[#242932] p-4">
+                    <p className="text-xs text-neutral-500">Least-Selling Product</p>
+                    <h4 className="text-white font-semibold mt-3">
+                      {profitGenerateData?.leastSellingProduct?.productName || "—"}
+                    </h4>
+                    <p className="text-xs text-neutral-400 mt-2">
+                      {Number(profitGenerateData?.leastSellingProduct?.quantitySold || 0).toLocaleString("en-IN")} units sold
+                    </p>
                   </div>
 
-                  <div className="group bg-[#101318] border border-[#242932] rounded-2xl p-5 hover:border-[#343941] transition-all duration-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.06] flex items-center justify-center">
-                          <PiCurrencyDollarBold
-                            className="text-neutral-300"
-                            size={19}
-                          />
-                        </div>
-
-                        <span className="text-sm font-medium text-neutral-400">
-                          Highest Customer Value
-                        </span>
-                      </div>
-
-                      <span className="text-[10px] uppercase tracking-wider text-neutral-600">
-                        Revenue
-                      </span>
-                    </div>
-
-                    <div className="mt-7">
-                      <h3 className="text-xl font-semibold text-white tracking-tight">
-                        25–34
-                      </h3>
-
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-sm text-neutral-300">₹5.56L</span>
-
-                        <span className="text-xs text-neutral-600">
-                          revenue
-                        </span>
-                      </div>
-                    </div>
+                  <div className="rounded-xl border border-[#242932] p-4">
+                    <p className="text-xs text-neutral-500">Most-Selling Category</p>
+                    <h4 className="text-white font-semibold mt-3">
+                      {profitGenerateData?.mostSellingCategory?.category || "—"}
+                    </h4>
+                    <p className="text-xs text-neutral-400 mt-2">
+                      {Number(profitGenerateData?.mostSellingCategory?.quantitySold || 0).toLocaleString("en-IN")} units sold
+                    </p>
                   </div>
 
-                  <div className="group bg-[#101318] border border-[#242932] rounded-2xl p-5 hover:border-[#343941] transition-all duration-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.06] flex items-center justify-center">
-                          <VscPercentage
-                            className="text-neutral-300"
-                            size={19}
-                          />
-                        </div>
+                  <div className="rounded-xl border border-[#242932] p-4">
+                    <p className="text-xs text-neutral-500">Least-Selling Category</p>
+                    <h4 className="text-white font-semibold mt-3">
+                      {profitGenerateData?.leastSellingCategory?.category || "—"}
+                    </h4>
+                    <p className="text-xs text-neutral-400 mt-2">
+                      {Number(profitGenerateData?.leastSellingCategory?.quantitySold || 0).toLocaleString("en-IN")} units sold
+                    </p>
+                  </div>
 
-                        <span className="text-sm font-medium text-neutral-400">
-                          Highest AOV Segment
-                        </span>
-                      </div>
+                  <div className="rounded-xl border border-[#242932] p-4">
+                    <p className="text-xs text-neutral-500">Most-Purchasing Age Group</p>
+                    <h4 className="text-white font-semibold mt-3">
+                      {profitGenerateData?.mostPurchasingAgeGroup?.ageGroup || "—"}
+                    </h4>
+                    <p className="text-xs text-neutral-400 mt-2">
+                      {Number(profitGenerateData?.mostPurchasingAgeGroup?.totalCustomers || 0).toLocaleString("en-IN")} customers
+                    </p>
+                  </div>
 
-                      <span className="text-[10px] uppercase tracking-wider text-neutral-600">
-                        AOV
-                      </span>
-                    </div>
+                  <div className="rounded-xl border border-[#242932] p-4">
+                    <p className="text-xs text-neutral-500">Least-Purchasing Age Group</p>
+                    <h4 className="text-white font-semibold mt-3">
+                      {profitGenerateData?.leastPurchasingAgeGroup?.ageGroup || "—"}
+                    </h4>
+                    <p className="text-xs text-neutral-400 mt-2">
+                      {Number(profitGenerateData?.leastPurchasingAgeGroup?.totalCustomers || 0).toLocaleString("en-IN")} customers
+                    </p>
+                  </div>
 
-                    <div className="mt-7">
-                      <h3 className="text-xl font-semibold text-white tracking-tight">
-                        45–50
-                      </h3>
+                  <div className="rounded-xl border border-[#242932] p-4">
+                    <p className="text-xs text-neutral-500">Highest-Revenue Age Group</p>
+                    <h4 className="text-white font-semibold mt-3">
+                      {profitGenerateData?.highestRevenueAgeGroup?.ageGroup || "—"}
+                    </h4>
+                    <p className="text-xs text-neutral-400 mt-2">
+                      ₹{Number(profitGenerateData?.highestRevenueAgeGroup?.revenue || 0).toLocaleString("en-IN")} revenue
+                    </p>
+                  </div>
 
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-sm text-neutral-300">₹556</span>
-
-                        <span className="text-xs text-neutral-600">
-                          per order
-                        </span>
-                      </div>
-                    </div>
+                  <div className="rounded-xl border border-[#242932] p-4">
+                    <p className="text-xs text-neutral-500">Lowest-Revenue Age Group</p>
+                    <h4 className="text-white font-semibold mt-3">
+                      {profitGenerateData?.lowestRevenueAgeGroup?.ageGroup || "—"}
+                    </h4>
+                    <p className="text-xs text-neutral-400 mt-2">
+                      ₹{Number(profitGenerateData?.lowestRevenueAgeGroup?.revenue || 0).toLocaleString("en-IN")} revenue
+                    </p>
                   </div>
                 </div>
               </div>

@@ -3,12 +3,15 @@ import React from "react";
 import { useState } from "react";
 import { FiX, FiImage, FiUpload } from "react-icons/fi";
 import { UseMe } from "../../../../context/Meprovider";
+
 const UpdateLatestArrivals = ({ oncloseUpdateLatestArrivals }) => {
   const { latestArrivalsId } = UseMe();
+
   const [latestArrivalssName, setLatestArrivalssName] = useState("");
   const [latestArrivalssCategory, setLatestArrivalssCategory] = useState("");
   const [latestArrivalssDescription, setLatestArrivalssDescription] =
     useState("");
+  const [latestArrivalssStatus, setLatestArrivalssStatus] = useState("");
   const [latestArrivalssImage, setlatestArrivalssImage] = useState(null);
   const [previiew, setPreviiew] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,10 +27,9 @@ const UpdateLatestArrivals = ({ oncloseUpdateLatestArrivals }) => {
     setlatestArrivalssImage(null);
     setPreviiew("");
   };
+
   const updateArrivals = async () => {
     try {
-      
-
       setLoading(true);
       const adminToken = localStorage.getItem("token");
 
@@ -36,6 +38,8 @@ const UpdateLatestArrivals = ({ oncloseUpdateLatestArrivals }) => {
       formData.append("name", latestArrivalssName);
       formData.append("category", latestArrivalssCategory);
       formData.append("description", latestArrivalssDescription);
+      formData.append("status", latestArrivalssStatus);
+
       if (latestArrivalssImage) {
         formData.append("latestArrivals", latestArrivalssImage);
       }
@@ -52,6 +56,7 @@ const UpdateLatestArrivals = ({ oncloseUpdateLatestArrivals }) => {
         setLatestArrivalssName("");
         setLatestArrivalssCategory("");
         setLatestArrivalssDescription("");
+        setLatestArrivalssStatus("");
         setlatestArrivalssImage(null);
         setPreviiew("");
 
@@ -124,6 +129,26 @@ const UpdateLatestArrivals = ({ oncloseUpdateLatestArrivals }) => {
                 <option value="Jackets">Jackets</option>
                 <option value="Innerwear">Innerwear</option>
                 <option value="Shorts">Shorts</option>
+              </select>
+            </div>
+
+            {/* Status */}
+            <div>
+              <label className="mb-2 block text-xs font-medium text-gray-300">
+                Status
+              </label>
+
+              <select
+                value={latestArrivalssStatus}
+                onChange={(e) => setLatestArrivalssStatus(e.target.value)}
+                className="h-11 w-full rounded-lg border border-[#2A2E33] bg-[#0B0D10] px-4 text-sm text-gray-300 outline-none focus:border-[#555B63]"
+              >
+                <option value="" disabled>
+                  Select status
+                </option>
+
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
               </select>
             </div>
 

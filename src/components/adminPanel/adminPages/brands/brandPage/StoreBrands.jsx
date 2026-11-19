@@ -105,10 +105,10 @@ const StoreBrands = () => {
     (brand) => brand.status !== "Active",
   ).length;
 
-  const totalBrandProducts = getBrands.reduce(
-    (total, brand) => total + (Number(brand.productCount) || 0),
-    0,
-  );
+  // const totalBrandProducts = getBrands.reduce(
+  //   (total, brand) => total + (Number(brand.productCount) || 0),
+  //   0,
+  // );
 
   return (
     <div className="min-h-screen">
@@ -150,7 +150,7 @@ const StoreBrands = () => {
         </div>
 
         {/* BRAND OVERVIEW */}
-        <div className="mt-7 grid grid-cols-1 gap-4 text-white sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-7 grid grid-cols-1 gap-4 text-white sm:grid-cols-2 lg:grid-cols-3">
           <div className="rounded-xl border border-[#24272c] bg-[#151719] p-5">
             <p className="text-sm text-gray-500">Total Brands</p>
             <h2 className="mt-2 text-2xl font-semibold">{totalBrands}</h2>
@@ -166,12 +166,12 @@ const StoreBrands = () => {
             <h2 className="mt-2 text-2xl font-semibold">{inactiveBrands}</h2>
           </div>
 
-          <div className="rounded-xl border border-[#24272c] bg-[#151719] p-5">
+          {/* <div className="rounded-xl border border-[#24272c] bg-[#151719] p-5">
             <p className="text-sm text-gray-500">Brand Products</p>
             <h2 className="mt-2 text-2xl font-semibold">
               {totalBrandProducts}
             </h2>
-          </div>
+          </div> */}
         </div>
 
         {/* BULK DELETE ACTIONS */}

@@ -9,6 +9,7 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
   const [latestArrivalsCategory, setLatestArrivalsCategory] = useState("");
   const [latestArrivalsDescription, setLatestArrivalsDescription] =
     useState("");
+  const [latestArrivalsStatus, setLatestArrivalsStatus] = useState("Inactive");
 
   const [loading, setLoading] = useState(false);
 
@@ -57,6 +58,7 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
       formData.append("category", latestArrivalsCategory);
       formData.append("description", latestArrivalsDescription.trim());
       formData.append("latestArrivals", latestArrivalsimage);
+      formData.append("status", latestArrivalsStatus);
 
       const createArrivalsApi = await axios.post(
         `${import.meta.env.VITE_API_URL}/Me/createLatestArrivals`,
@@ -74,6 +76,7 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
         setLatestArrivalsName("");
         setLatestArrivalsCategory("");
         setLatestArrivalsDescription("");
+        setLatestArrivalsStatus("Inactive");
         setLatestArrivalsimage(null);
         setPreview("");
 
@@ -146,6 +149,22 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
                 <option value="Jackets">Jackets</option>
                 <option value="Innerwear">Innerwear</option>
                 <option value="Shorts">Shorts</option>
+              </select>
+            </div>
+
+            {/* Status */}
+            <div>
+              <label className="mb-2 block text-xs font-medium text-gray-300">
+                Status
+              </label>
+
+              <select
+                value={latestArrivalsStatus}
+                onChange={(e) => setLatestArrivalsStatus(e.target.value)}
+                className="h-11 w-full rounded-lg border border-[#2A2E33] bg-[#0B0D10] px-4 text-sm text-gray-300 outline-none focus:border-[#555B63]"
+              >
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
               </select>
             </div>
 
@@ -240,7 +259,6 @@ const CreateLatestOverDisplay = ({ oncloseCreateLatestArrivals }) => {
             className="rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:bg-gray-200"
           >
             {loading ? "Creating..." : "Create Latest Arrival"}
-            
           </button>
         </div>
       </div>
