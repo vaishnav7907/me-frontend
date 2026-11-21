@@ -9,6 +9,7 @@ import {
   FiPlus,
   FiEye,
 } from "react-icons/fi";
+import { FiX, FiAlertTriangle } from "react-icons/fi";
 import UpdateWelcomeImageModal from "./UpdateWelcomeImageModal";
 import CreateWelcomeImageModal from "./CreateWelcomeImageModal";
 import axios from "axios";
@@ -21,6 +22,9 @@ const GetwelcomeImage = () => {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [selectedwelcomeImg, setSelectedwelcomeImg] = useState(null);
+
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deletewelcomeImageData, setDeletewelcomeImageData] = useState(null);
   const getimageFn = useCallback(async () => {
     try {
       const welcomeImage = await axios.get(
@@ -40,20 +44,14 @@ const GetwelcomeImage = () => {
   }, [getimageFn]);
 
   const handleDeleteImage = async (image) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to permanently delete this welcome image?",
-    );
-
-    if (!confirmDelete) return;
-
     try {
       setDeleting(true);
 
       const token =
-        localStorage.getItem("token") || localStorage.getItem("userToken");
+        localStorage.getItem("token") 
 
       const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/Me/deleteWelcomeImage`,
+        `${import.meta.env.VITE_API_URL}/Me/deleteWelcomeImage/${deletewelcomeImageData._id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -63,6 +61,7 @@ const GetwelcomeImage = () => {
 
       if (response.data.success) {
         setGetImage((prev) => prev.filter((item) => item._id !== image._id));
+        setDeleteModal(false);
       }
     } catch (error) {
       console.log("error in deleting welcome image", error);
@@ -198,7 +197,7 @@ const GetwelcomeImage = () => {
                   </div>
 
                   {/* Image Bottom Overlay */}
-                  <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+                  {/* <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
                     <div>
                       <p className="text-xs text-white/60">ME Storefront</p>
                       <h3 className="mt-1 text-lg font-semibold text-white">
@@ -215,7 +214,7 @@ const GetwelcomeImage = () => {
                     >
                       <FiEye size={15} />
                     </button>
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Card Details */}
@@ -268,7 +267,10 @@ const GetwelcomeImage = () => {
                     </button>
 
                     <button
-                      onClick={() => handleDeleteImage(image)}
+                      onClick={() => {
+                        setDeletewelcomeImageData(image);
+                        setDeleteModal(true);
+                      }}
                       disabled={deleting}
                       className="flex items-center justify-center gap-2 rounded-xl border border-red-500/15 bg-red-500/[0.05] px-4 py-2.5 text-xs font-medium text-red-400 transition hover:bg-red-500/10 disabled:opacity-50"
                     >
@@ -341,6 +343,79 @@ const GetwelcomeImage = () => {
       </AnimatePresence>
 
       {/* Update Modal */}
+
+      {deleteModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-[#242932] bg-[#12151A] shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#242932] px-6 py-5">
+              <h2 className="text-lg font-semibold text-white">
+                Delete Welcome Image
+              </h2>
+
+              <button
+                onClick={() => setDeleteModal(false)}
+                className="rounded-lg p-2 text-gray-400 transition hover:bg-[#1B1F26] hover:text-white"
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+
+            <div className="px-6 py-6">
+              <div className="mb-5 flex justify-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10 text-red-400">
+                  <FiAlertTriangle size={28} />
+                </div>
+              </div>
+
+              <div className="text-center">
+                <h3 className="text-base font-semibold text-white">
+                  Are you sure you want to delete this welcome image?
+                </h3>
+
+                <div className="mt-4 flex items-center justify-center gap-3">
+                  <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-lg border border-white/[0.08] bg-white">
+                    {deletewelcomeImageData?.welcomeImage?.url ? (
+                      <img
+                        src={deletewelcomeImageData.welcomeImage.url}
+                        alt="Welcome image"
+                        className="h-full w-full object-contain p-1"
+                      />
+                    ) : (
+                      <span className="text-xs font-semibold text-black">
+                        Image not found
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <p className="mt-5 text-sm leading-6 text-gray-500">
+                  This action will permanently delete the welcome image and its
+                  Cloudinary image. This cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 border-t border-[#242932] px-6 py-4">
+              <button
+                onClick={() => setDeleteModal(false)}
+                disabled={deleting}
+                className="rounded-lg border border-[#2A2F38] px-4 py-2.5 text-sm font-medium text-gray-300 transition hover:bg-[#1B1F26] hover:text-white disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => handleDeleteImage(deletewelcomeImageData)}
+                disabled={deleting}
+                className="flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <FiTrash2 size={16} />
+                {deleting ? "Deleting..." : "Delete Image"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <AnimatePresence>
         {updateImageModal && selectedImage && (
           <UpdateWelcomeImageModal

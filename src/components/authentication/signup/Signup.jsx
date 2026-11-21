@@ -6,6 +6,7 @@ import { RiArrowRightLongFill } from "react-icons/ri";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import axios from "axios";
 import { UseMe } from "../../context/Meprovider";
+
 const Signup = () => {
   const navigate = useNavigate();
 
@@ -92,14 +93,15 @@ const Signup = () => {
       <h1
         className="
         absolute
-        -top-10
-        right-8
-        text-[220px]
+        -top-4 sm:-top-10
+        right-2 sm:right-8
+        text-[100px] sm:text-[160px] md:text-[220px]
         lg:text-[320px]
         font-bold
         text-white/[0.03]
         select-none
-        pointer-events-none"
+        pointer-events-none
+        whitespace-nowrap"
       >
         ME
       </h1>
@@ -112,11 +114,13 @@ const Signup = () => {
 
       <button
         onClick={() => navigate(-1)}
-        className="group absolute top-10 left-10 flex items-center gap-3 z-20"
+        className="group absolute top-6 left-4 sm:top-8 sm:left-8 lg:top-10 lg:left-10 flex items-center gap-2 sm:gap-3 z-20"
       >
-        <IoArrowBack className="text-xl transition-transform duration-300 group-hover:-translate-x-2" />
+        <IoArrowBack className="text-lg sm:text-xl transition-transform duration-300 group-hover:-translate-x-2" />
 
-        <span className="uppercase tracking-[0.35em] text-sm">Back</span>
+        <span className="uppercase tracking-[0.25em] sm:tracking-[0.35em] text-xs sm:text-sm">
+          Back
+        </span>
       </button>
 
       <div
@@ -125,9 +129,16 @@ const Signup = () => {
         mx-auto
         min-h-screen
         grid
+        grid-cols-1
         lg:grid-cols-[1.15fr_0.85fr]
-        px-8
-        lg:px-20"
+        px-4
+        sm:px-8
+        lg:px-20
+        pt-24
+        sm:pt-28
+        lg:pt-0
+        pb-8
+        sm:pb-12"
       >
         {/* LEFT */}
 
@@ -135,14 +146,16 @@ const Signup = () => {
           initial={{ opacity: 0, x: -60 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
-          className="flex flex-col justify-center pr-20"
+          className="flex flex-col justify-center pr-0 lg:pr-20 py-4 sm:py-8 lg:py-0"
         >
           <p className="uppercase tracking-[0.45em] text-gray-500 text-sm"></p>
 
           <h1
             className="
-            mt-8
-            text-7xl
+            mt-4 sm:mt-8
+            text-5xl
+            sm:text-7xl
+            md:text-8xl
             lg:text-[110px]
             italic font-semibold
             leading-[0.9]"
@@ -153,8 +166,8 @@ const Signup = () => {
           {/* <p
             className="
             mt-10
-            
-            
+
+
             text-lg
             text-gray-400
             leading-9"
@@ -171,16 +184,16 @@ const Signup = () => {
           initial={{ opacity: 0, x: 60 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
-          className="flex flex-col items-center justify-center pt-24 pb-10"
+          className="flex flex-col items-center justify-center pt-8 sm:pt-12 lg:pt-24 pb-6 sm:pb-10"
         >
           <form
-            className="w-full max-w-md flex flex-col gap-14"
+            className="w-full max-w-md flex flex-col gap-8 sm:gap-10 lg:gap-14"
             onSubmit={userSingnupFn}
           >
             {/* Email */}
 
-            <div className="space-y-4">
-              <label className="uppercase tracking-[0.35em] text-xs text-gray-500">
+            <div className="space-y-3 sm:space-y-4">
+              <label className="uppercase tracking-[0.25em] sm:tracking-[0.35em] text-xs text-gray-500">
                 Email
               </label>
 
@@ -194,17 +207,17 @@ const Signup = () => {
                 bg-transparent
                 border-b
                 border-white/20
-                pb-4
+                pb-3 sm:pb-4
                 outline-none
-                text-lg
+                text-base sm:text-lg
                 placeholder:text-gray-600
                 focus:border-white
                 transition"
               />
             </div>
 
-            <div className="space-y-4">
-              <label className="uppercase tracking-[0.35em] text-xs text-gray-500">
+            <div className="space-y-3 sm:space-y-4">
+              <label className="uppercase tracking-[0.25em] sm:tracking-[0.35em] text-xs text-gray-500">
                 User name
               </label>
 
@@ -218,17 +231,17 @@ const Signup = () => {
                 bg-transparent
                 border-b
                 border-white/20
-                pb-4
+                pb-3 sm:pb-4
                 outline-none
-                text-lg
+                text-base sm:text-lg
                 placeholder:text-gray-600
                 focus:border-white
                 transition"
               />
             </div>
 
-            <div className="space-y-4">
-              <label className="uppercase tracking-[0.35em] text-xs text-gray-500">
+            <div className="space-y-3 sm:space-y-4">
+              <label className="uppercase tracking-[0.25em] sm:tracking-[0.35em] text-xs text-gray-500">
                 Age
               </label>
 
@@ -240,12 +253,12 @@ const Signup = () => {
                 value={Age}
                 onChange={onchangeAge}
                 required
-                className="w-full bg-transparent border-b border-white/20 pb-4 outline-none text-lg placeholder:text-gray-600 focus:border-white transition"
+                className="w-full bg-transparent border-b border-white/20 pb-3 sm:pb-4 outline-none text-base sm:text-lg placeholder:text-gray-600 focus:border-white transition"
               />
             </div>
 
-            <div className="space-y-4">
-              <label className="uppercase tracking-[0.35em] text-xs text-gray-500">
+            <div className="space-y-3 sm:space-y-4">
+              <label className="uppercase tracking-[0.25em] sm:tracking-[0.35em] text-xs text-gray-500">
                 Phone Number
               </label>
 
@@ -259,9 +272,9 @@ const Signup = () => {
                 bg-transparent
                 border-b
                 border-white/20
-                pb-4
+                pb-3 sm:pb-4
                 outline-none
-                text-lg
+                text-base sm:text-lg
                 placeholder:text-gray-600
                 focus:border-white
                 transition"
@@ -269,8 +282,8 @@ const Signup = () => {
             </div>
             {/* Password */}
 
-            <div className="space-y-4">
-              <label className="uppercase tracking-[0.35em] text-xs text-gray-500">
+            <div className="space-y-3 sm:space-y-4">
+              <label className="uppercase tracking-[0.25em] sm:tracking-[0.35em] text-xs text-gray-500">
                 Password
               </label>
 
@@ -285,9 +298,9 @@ const Signup = () => {
                   bg-transparent
                   border-b
                   border-white/20
-                  pb-4
+                  pb-3 sm:pb-4
                   outline-none
-                  text-lg
+                  text-base sm:text-lg
                   placeholder:text-gray-600
                   focus:border-white
                   transition"
@@ -317,12 +330,12 @@ const Signup = () => {
               group
               inline-flex
               items-center
-              gap-4
+              gap-3 sm:gap-4
               w-fit
-              mt-2
+              mt-1 sm:mt-2
               uppercase
-              tracking-[0.45em]
-              text-base
+              tracking-[0.3em] sm:tracking-[0.45em]
+              text-sm sm:text-base
               font-medium"
             >
               <span>ENTER</span>

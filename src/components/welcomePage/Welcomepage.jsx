@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Signin from "../authentication/signin/Signin";
 import { useNavigate } from "react-router-dom";
+
 const Welcomepage = () => {
   const navigate = useNavigate();
 
@@ -30,40 +31,21 @@ const Welcomepage = () => {
       setButtonanimate(true);
     }, 10000);
   }, []);
-  return (
-    <div className="h-screen bg-black flex items-center justify-center px-6 relative">
-      {/* <AnimatePresence>
-        {authcome && (
-          <motion.div
-            key="auth"
-            initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -30 }}
-            transition={{ duration: 0.8 }}
-            className="absolute top-8 right-10 flex gap-8"
-          >
-            <motion.span className="border-b border-gray-400 cursor-pointer hover:scale-110 transition duration-300" onClick={()=>navigate("/signin")}>
-              <p className="text-white">Sign In</p>
-            </motion.span>
 
-            <motion.span className="border-b border-gray-400 cursor-pointer hover:scale-110 transition duration-300" onClick={()=>navigate("/signup")}>
-              <p className="text-white">Sign Up</p>
-            </motion.span>
-          </motion.div>
-        )}
-      </AnimatePresence> */}
+  return (
+    <div className="min-h-screen w-full bg-black flex items-center justify-center px-3 sm:px-6 relative overflow-hidden">
       <AnimatePresence mode="wait">
         {!showlogo ? (
           <motion.h1
             key="quote"
-            className="text-white text-5xl font-light"
+            className="text-white text-2xl sm:text-4xl md:text-5xl font-light text-center w-full"
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8 }}
           >
             {text.split("").map((char, index) => (
               <motion.span
                 key={index}
-                className="text-white text-4xl md:text-6xl font-thin uppercase tracking-[0.2em] text-center"
+                className="text-white text-2xl sm:text-4xl md:text-6xl font-thin uppercase tracking-[0.08em] sm:tracking-[0.15em] md:tracking-[0.2em] text-center"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.2, duration: 1 }}
@@ -77,7 +59,7 @@ const Welcomepage = () => {
             className="flex flex-col items-center justify-center w-full min-h-screen"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            onClick={()=>navigate("/dashboard")}
+            onClick={() => navigate("/dashboard")}
           >
             {/* Logo */}
             <motion.div
@@ -93,10 +75,10 @@ const Welcomepage = () => {
             >
               {/* Glow */}
               <div className="absolute inset-0 flex justify-center items-center">
-                <div className="h-36 w-36 rounded-full bg-white/10 blur-[90px]" />
+                <div className="h-24 w-24 sm:h-36 sm:w-36 rounded-full bg-white/10 blur-[70px] sm:blur-[90px]" />
               </div>
 
-              <div className="relative flex items-end gap-2">
+              <div className="relative flex items-end gap-1 sm:gap-2">
                 <motion.span
                   initial={{ y: -250, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -105,7 +87,7 @@ const Welcomepage = () => {
                     stiffness: 120,
                     damping: 12,
                   }}
-                  className="text-white text-8xl md:text-9xl font-thin tracking-tight"
+                  className="text-white text-7xl sm:text-8xl md:text-9xl font-thin tracking-tight"
                 >
                   M
                 </motion.span>
@@ -119,7 +101,7 @@ const Welcomepage = () => {
                     damping: 12,
                     delay: 0.1,
                   }}
-                  className="text-white text-8xl md:text-9xl font-bold tracking-tight"
+                  className="text-white text-7xl sm:text-8xl md:text-9xl font-bold tracking-tight"
                 >
                   E
                 </motion.span>
