@@ -24,7 +24,7 @@ const ProductInfo = () => {
 
   if (!product) {
     return (
-      <section className="min-h-screen bg-black text-white flex items-center justify-center">
+      <section className="min-h-screen bg-black text-white flex items-center justify-center px-4">
         <div className="text-center">
           <p className="text-xl">Product not found</p>
           <button
@@ -163,18 +163,20 @@ const ProductInfo = () => {
           },
         },
       );
-       console.log(addToCartApi.data);
-    alert("Product added to cart successfully");
+      console.log(addToCartApi.data);
+      alert("Product added to cart successfully");
     } catch (error) {
-       console.log(
-      "Error in add to cart:",
-      error.response?.data?.message || error.message,
-    );
+      console.log(
+        "Error in add to cart:",
+        error.response?.data?.message || error.message,
+      );
     }
   };
+
   return (
     <section className="min-h-screen bg-black text-white">
-      <div className="pl-5 pt-7">
+      {/* Back Button */}
+      <div className="pl-4 sm:pl-5 pt-5 sm:pt-7">
         <button
           className="group flex items-center gap-3"
           onClick={() => navigate(-1)}
@@ -186,96 +188,103 @@ const ProductInfo = () => {
         </button>
       </div>
 
-      <div className="max-w-7xl mx-auto px-8 py-12 ">
-        <div className="grid grid-cols-2 gap-16 ">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* Main Grid — single col on mobile, two cols on lg+ */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+
+          {/* LEFT: Image Gallery */}
           <motion.div layout>
-            <div className="overflow-hidden rounded-3xl bg-neutral-900">
+            {/* Main Image */}
+            <div className="overflow-hidden rounded-2xl sm:rounded-3xl bg-neutral-900">
               {selectedImage ? (
                 <img
                   src={selectedImage}
                   alt={product.name}
-                  className="w-full h-[700px] object-cover hover:scale-110 transition duration-700"
+                  className="w-full h-72 sm:h-96 md:h-[500px] lg:h-[700px] object-cover hover:scale-110 transition duration-700"
                 />
               ) : (
-                <div className="w-full h-[700px] flex items-center justify-center text-white/40">
+                <div className="w-full h-72 sm:h-96 md:h-[500px] lg:h-[700px] flex items-center justify-center text-white/40">
                   No Image
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4 mt-5">
-              {galleryImages.map((image, index) => (
-                <button
-                  key={image.publicId || index}
-                  onClick={() => handleImageChange(image)}
-                  className={`overflow-hidden rounded-xl border ${selectedImage === image.url ? "border-white" : "border-white/10"}`}
-                >
-                  <img
-                    src={image.url}
-                    alt={`${product.name} ${index + 1}`}
-                    className="h-32 w-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
+
+            {/* Thumbnail Strip */}
+            {galleryImages.length > 0 && (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-4 mt-3 sm:mt-5">
+                {galleryImages.map((image, index) => (
+                  <button
+                    key={image.publicId || index}
+                    onClick={() => handleImageChange(image)}
+                    className={`overflow-hidden rounded-lg sm:rounded-xl border ${
+                      selectedImage === image.url
+                        ? "border-white"
+                        : "border-white/10"
+                    }`}
+                  >
+                    <img
+                      src={image.url}
+                      alt={`${product.name} ${index + 1}`}
+                      className="h-20 sm:h-28 lg:h-32 w-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
 
-          <div className=" ">
-            <p className="uppercase tracking-[0.45em] text-neutral-500 text-sm">
+          {/* RIGHT: Product Details */}
+          <div>
+            {/* Category & Name */}
+            <p className="uppercase tracking-[0.35em] sm:tracking-[0.45em] text-neutral-500 text-xs sm:text-sm">
               {product.category}
             </p>
-            <h1 className="text-5xl font-light mt-3"> {product.name} </h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light mt-2 sm:mt-3 leading-tight">
+              {product.name}
+            </h1>
 
-            <div className="flex items-center gap-2 mt-5">
-              <span className="flex gap-1 items-center">
-                <IoStar className="text-yellow-400" />
-                <IoStar className="text-yellow-400" />
-                <IoStar className="text-yellow-400" />
-                <IoStar className="text-yellow-400" />
-                <IoStar className="text-yellow-400" />
-              </span>
-              <div className="flex gap-2 text-white/60 ml-2">
-                <p>4.9</p> <p>(128 Reviews)</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 mt-8">
-              <h2 className="text-4xl font-semibold"> ₹{product.price} </h2>
+            {/* Price */}
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-6 sm:mt-8">
+              <h2 className="text-3xl sm:text-4xl font-semibold">
+                &#8377;{product.price}
+              </h2>
               {product.realPrice > product.price && (
-                <span className="text-lg text-white/40 line-through">
-                  ₹{product.realPrice}
+                <span className="text-base sm:text-lg text-white/40 line-through">
+                  &#8377;{product.realPrice}
                 </span>
               )}
-
               {product.discount > 0 && (
-                <span className="text-sm tracking-[0.15em] text-white/60 uppercase">
+                <span className="text-xs sm:text-sm tracking-[0.15em] text-white/60 uppercase">
                   {product.discount}% Off
                 </span>
               )}
             </div>
-            <p className="text-white/60 leading-8 mt-8">
+
+            {/* Description */}
+            <p className="text-white/60 leading-7 sm:leading-8 mt-6 sm:mt-8 text-sm sm:text-base">
               {product.description}
             </p>
 
-            <div className="mt-10">
-              <h4 className="mb-4 text-lg"> Select Color </h4>
-
-              <div className="flex gap-5">
+            {/* Color Selector */}
+            <div className="mt-8 sm:mt-10">
+              <h4 className="mb-3 sm:mb-4 text-base sm:text-lg">
+                Select Color
+              </h4>
+              <div className="flex flex-wrap gap-3 sm:gap-5">
                 {product?.variants?.map((variant, index) => (
                   <button
                     key={index}
                     onClick={() => handlevariantChange(variant)}
-                    className={`w-10 h-10 rounded-full border-2 transition ${
+                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 transition ${
                       selectedVariant === variant
                         ? "border-white scale-110"
                         : "border-white/20"
                     }`}
-                    style={{
-                      backgroundColor: variant?.color?.code,
-                    }}
+                    style={{ backgroundColor: variant?.color?.code }}
                   />
                 ))}
               </div>
-              <p className="mt-3 text-white/60">
+              <p className="mt-2 sm:mt-3 text-white/60 text-sm">
                 Selected Color:
                 <span className="text-white ml-2">
                   {selectedVariant?.color?.name || "Select Color"}
@@ -283,13 +292,14 @@ const ProductInfo = () => {
               </p>
             </div>
 
-            <div className="mt-10">
-              <h4 className="mb-4 text-lg"> Select Size </h4>
-
-              <div className="flex gap-5 items-center">
+            {/* Size Selector */}
+            <div className="mt-8 sm:mt-10">
+              <h4 className="mb-3 sm:mb-4 text-base sm:text-lg">
+                Select Size
+              </h4>
+              <div className="flex flex-wrap gap-3 sm:gap-5 items-center">
                 {selectedVariant?.sizes?.map((size, index) => {
                   const outofStock = size.stock <= 0;
-
                   return (
                     <button
                       key={size._id || index}
@@ -298,16 +308,23 @@ const ProductInfo = () => {
                         setSelectedSize(size.size);
                         setQuantity(1);
                       }}
-                      className={`w-12 h-12 rounded-full border-2 flex justify-center items-center transition ${selectedSize === size.size ? "border-white bg-white text-black" : "border-white/20 hover:border-white"} ${outofStock ? "opacity-30 cursor-not-allowed line-through" : ""}`}
+                      className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 flex justify-center items-center transition text-sm sm:text-base ${
+                        selectedSize === size.size
+                          ? "border-white bg-white text-black"
+                          : "border-white/20 hover:border-white"
+                      } ${
+                        outofStock
+                          ? "opacity-30 cursor-not-allowed line-through"
+                          : ""
+                      }`}
                     >
                       {size.size}
                     </button>
                   );
                 })}
               </div>
-
               {selectedSize && (
-                <p className="mt-3 text-white/50 text-sm">
+                <p className="mt-2 sm:mt-3 text-white/50 text-xs sm:text-sm">
                   {
                     selectedVariant?.sizes?.find(
                       (size) => size.size === selectedSize,
@@ -318,60 +335,64 @@ const ProductInfo = () => {
               )}
             </div>
 
-            <div className="mt-10">
-              <h4 className="mb-4 text-lg"> Quantity </h4>
+            {/* Quantity */}
+            <div className="mt-8 sm:mt-10">
+              <h4 className="mb-3 sm:mb-4 text-base sm:text-lg">Quantity</h4>
               <div className="flex items-center gap-3">
                 <button
                   onClick={decreaseQuantity}
                   disabled={quantity <= 1}
-                  className="h-12 w-12 rounded-full border border-white/20 flex items-center justify-center hover:border-white transition disabled:opacity-30"
+                  className="h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-white/20 flex items-center justify-center hover:border-white transition disabled:opacity-30"
                 >
                   <IoRemove />
                 </button>
-
-                <p className="text-2xl font-medium w-8 text-center">
+                <p className="text-xl sm:text-2xl font-medium w-8 text-center">
                   {quantity}
                 </p>
-
                 <button
                   onClick={increaseQuantity}
-                  className="h-12 w-12 rounded-full border border-white/20 flex items-center justify-center hover:border-white transition"
+                  className="h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-white/20 flex items-center justify-center hover:border-white transition"
                 >
                   <IoAdd />
                 </button>
               </div>
             </div>
 
-            <div className="flex gap-5 mt-12">
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 mt-10 sm:mt-12">
               <button
-                className="flex-1 bg-white text-black py-4 rounded-full text-lg font-medium hover:bg-gray-200 transition"
-                onClick={addToCart }
+                className="flex-1 bg-white text-black py-3.5 sm:py-4 rounded-full text-base sm:text-lg font-medium hover:bg-gray-200 transition"
+                onClick={addToCart}
               >
                 Add to Cart
               </button>
               <button
-                className="border border-white rounded-full hover:bg-white hover:text-black transition py-4 text-lg flex-1"
+                className="flex-1 border border-white rounded-full hover:bg-white hover:text-black transition py-3.5 sm:py-4 text-base sm:text-lg"
                 onClick={handleBuyNow}
               >
                 Buy Now
               </button>
-              {/* <button className="w-14 border border-white/20 rounded-full flex items-center justify-center hover:border-white transition">
-                <IoHeartOutline className="text-xl" />
-              </button> */}
             </div>
-            <div className="h-[2px] w-full bg-white/10 mt-12" />
 
-            <div className="mt-12 pt-8 space-y-5">
+            {/* Divider */}
+            <div className="h-[1px] sm:h-[2px] w-full bg-white/10 mt-10 sm:mt-12" />
+
+            {/* Product Details Table */}
+            <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 space-y-4 sm:space-y-5">
               {Object.entries(product.details || {}).map(([key, value]) => (
-                <div key={key} className="flex justify-between gap-10">
-                  <p className="text-white/60"> {key} </p>{" "}
-                  <p className="text-right"> {value} </p>
+                <div key={key} className="flex justify-between gap-6 sm:gap-10">
+                  <p className="text-white/60 text-sm sm:text-base shrink-0">
+                    {key}
+                  </p>
+                  <p className="text-right text-sm sm:text-base">{value}</p>
                 </div>
               ))}
             </div>
-            <div className="mt-10 pt-8 border-t border-white/10">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full overflow-hidden bg-white">
+
+            {/* Brand */}
+            <div className="mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-white/10">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full overflow-hidden bg-white shrink-0">
                   <img
                     src={product.brand?.brandIcon?.url}
                     alt={product.brand?.brandName}
@@ -379,8 +400,10 @@ const ProductInfo = () => {
                   />
                 </div>
                 <div>
-                  <p className="text-white/50 text-sm"> Brand </p>
-                  <p className="text-lg"> {product.brand?.brandName} </p>
+                  <p className="text-white/50 text-xs sm:text-sm">Brand</p>
+                  <p className="text-base sm:text-lg">
+                    {product.brand?.brandName}
+                  </p>
                 </div>
               </div>
             </div>

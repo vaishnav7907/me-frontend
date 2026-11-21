@@ -1,86 +1,12 @@
 import React, { useEffect, useState } from "react";
-import premiumshirt1 from "../../../../../../assets/premiumshirts/premiumshirt1.jpg";
-import premiumshirt2 from "../../../../../../assets/premiumshirts/premiumshirt2.jpg";
 import { motion } from "motion/react";
 import { IoArrowBack } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { UseMe } from "../../../../../context/Meprovider";
+
 const PremiumShirts = () => {
   const navigate = useNavigate();
-
-  const shirts = [
-    {
-      id: 1,
-      name: "Oxford White",
-      price: "$89",
-      image: premiumshirt1,
-      category: "Essential",
-    },
-    {
-      id: 2,
-      name: "Midnight Black",
-      price: "$94",
-      image: premiumshirt2,
-      category: "Premium",
-    },
-    {
-      id: 3,
-      name: "Stone Linen",
-      price: "$86",
-      image: premiumshirt1,
-      category: "Linen",
-    },
-    {
-      id: 4,
-      name: "Classic Blue",
-      price: "$91",
-      image: premiumshirt2,
-      category: "Formal",
-    },
-    {
-      id: 5,
-      name: "Modern Fit",
-      price: "$88",
-      image: premiumshirt1,
-      category: "Casual",
-    },
-    {
-      id: 6,
-      name: "Minimal Grey",
-      price: "$90",
-      image: premiumshirt2,
-      category: "Luxury",
-    },
-    {
-      id: 6,
-      name: "Minimal Grey",
-      price: "$90",
-      image: premiumshirt2,
-      category: "Luxury",
-    },
-    {
-      id: 6,
-      name: "Minimal Grey",
-      price: "$90",
-      image: premiumshirt2,
-      category: "Luxury",
-    },
-    {
-      id: 6,
-      name: "Minimal Grey",
-      price: "$90",
-      image: premiumshirt2,
-      category: "Luxury",
-    },
-    {
-      id: 6,
-      name: "Minimal Grey",
-      price: "$90",
-      image: premiumshirt2,
-      category: "Luxury",
-    },
-  ];
 
   const { getProductCategory } = UseMe();
   const [latestArrivalsShirts, setLatestArrivalsShirts] = useState([]);
@@ -102,9 +28,29 @@ const PremiumShirts = () => {
     }
   };
 
+  const BrandIcon = ({ brand }) => {
+    const brandLogo = brand?.brandIcon?.url;
+
+    return (
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center shadow-lg overflow-hidden p-1.5">
+        {brandLogo ? (
+          <img
+            src={brandLogo}
+            alt={brand?.name || brand?.brandName || "Brand"}
+            className="w-full h-full object-contain"
+          />
+        ) : (
+          <span className="text-black font-serif font-semibold text-xs sm:text-sm tracking-wider">
+            {getBrandInitials(brand)}
+          </span>
+        )}
+      </div>
+    );
+  };
   const handPickedShirts = latestArrivalsShirts.filter(
     (product) => product.isHandPicked === true,
   );
+
   useEffect(() => {
     if (getProductCategory) {
       getLatestArrivalsShirts();
@@ -112,370 +58,191 @@ const PremiumShirts = () => {
   }, [getProductCategory]);
 
   return (
-    <section className="bg-black text-white min-h-screen overflow-hidden">
-      <h1 className="absolute top-24 left-0 text-[180px] lg:text-[260px] font-bold text-white/[0.03] uppercase pointer-events-none select-none">
+    <section className="bg-black text-white min-h-screen overflow-hidden relative">
+      <h1 className="absolute top-20 sm:top-24 left-0 text-[90px] sm:text-[180px] lg:text-[260px] font-bold text-white/[0.03] uppercase pointer-events-none select-none whitespace-nowrap">
         SHIRTS
       </h1>
 
       <button
-        className="group flex items-center gap-3 absolute top-10 left-7"
+        className="group flex items-center gap-3 absolute top-7 sm:top-10 left-4 sm:left-7 z-10"
         onClick={() => navigate(-1)}
       >
         <span className="text-xl transition-transform duration-300 group-hover:-translate-x-2">
           <IoArrowBack className="transition-transform duration-300 group-hover:-translate-x-1" />
         </span>
-        <span className="uppercase tracking-[0.35em] text-sm">Back</span>
+        <span className="uppercase tracking-[0.35em] text-xs sm:text-sm">
+          Back
+        </span>
       </button>
-      {/* heading portion */}
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-20 pt-32">
+      <div className="pt-28 sm:pt-32">
         <motion.div
-          className="text-center"
+          className="text-center px-4"
           initial={{ opacity: 0, y: 70 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          {/* <p className="uppercase tracking-[0.45em] text-neutral-500 text-sm">
+          <p className="uppercase tracking-[0.35em] sm:tracking-[0.45em] text-neutral-500 text-xs sm:text-sm">
             Latest Arrival
-          </p> */}
-          <h2 className="font-serif text-5xl lg:text-7xl mt-6">
-            Latest Arrival
+          </p>
+
+          <h2 className="font-serif text-4xl sm:text-5xl lg:text-7xl mt-5 sm:mt-6">
+            Essential <span className="text-red-950">S</span>-hirts
           </h2>
-          <p className="max-w-2xl mx-auto mt-8 text-neutral-400 leading-8">
+
+          <p className="max-w-2xl mx-auto mt-5 sm:mt-8 text-sm sm:text-base text-neutral-400 leading-7 sm:leading-8">
             Discover timeless silhouettes crafted from premium fabrics. Designed
             for modern elegance and everyday luxury.
           </p>
         </motion.div>
+      </div>
 
-        {/* content section */}
-        <motion.div
-          className="grid lg:grid-cols-5 gap-8 mt-24"
-          initial={{ opacity: 0, scale: 0.96 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
-          {/* Large Featured Image */}
-          {latestArrivalsShirts.length > 0 && (
-            <div
-              className="lg:col-span-3 overflow-hidden relative group cursor-pointer"
+      <div className="max-w-[1600px] mx-auto">
+        <div className="flex items-center justify-between border-y border-white/10 py-3 sm:py-5 px-4 sm:px-6 lg:px-10 mb-4 sm:mb-8">
+          <p className="uppercase tracking-[0.2em] sm:tracking-[0.3em] text-neutral-400 text-[8px] sm:text-[11px]">
+            Discover the collection
+          </p>
+
+          <p className="uppercase tracking-[0.15em] sm:tracking-[0.2em] text-neutral-500 text-[8px] sm:text-xs">
+            {latestArrivalsShirts.length} Products
+          </p>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4">
+          {latestArrivalsShirts.map((items, index) => (
+            <motion.div
+              key={items._id}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.12 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -5 }}
               onClick={() =>
                 navigate("/productInfo", {
-                  state: { product: latestArrivalsShirts[0] },
+                  state: { product: items },
                 })
               }
+              className="cursor-pointer group"
             >
-              <img
-                src={
-                  latestArrivalsShirts[0].variants?.[0]?.color?.mainImage?.url
-                }
-                alt={latestArrivalsShirts[0].name}
-                className="h-[720px] w-full object-cover group-hover:scale-105 transition duration-500"
-              />
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-
-              <div className="absolute top-8 left-8">
-                <span className="bg-white text-black px-5 py-2 tracking-[0.3em] text-xs uppercase">
-                  New Arrival
-                </span>
-              </div>
-
-              <div className="absolute bottom-10 left-10">
-                <p className="tracking-[0.35em] uppercase text-neutral-300 text-sm">
-                  Signature Collection
-                </p>
-
-                <h1 className="font-serif text-5xl mt-5">
-                  {latestArrivalsShirts[0].name}
-                </h1>
-
-                <p className="text-neutral-300 max-w-md mt-5 leading-7">
-                  Discover premium craftsmanship, luxurious fabrics, and
-                  timeless designs tailored for modern elegance.
-                </p>
-
-                <button className="mt-8 border border-white px-8 py-3 hover:bg-white hover:text-black duration-300">
-                  Explore
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Two Small Featured Images */}
-          <div className="lg:col-span-2 flex flex-col gap-8">
-            {latestArrivalsShirts.slice(1, 3).map((items, index) => (
-              <motion.div
-                className="h-[346px] overflow-hidden group cursor-pointer relative"
-                key={items._id}
-                initial={{ opacity: 0, x: 60 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{
-                  duration: 0.6,
-                  delay: index * 0.15,
-                }}
-                viewport={{ once: true }}
-                onClick={() =>
-                  navigate("/productInfo", {
-                    state: { product: items },
-                  })
-                }
-              >
+              <div className="aspect-[3/4] overflow-hidden relative bg-neutral-900">
                 <img
                   src={items.variants?.[0]?.color?.mainImage?.url}
                   alt={items.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent pointer-events-none" />
 
-                <div className="absolute bottom-8 left-8">
-                  <p className="tracking-[0.25em] uppercase text-xs text-neutral-300">
+                <BrandIcon brand={items.brand} />
+              </div>
+
+              <div className="flex flex-col gap-3 p-2 sm:p-3">
+                <div>
+                  <p className="uppercase tracking-[0.04em] text-neutral-500 text-xs sm:text-sm">
                     {items.category}
                   </p>
 
-                  <h3 className="font-serif text-3xl mt-3">{items.name}</h3>
+                  <h3 className="font-serif tracking-wide text-sm sm:text-base mt-1">
+                    {items.name}
+                  </h3>
+                </div>
 
-                  <div className="flex items-center gap-6 mt-4">
-                    <span className="text-neutral-300">₹{items.price}</span>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <p className="text-sm font-semibold text-white">
+                    ₹{items.price}
+                  </p>
 
-                    <button className="opacity-0 group-hover:opacity-100 duration-500 border-b border-white">
-                      View Details
-                    </button>
+                  {items.discount > 0 && (
+                    <p className="text-xs sm:text-sm text-green-500">
+                      {items.discount}% OFF
+                    </p>
+                  )}
+
+                  <p className="text-xs sm:text-sm text-neutral-500 line-through">
+                    ₹{items.realPrice}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+      {handPickedShirts.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10 sm:py-16">
+          <div>
+            <p className="uppercase tracking-[0.35em] sm:tracking-[0.45em] text-neutral-500 text-xs sm:text-sm">
+              trending now
+            </p>
+
+            <h2 className="font-serif text-3xl sm:text-4xl mt-3">
+              Handpicked For You
+            </h2>
+          </div>
+
+          <div className="flex gap-3 sm:gap-6 overflow-x-auto pt-5 sm:pt-6 pb-6 snap-x snap-mandatory scrollbar-thin">
+            {handPickedShirts.map((data, index) => (
+              <motion.div
+                key={data._id || data.id}
+                initial={{ opacity: 0, x: 80 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{
+                  duration: 0.6,
+                  delay: index * 0.1,
+                }}
+                viewport={{ once: true }}
+                whileHover={{ y: -6 }}
+                className="flex-none w-[75vw] sm:w-[320px] md:w-[350px] snap-start group cursor-pointer"
+              >
+                <div className="relative overflow-hidden rounded-sm">
+                  <div className="aspect-[3/4] overflow-hidden bg-neutral-900">
+                    <img
+                      src={data.variants?.[0]?.color?.mainImage?.url}
+                      alt={data.name}
+                      className="w-full h-full object-cover duration-700 group-hover:scale-105"
+                    />
+                  </div>
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+
+                  <BrandIcon brand={data.brand} />
+                </div>
+
+                <div className="flex flex-col gap-2 sm:gap-3 pt-3 sm:pt-4">
+                  <div>
+                    <p className="uppercase tracking-[0.04em] text-neutral-500 text-[10px] sm:text-xs">
+                      {data.category}
+                    </p>
+
+                    <h3 className="font-serif tracking-wide text-sm sm:text-base mt-1 line-clamp-2">
+                      {data.name}
+                    </h3>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <p className="text-xs sm:text-sm font-semibold text-white">
+                      ₹{data.price}
+                    </p>
+
+                    {data.discount > 0 && (
+                      <p className="text-[10px] sm:text-sm text-green-500">
+                        {data.discount}% OFF
+                      </p>
+                    )}
+
+                    <p className="text-[10px] sm:text-sm text-neutral-500 line-through">
+                      ₹{data.realPrice}
+                    </p>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
-        </motion.div>
-        {/* latest shirt///// */}
-        <div className=" max-w-7xl mx-auto px-6  py-32 ">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            viewport={{ once: true }}
-          >
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between  mb-16">
-              <div>
-                <p className="uppercase tracking-[0.45em] text-neutral-500 text-sm">
-                  editorial collection
-                </p>
-                <h2 className="font-serif text-5xl mt-4">
-                  Latest Premium Shirts
-                </h2>
-              </div>
-
-              <div>
-                <p className="text-neutral-400 max-w-lg mt-6 lg:mt-0 leading-8">
-                  Every shirt is designed with precision tailoring, premium
-                  fabrics, and timeless silhouettes that elevate everyday
-                  dressing.
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
-          <div className="grid grid-cols-4 gap-6 auto-rows-[346px]">
-            {latestArrivalsShirts.slice(3).map((shirtData, index) => {
-              const large = index === 0 || index === 3;
-
-              return (
-                <motion.div
-                  key={shirtData._id}
-                  className={`overflow-hidden group cursor-pointer relative ${
-                    large ? "lg:row-span-2" : ""
-                  }`}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.12 }}
-                  viewport={{ once: true }}
-                  whileHover={{ y: -5 }}
-                  onClick={() =>
-                    navigate("/productInfo", {
-                      state: { product: shirtData },
-                    })
-                  }
-                >
-                  <img
-                    src={shirtData.variants?.[0]?.color?.mainImage?.url}
-                    alt={shirtData.name}
-                    className={`w-full h-full object-cover duration-700 group-hover:scale-110 ${
-                      large ? "h-[666px]" : "h-[330px]"
-                    }`}
-                  />
-
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-
-                  <span className="absolute top-5 left-5 bg-white text-black text-[10px] tracking-[0.3em] px-3 py-2 uppercase">
-                    New
-                  </span>
-
-                  <span className="absolute top-5 right-5 bg-white text-black text-[10px] tracking-[0.3em] px-3 py-2 uppercase">
-                    <div className="h-4 w-4 overflow-hidden">
-                      <img
-                        src={shirtData.brand?.brandIcon?.url}
-                        alt={shirtData.brand?.brandName || "Brand"}
-                        className="w-full h-full object-cover overflow-hidden"
-                      />
-                    </div>
-                  </span>
-
-                  <div className="absolute bottom-7 left-7 right-7">
-                    <p className="tracking-[0.25em] uppercase text-xs text-neutral-300">
-                      {shirtData.category}
-                    </p>
-
-                    <h3 className="font-serif text-3xl mt-3">
-                      {shirtData.name}
-                    </h3>
-
-                    <div className="flex items-center gap-4 mt-4">
-                      <span className="text-white text-lg font-medium">
-                        ₹{shirtData.price}
-                      </span>
-
-                      <span className="text-neutral-400 text-sm line-through">
-                        ₹{shirtData.realPrice}
-                      </span>
-
-                      {shirtData.discount > 0 && (
-                        <span className="text-neutral-300 text-xs tracking-[0.15em] uppercase">
-                          {shirtData.discount}% Off
-                        </span>
-                      )}
-
-                      <button
-                        className="opacity-0 group-hover:opacity-100 duration-500 border-b border-white ml-auto"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate("/productInfo", {
-                            state: { product: shirtData._id },
-                          });
-                        }}
-                      >
-                        View
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
         </div>
+      )}
 
-        <hr className="w-full text-gray-500" />
-
-        <motion.div
-          className="max-w-7xl mx-auto px-6 py-32"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
-          <div className="text-center">
-            <p className="uppercase tracking-[0.45em] text-neutral-500 text-sm">
-              crafted for you
-            </p>
-
-            <h2 className="font-serif text-4xl lg:text-6xl leading-tight mt-8">
-              <span className="text-[#D4AF37]">Luxury</span> isn't about excess.
-              <br />
-              It's about choosing pieces
-              <br />
-              you'll wear for years.
-            </h2>
-          </div>
-        </motion.div>
-
-        <hr className="w-full text-gray-500" />
-
-        {handPickedShirts.length > 0 && (
-          <div className="max-w-7xl mx-auto px-6 py-32">
-            <div>
-              <p className="uppercase tracking-[0.45em] text-neutral-500 text-sm">
-                trending now
-              </p>
-
-              <h2 className="font-serif text-4xl mt-3">Handpicked For You</h2>
-            </div>
-
-            <div className="flex gap-6 overflow-x-auto pt-6 pb-6 snap-x snap-mandatory scrollbar-thin">
-              {handPickedShirts.map((data, index) => (
-                <motion.div
-                  key={data._id}
-                  initial={{ opacity: 0, x: 80 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  whileHover={{ y: -10 }}
-                  onClick={() =>
-                    navigate("/productInfo", {
-                      state: { product: data},
-                    })
-                  }
-                  className="min-w-[320px] snap-center group cursor-pointer"
-                >
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={data.variants?.[0]?.color?.mainImage?.url}
-                      alt={data.name}
-                      className="w-full h-[450px] object-cover duration-700 group-hover:scale-110"
-                    />
-
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-
-                    {/* Brand Icon */}
-                    {data.brand?.brandIcon?.url && (
-                      <div className="absolute top-5 right-5 h-12 w-12 bg-white p-2 rounded-sm">
-                        <img
-                          src={data.brand.brandIcon.url}
-                          alt={data.brand?.brandName || "Brand"}
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-                    )}
-
-                    <div className="absolute bottom-7 left-7 right-7">
-                      <p className="uppercase tracking-[0.25em] text-xs text-neutral-300">
-                        {data.handPickedLabel}
-                      </p>
-
-                      <h3 className="font-serif text-2xl mt-2">{data.name}</h3>
-
-                      <p className="text-neutral-300 text-sm mt-2">
-                        {data.handPickedDescription}
-                      </p>
-
-                      {/* Keep your existing price section here */}
-                      <div className="flex items-center gap-3 mt-3">
-                        <span className="text-white font-medium">
-                          ₹{data.price}
-                        </span>
-
-                        <span className="text-neutral-400 text-sm line-through">
-                          ₹{data.realPrice}
-                        </span>
-
-                        {data.discount > 0 && (
-                          <span className="text-neutral-300 text-xs uppercase tracking-wider">
-                            {data.discount}% Off
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="max-w-7xl mx-auto px-6  py-10 text-center">
-          <h2 className="font-serif text-4xl mt-3">
-            Crafted for confidence. Designed by ME.
-          </h2>
-        </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 text-center">
+        <h2 className="font-serif text-2xl sm:text-4xl mt-3">
+          Crafted for confidence. Designed by ME.
+        </h2>
       </div>
     </section>
   );

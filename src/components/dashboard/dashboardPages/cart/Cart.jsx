@@ -13,7 +13,9 @@ const Cart = () => {
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [cartData, setCartData] = useState([]);
 
-  const selectedCartItem = cartData.find((item) => item._id === selectedItemId);
+  const selectedCartItem = cartData.find(
+    (item) => item._id === selectedItemId,
+  );
 
   console.log("selected cart item", selectedCartItem);
 
@@ -60,30 +62,29 @@ const Cart = () => {
   useEffect(() => {
     getCartData();
   }, []);
+
   return (
-    <section className="min-h-screen bg-black text-white px-6 lg:px-20 py-28">
-      {/* Heading */}
+    <section className="min-h-screen bg-black text-white px-4 py-24 sm:px-6 sm:py-28 lg:px-20">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="mb-20"
+        className="mb-12 sm:mb-16 lg:mb-20"
       >
-        <p className="uppercase tracking-[6px] text-gray-500 text-sm">
+        <p className="text-xs uppercase tracking-[4px] text-gray-500 sm:text-sm sm:tracking-[6px]">
           Your Selection
         </p>
 
-        <h1 className="text-5xl lg:text-7xl font-serif mt-4">
+        <h1 className="mt-3 font-serif text-5xl sm:mt-4 sm:text-6xl lg:text-7xl">
           Car<span className="text-zinc-500">t</span>
         </h1>
       </motion.div>
 
-      {/* Main Section */}
-      <div className=" gap-20">
+      <div className="w-full">
         <div>
           {cartData.length === 0 ? (
-            <div className="flex flex-col items-center justify-center border-t border-zinc-800 py-10 text-center">
-              <p className="text-sm uppercase tracking-[5px] text-gray-500">
+            <div className="flex flex-col items-center justify-center border-t border-zinc-800 py-12 px-4 text-center sm:py-16">
+              <p className="text-xs uppercase tracking-[4px] text-gray-500 sm:text-sm sm:tracking-[5px]">
                 Your Selection
               </p>
 
@@ -92,13 +93,13 @@ const Cart = () => {
               </h2>
 
               <p className="mt-4 max-w-md text-sm leading-6 text-gray-400">
-                Discover timeless essentials and find something that reflects
-                your style.
+                Discover timeless essentials and find something that reflects your
+                style.
               </p>
 
               <button
                 onClick={() => navigate("/")}
-                className="mt-8 flex items-center gap-3 rounded-full bg-white px-7 py-3 text-sm font-medium text-black transition hover:bg-zinc-200"
+                className="mt-8 flex items-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:bg-zinc-200 sm:px-7"
               >
                 Explore Collection
                 <GoArrowUpRight size={18} />
@@ -107,7 +108,8 @@ const Cart = () => {
           ) : (
             cartData.map((item, index) => {
               const product = item.product;
-console.log(" cart product",product);
+
+              console.log("cart product", product);
 
               const selectedVariant = product?.variants?.find(
                 (variant) =>
@@ -122,6 +124,7 @@ console.log(" cart product",product);
               );
 
               const brandIcon = product?.brand?.brandIcon?.url;
+
               console.log("brand image in cart", brandIcon);
 
               const image =
@@ -144,39 +147,35 @@ console.log(" cart product",product);
                     delay: index * 0.08,
                   }}
                   whileHover={{ x: 4 }}
-                  className="border-t border-zinc-800 py-8 sm:py-10"
+                  className="border-t border-zinc-800 py-6 sm:py-8 lg:py-10"
                 >
-                  <div className="flex flex-col gap-6 sm:flex-row sm:gap-8">
-                    <div className="hidden pt-1 font-serif text-4xl text-zinc-700 sm:block">
+                  <div className="flex flex-col gap-5 sm:gap-6 lg:flex-row lg:gap-8">
+                    <div className="hidden pt-1 font-serif text-3xl text-zinc-700 lg:block lg:text-4xl">
                       {String(index + 1).padStart(2, "0")}
                     </div>
 
-                    <div className="relative shrink-0">
+                    <div className="relative w-full shrink-0 overflow-hidden rounded-xl sm:max-w-[280px] lg:max-w-none lg:w-56">
                       <img
                         src={image}
                         alt={product?.name || "Product"}
-                        className="h-80 w-full rounded-xl bg-zinc-900 object-cover sm:h-72 sm:w-56"
+                        className="aspect-[4/5] w-full rounded-xl bg-zinc-900 object-cover sm:aspect-[3/4] lg:h-72 lg:aspect-auto"
                       />
-
-                      {/* <span className="absolute left-3 top-3 rounded-full border border-white/20 bg-black/70 px-3 py-1 text-[10px] uppercase tracking-[2px] text-white backdrop-blur-sm">
-                        ME Collection
-                      </span> */}
                     </div>
 
                     <div className="flex min-w-0 flex-1 flex-col justify-between">
                       <div>
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <div className="flex items-center gap-3">
+                        <div className="flex items-start justify-between gap-3 sm:gap-4">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 sm:gap-3">
                               {brandIcon && (
                                 <img
                                   src={brandIcon}
                                   alt={product.brand.brandName || "Brand"}
-                                  className="h-8 w-8 rounded-full border border-zinc-800 bg-white object-contain p-1"
+                                  className="h-7 w-7 shrink-0 rounded-full border border-zinc-800 bg-white object-contain p-1 sm:h-8 sm:w-8"
                                 />
                               )}
 
-                              <p className="text-xs uppercase tracking-[3px] text-gray-500">
+                              <p className="break-words text-[10px] uppercase tracking-[2px] text-gray-500 sm:text-xs sm:tracking-[3px]">
                                 {product?.brand?.brandName ||
                                   product?.brand?.name ||
                                   product?.brandName ||
@@ -185,11 +184,11 @@ console.log(" cart product",product);
                               </p>
                             </div>
 
-                            <h3 className="mt-3 font-serif text-2xl leading-tight sm:text-3xl">
+                            <h3 className="mt-3 break-words font-serif text-xl leading-tight sm:text-2xl lg:text-3xl">
                               {product?.name || "Product"}
                             </h3>
 
-                            <p className="mt-3 text-sm text-gray-400">
+                            <p className="mt-2 break-all text-xs text-gray-400 sm:mt-3 sm:text-sm">
                               SKU: {product?.sku || "Not available"}
                             </p>
                           </div>
@@ -200,15 +199,15 @@ console.log(" cart product",product);
                               setShowDeleteConfirm(true);
                             }}
                             aria-label={`Remove ${product?.name || "product"} from cart`}
-                            className="rounded-full border border-zinc-800 p-3 text-gray-500 transition hover:border-red-500/50 hover:text-red-400"
+                            className="shrink-0 rounded-full border border-zinc-800 p-2.5 text-gray-500 transition hover:border-red-500/50 hover:text-red-400 sm:p-3"
                           >
-                            <GoTrash size={19} />
+                            <GoTrash size={18} />
                           </button>
                         </div>
 
-                        <div className="mt-6 flex flex-wrap gap-3">
-                          <div className="rounded-lg border border-zinc-800 px-4 py-3">
-                            <p className="text-[10px] uppercase tracking-[2px] text-gray-500">
+                        <div className="mt-5 grid grid-cols-2 gap-2 sm:mt-6 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
+                          <div className="rounded-lg border border-zinc-800 px-3 py-3 sm:px-4">
+                            <p className="text-[9px] uppercase tracking-[2px] text-gray-500 sm:text-[10px]">
                               Size
                             </p>
                             <p className="mt-1 text-sm font-medium">
@@ -216,26 +215,28 @@ console.log(" cart product",product);
                             </p>
                           </div>
 
-                          <div className="rounded-lg border border-zinc-800 px-4 py-3">
-                            <p className="text-[10px] uppercase tracking-[2px] text-gray-500">
+                          <div className="rounded-lg border border-zinc-800 px-3 py-3 sm:px-4">
+                            <p className="text-[9px] uppercase tracking-[2px] text-gray-500 sm:text-[10px]">
                               Color
                             </p>
 
-                            <div className="mt-2 flex items-center gap-2">
+                            <div className="mt-2 flex min-w-0 items-center gap-2">
                               <span
-                                className="h-4 w-4 rounded-full border border-zinc-600"
+                                className="h-3.5 w-3.5 shrink-0 rounded-full border border-zinc-600 sm:h-4 sm:w-4"
                                 style={{
                                   backgroundColor:
                                     selectedVariant?.color?.code || "#777777",
                                 }}
                               />
 
-                              <span className="text-sm">{item.color}</span>
+                              <span className="truncate text-sm">
+                                {item.color}
+                              </span>
                             </div>
                           </div>
 
-                          <div className="rounded-lg border border-zinc-800 px-4 py-3">
-                            <p className="text-[10px] uppercase tracking-[2px] text-gray-500">
+                          <div className="rounded-lg border border-zinc-800 px-3 py-3 sm:px-4">
+                            <p className="text-[9px] uppercase tracking-[2px] text-gray-500 sm:text-[10px]">
                               Quantity
                             </p>
                             <p className="mt-1 text-sm font-medium">
@@ -243,12 +244,12 @@ console.log(" cart product",product);
                             </p>
                           </div>
 
-                          <div className="rounded-lg border border-zinc-800 px-4 py-3">
-                            <p className="text-[10px] uppercase tracking-[2px] text-gray-500">
+                          <div className="rounded-lg border border-zinc-800 px-3 py-3 sm:px-4">
+                            <p className="text-[9px] uppercase tracking-[2px] text-gray-500 sm:text-[10px]">
                               Availability
                             </p>
 
-                            <p className="mt-1 text-sm font-medium">
+                            <p className="mt-1 text-xs font-medium sm:text-sm">
                               {!selectedSize
                                 ? "Check stock"
                                 : selectedSize.stock <= 0
@@ -261,17 +262,17 @@ console.log(" cart product",product);
                         </div>
                       </div>
 
-                      <div className="mt-8 flex flex-wrap items-end justify-between gap-4 border-t border-zinc-800 pt-5">
-                        <div>
+                      <div className="mt-6 flex flex-col gap-5 border-t border-zinc-800 pt-5 sm:mt-8 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+                        <div className="min-w-0">
                           <p className="text-xs text-gray-500">
                             ₹{price.toLocaleString("en-IN")} × {quantity}
                           </p>
 
-                          <p className="mt-1 text-xs uppercase tracking-[2px] text-gray-500">
+                          <p className="mt-1 text-[10px] uppercase tracking-[2px] text-gray-500 sm:text-xs">
                             Item total
                           </p>
 
-                          <p className="mt-2 text-2xl font-medium">
+                          <p className="mt-2 text-2xl font-medium sm:text-3xl">
                             ₹{itemTotal.toLocaleString("en-IN")}
                           </p>
                         </div>
@@ -284,9 +285,9 @@ console.log(" cart product",product);
 
                             console.log("product details cart to buy", product);
                           }}
-                          className="flex items-center gap-2 border-b border-zinc-600 pb-1 text-xs uppercase tracking-[2px] text-gray-300 transition hover:border-white hover:text-white"
+                          className="flex w-full items-center justify-center gap-2 border border-zinc-700 px-5 py-3 text-xs uppercase tracking-[2px] text-gray-300 transition hover:border-white hover:text-white sm:w-auto sm:border-0 sm:border-b sm:px-0 sm:py-1"
                         >
-                          order now
+                          Order Now
                           <GoArrowUpRight size={16} />
                         </button>
                       </div>
@@ -298,20 +299,23 @@ console.log(" cart product",product);
           )}
         </div>
       </div>
+
       {showDeleteConfirm && selectedCartItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 px-3 py-6 backdrop-blur-sm sm:px-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="w-full max-w-md rounded-2xl border border-zinc-800 bg-[#111] p-6 sm:p-8"
+            className="my-auto w-full max-w-md rounded-2xl border border-zinc-800 bg-[#111] p-4 sm:p-6 lg:p-8"
           >
-            <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10 text-red-500">
-              <GoTrash size={26} />
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-red-500 sm:mb-5 sm:h-14 sm:w-14">
+              <GoTrash size={24} />
             </div>
 
-            <h2 className="font-serif text-2xl">Remove Product?</h2>
+            <h2 className="font-serif text-xl sm:text-2xl">
+              Remove Product?
+            </h2>
 
-            <p className="mt-2 text-sm leading-6 text-gray-400">
+            <p className="mt-2 text-xs leading-6 text-gray-400 sm:text-sm">
               Are you sure you want to remove this product from your cart?
             </p>
 
@@ -330,29 +334,31 @@ console.log(" cart product",product);
                 "";
 
               return (
-                <div className="mt-6 flex gap-4 rounded-xl border border-zinc-800 bg-black p-4">
+                <div className="mt-5 flex gap-3 rounded-xl border border-zinc-800 bg-black p-3 sm:mt-6 sm:gap-4 sm:p-4">
                   <img
                     src={image}
                     alt={product?.name || "Product"}
-                    className="h-28 w-24 rounded-lg object-cover"
+                    className="h-24 w-20 shrink-0 rounded-lg object-cover sm:h-28 sm:w-24"
                   />
 
                   <div className="flex min-w-0 flex-1 flex-col justify-center">
-                    <h3 className="font-medium">{product?.name}</h3>
+                    <h3 className="break-words text-sm font-medium sm:text-base">
+                      {product?.name}
+                    </h3>
 
-                    <p className="mt-2 text-sm text-gray-400">
+                    <p className="mt-1.5 text-xs text-gray-400 sm:mt-2 sm:text-sm">
                       Size: {selectedCartItem.size}
                     </p>
 
-                    <p className="mt-1 text-sm text-gray-400">
+                    <p className="mt-1 text-xs text-gray-400 sm:text-sm">
                       Color: {selectedCartItem.color}
                     </p>
 
-                    <p className="mt-1 text-sm text-gray-400">
+                    <p className="mt-1 text-xs text-gray-400 sm:text-sm">
                       Quantity: {selectedCartItem.quantity}
                     </p>
 
-                    <p className="mt-2 font-semibold">
+                    <p className="mt-2 text-sm font-semibold sm:text-base">
                       ₹
                       {(
                         (Number(product?.price) || 0) *
@@ -364,13 +370,13 @@ console.log(" cart product",product);
               );
             })()}
 
-            <div className="mt-8 flex gap-3">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <button
                 onClick={() => {
                   setShowDeleteConfirm(false);
                   setSelectedItemId(null);
                 }}
-                className="flex-1 rounded-full border border-zinc-700 py-3 transition hover:bg-zinc-900"
+                className="flex-1 rounded-full border border-zinc-700 py-3 text-sm transition hover:bg-zinc-900"
               >
                 Cancel
               </button>
@@ -383,7 +389,7 @@ console.log(" cart product",product);
                     selectedCartItem._id,
                   );
                 }}
-                className="flex-1 rounded-full bg-white py-3 text-black transition hover:bg-zinc-200"
+                className="flex-1 rounded-full bg-white py-3 text-sm text-black transition hover:bg-zinc-200"
               >
                 Yes, Remove
               </button>

@@ -6,6 +6,7 @@ const AdminNavbar = () => {
   const location = useLocation();
   const pageNames = {
     "/adminDash": "Dashboard",
+    "/adminDash/storeWelcomeImage":"WelcomeImage",
     "/adminDash/storeProducts": "Products",
     "/adminDash/storeNewArrivals": "New Arrivals",
     "/adminDash/storeBrands": "Brands",

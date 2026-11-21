@@ -47,6 +47,7 @@ import GetOfferSales from "./components/adminPanel/adminPages/offer/GetOfferSale
 import Shorts from "./components/dashboard/dashboardPages/newcollections/newcollectionpages/shorts/Shorts";
 import Innerwears from "./components/dashboard/dashboardPages/newcollections/newcollectionpages/innerwears/Innerwears";
 import LatestArrivalsProductPage from "./components/adminPanel/adminPages/storeLatestArrivals/latestArriavlsProduct/LatestArrivalsProductPage";
+import GetwelcomeImage from "./components/adminPanel/adminPages/welcomePage/GetwelcomeImage";
 // import OfferSales from "./components/adminPanel/adminPages/offer/offerSales";
 // import AdminWelcomePage from "./components/adminPanel/adminAuthentication/adminWelcomePage/AdminWelcomePage";
 
@@ -114,6 +115,7 @@ function App() {
             }
           >
             <Route index element={<StoreOverview />} />
+            <Route path="storeWelcomeImage" element={<GetwelcomeImage/>}/>
             <Route path="storeProducts" element={<StoreProducts />} />
             <Route path="storeNewArrivals" element={<StoreNewArrivals />} />
             <Route path="storeBrands" element={<StoreBrands />} />

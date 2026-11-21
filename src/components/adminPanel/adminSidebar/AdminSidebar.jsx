@@ -9,8 +9,9 @@ import {
   FiDollarSign,
   FiSettings,
   FiLogOut,
-  
+  FiImage,
 } from "react-icons/fi";
+// import { FiImage } from "react-icons/fi";
 import { LuClipboardList } from "react-icons/lu";
 import { NavLink } from "react-router-dom";
 import { UseMe } from "../../context/Meprovider";
@@ -32,6 +33,11 @@ const AdminSidebar = () => {
       title: "Store",
       items: [
         {
+          name: "WelcomePage",
+          icon: <FiImage />,
+          path: "/adminDash/storeWelcomeImage",
+        },
+        {
           name: "Products",
           icon: <FiShoppingBag />,
           path: "/adminDash/storeProducts",
@@ -47,9 +53,9 @@ const AdminSidebar = () => {
           path: "/adminDash/storeBrands",
         },
         {
-          name:"Offer",
-          icon: <LuClipboardList  />,
-          path:"/adminDash/offerSales"
+          name: "Offer",
+          icon: <LuClipboardList />,
+          path: "/adminDash/offerSales",
         },
         {
           name: "Orders",

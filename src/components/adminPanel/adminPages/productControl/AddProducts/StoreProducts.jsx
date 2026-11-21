@@ -166,7 +166,7 @@ const StoreProducts = () => {
         alert(response.data.message);
 
         setBulkDeleteProducts([]);
-setBulkDeleteModal(false)
+        setBulkDeleteModal(false);
         await getProductsFn();
       }
     } catch (error) {
@@ -370,7 +370,7 @@ setBulkDeleteModal(false)
           </div>
         </div>
       </div>
-      <div className="px-6 lg:px-8 pb-10">
+      <div className="px-6 lg:px-8 ">
         <div className="flex justify-between">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -416,12 +416,16 @@ setBulkDeleteModal(false)
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="px-4 pb-5">
         {!gridListView ? (
           <ProductGrid products={filteredProducts} />
         ) : (
           <ProductList products={filteredProducts} />
         )}
       </div>
+
       {showAddProduct && (
         <AddProductOverDisplay onClose={() => setShowAddProduct(false)} />
       )}
@@ -438,17 +442,13 @@ setBulkDeleteModal(false)
         />
       )}
       {bulkDeleteModal && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm px-4"
-          
-        >
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm px-4">
           <div
             onClick={(e) => e.stopPropagation()}
             className="relative w-full max-w-md rounded-2xl border border-white/[0.08] bg-[#111317] p-7 shadow-2xl"
           >
             <button
-              onClick={()=>setBulkDeleteModal(false)}
-              
+              onClick={() => setBulkDeleteModal(false)}
               className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 hover:bg-white/[0.06] hover:text-white"
             >
               <FiX size={19} />
@@ -507,8 +507,7 @@ setBulkDeleteModal(false)
             <div className="mt-7 flex gap-3">
               <button
                 type="button"
-                onClick={()=>setBulkDeleteModal(false)}
-                
+                onClick={() => setBulkDeleteModal(false)}
                 className="h-11 flex-1 rounded-lg border border-white/[0.09] bg-white/[0.03] text-sm font-medium text-neutral-400 transition hover:bg-white/[0.07] hover:text-white disabled:opacity-50"
               >
                 Cancel
@@ -517,7 +516,7 @@ setBulkDeleteModal(false)
               <button
                 type="button"
                 onClick={handleBulkDelete}
-                disabled={ bulkDeleteProducts.length === 0}
+                disabled={bulkDeleteProducts.length === 0}
                 className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-red-500 text-sm font-semibold text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <FiTrash2 size={15} />
