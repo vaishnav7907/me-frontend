@@ -7,7 +7,8 @@ import AddOffer from "./addoffer/AddOffer";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import UpdateOffer from "./updateOffer/UpdateOffer";
-import { UseMe } from "../../../context/Meprovider";
+import { UseMe } from "../../../context/Provider";
+// import { UseMe } from "../../../context/Meprovider";
 
 const GetOfferSales = () => {
   const { offerId, setOfferId } = UseMe();

@@ -15,7 +15,8 @@ import axios from "axios";
 import ProductUpdateOverDisplay from "../productUpdateOverDisplay/ProductUpdateOverDisplay";
 
 import ProductDeleteModal from "../productDeleteModal/ProductDeleteModal";
-import { UseMe } from "../../../../context/Meprovider";
+import { UseMe } from "../../../../context/Provider";
+// import { UseMe } from "../../../../context/Meprovider";
 const StoreProducts = () => {
   const statusFilters = ["All", "Active", "Inactive", "Low Stock"];
   const [gridListView, setGridListView] = useState(false);

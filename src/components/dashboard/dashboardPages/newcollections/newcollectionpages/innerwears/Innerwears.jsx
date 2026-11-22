@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
-import { UseMe } from "../../../../../context/Meprovider";
+// import { UseMe } from "../../../../../context/Meprovider";
 import axios from "axios";
+import { UseMe } from "../../../../../context/Provider";
 
 const Innerwears = () => {
   const navigate = useNavigate();

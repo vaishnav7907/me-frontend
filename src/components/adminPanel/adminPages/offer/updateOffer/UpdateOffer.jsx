@@ -8,7 +8,8 @@ import {
   FiCheck,
 } from "react-icons/fi";
 import axios from "axios";
-import { UseMe } from "../../../../context/Meprovider";
+import { UseMe } from "../../../../context/Provider";
+// import { UseMe } from "../../../../context/Meprovider";
 
 const API = import.meta.env.VITE_API_URL;
 

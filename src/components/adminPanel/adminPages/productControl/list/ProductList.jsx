@@ -3,7 +3,8 @@ import { useTable, tableFeatures } from "@tanstack/react-table";
 import { RiArrowRightWideLine, RiArrowLeftWideLine } from "react-icons/ri";
 import { BsThreeDots } from "react-icons/bs";
 import axios from "axios";
-import { UseMe } from "../../../../context/Meprovider";
+import { UseMe } from "../../../../context/Provider";
+// import { UseMe } from "../../../../context/Meprovider";
 
 const ProductList = ({ products }) => {
   const { bulkDeleteProducts, setBulkDeleteProducts } = UseMe();

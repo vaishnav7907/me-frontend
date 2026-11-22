@@ -2,9 +2,10 @@ import React from "react";
 import DashboardNavbar from "../../../navbars/DashboardNavbar";
 import { Outlet } from "react-router-dom";
 import MaindashboardSidebar from "../../../sidebars/MaindashboardSidebar";
-import { UseMe } from "../../../context/Meprovider";
+// import { UseMe } from "../../../context/Meprovider";
 import { AnimatePresence } from "motion/react";
 import { motion } from "motion/react";
+import { UseMe } from "../../../context/Provider";
 const MainPage = () => {
   const { sidebar, setSidebar } = UseMe();
   return (

@@ -4,7 +4,8 @@ import { BsBox } from "react-icons/bs";
 import { PiDotsThreeVerticalBold } from "react-icons/pi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineModeEditOutline } from "react-icons/md";
-import { UseMe } from "../../../../context/Meprovider";
+import { UseMe } from "../../../../context/Provider";
+// import { UseMe } from "../../../../context/Meprovider";
 
 const BrandGrid = ({brands=[]}) => {
   const {

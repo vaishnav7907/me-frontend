@@ -1,7 +1,8 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { FiX, FiAlertTriangle, FiTrash2 } from "react-icons/fi";
-import { UseMe } from "../../../../context/Meprovider";
+import { UseMe } from "../../../../context/Provider";
+// import { UseMe } from "../../../../context/Meprovider";
 
 const ProductDeleteModal = ({ oncloseDeleteModal }) => {
   const {

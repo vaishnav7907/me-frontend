@@ -5,7 +5,8 @@ import { IoArrowBack } from "react-icons/io5";
 import { RiArrowRightLongFill } from "react-icons/ri";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import axios from "axios";
-import { UseMe } from "../../context/Meprovider";
+import { UseMe } from "../../context/Provider";
+// import { UseMe } from "../../context/Meprovider";
 
 const Signup = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import React from "react";
 import { FiSearch, FiBell } from "react-icons/fi";
-import { UseMe } from "../../context/Meprovider";
+// import { UseMe } from "../../context/Meprovider";
 import { useLocation } from "react-router-dom";
 const AdminNavbar = () => {
   const location = useLocation();

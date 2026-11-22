@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
-import { UseMe } from "../../../context/Meprovider";
+import { UseMe } from "../../../context/Provider";
+// import { UseMe } from "../../../context/Meprovider";
 
 const NewCollections = () => {
   const { setGetProductCategory } = UseMe();

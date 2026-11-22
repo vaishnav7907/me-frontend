@@ -1,7 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FiX, FiUpload, FiTrash2 } from "react-icons/fi";
-import { UseMe } from "../../../../context/Meprovider";
+import { UseMe } from "../../../../context/Provider";
+// import { UseMe } from "../../../../context/Meprovider";
 
 const UpdateBrandOverDisplay = ({ oncloseUpdateBrand }) => {
   const [brandName, setBrandName] = useState("");

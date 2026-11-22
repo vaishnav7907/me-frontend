@@ -9,7 +9,8 @@ import {
   FiCheck,
 } from "react-icons/fi";
 import axios from "axios";
-import { UseMe } from "../../../../context/Meprovider";
+import { UseMe } from "../../../../context/Provider";
+// import { UseMe } from "../../../../context/Meprovider";
 const createEmptyVariant = () => ({
   color: { name: "", code: "#000000", mainImage: null, subImages: [] },
   sizes: [],

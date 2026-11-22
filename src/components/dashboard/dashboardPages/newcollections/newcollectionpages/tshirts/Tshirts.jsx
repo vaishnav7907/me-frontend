@@ -5,8 +5,9 @@ import { IoArrowBack } from "react-icons/io5";
 import tshirt1 from "../../../../../../assets/tshirts/tshirt1.webp";
 import tshirt2 from "../../../../../../assets/tshirts/tshirt2.jpg";
 import tshirt3 from "../../../../../../assets/tshirts/tshirt3.jpg";
-import { UseMe } from "../../../../../context/Meprovider";
+// import { UseMe } from "../../../../../context/Meprovider";
 import axios from "axios";
+import { UseMe } from "../../../../../context/Provider";
 
 const Tshirts = () => {
   const navigate = useNavigate();

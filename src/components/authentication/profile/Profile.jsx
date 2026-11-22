@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import axios from "axios";
-import { UseMe } from "../../context/Meprovider";
+import { UseMe } from "../../context/Provider";
+// import { UseMe } from "../../context/Meprovider";
 
 const Profile = () => {
   const navigate = useNavigate();

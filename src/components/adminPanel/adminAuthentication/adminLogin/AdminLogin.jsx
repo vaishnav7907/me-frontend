@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { FiArrowLeft, FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
 import { IoPersonOutline } from "react-icons/io5";
-import { UseMe } from "../../../context/Meprovider";
+// import { UseMe } from "../../../context/Meprovider";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { UseMe } from "../../../context/Provider";
 
 const AdminLogin = ({ setAdminSignIn, todash }) => {
   const [showPassword, setShowPassword] = useState(false);

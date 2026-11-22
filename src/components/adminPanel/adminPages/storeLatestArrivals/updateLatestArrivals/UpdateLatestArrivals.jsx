@@ -2,7 +2,8 @@ import axios from "axios";
 import React from "react";
 import { useState } from "react";
 import { FiX, FiImage, FiUpload } from "react-icons/fi";
-import { UseMe } from "../../../../context/Meprovider";
+import { UseMe } from "../../../../context/Provider";
+// import { UseMe } from "../../../../context/Meprovider";
 
 const UpdateLatestArrivals = ({ oncloseUpdateLatestArrivals }) => {
   const { latestArrivalsId } = UseMe();

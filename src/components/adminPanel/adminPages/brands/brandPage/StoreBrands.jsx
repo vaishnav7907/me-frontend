@@ -7,7 +7,8 @@ import BrandList from "../brandlist/BrandList";
 import BrandOverDisplay from "../brandOverDisplay/BrandOverDisplay";
 import UpdateBrandOverDisplay from "../updateBrandOverDisplay/UpdateBrandOverDisplay";
 import DeleteBrandModal from "../deleteBrandModal/DeleteBrandModal";
-import { UseMe } from "../../../../context/Meprovider";
+import { UseMe } from "../../../../context/Provider";
+// import { UseMe } from "../../../../context/Meprovider";
 
 const StoreBrands = () => {
   const {

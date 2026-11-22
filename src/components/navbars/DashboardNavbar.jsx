@@ -2,7 +2,8 @@ import React from "react";
 import { motion } from "motion/react";
 import { IoReorderTwoOutline } from "react-icons/io5";
 import { NavLink } from "react-router-dom";
-import { UseMe } from "../context/Meprovider";
+import { UseMe } from "../context/Provider";
+// import { UseMe } from "../context/Meprovider";
 
 const DashboardNavbar = () => {
   const { setSidebar, sidebar } = UseMe();

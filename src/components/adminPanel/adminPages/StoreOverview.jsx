@@ -18,7 +18,8 @@ import { FiTag } from "react-icons/fi";
 import axios from "axios";
 import { useState } from "react";
 import { useEffect } from "react";
-import { UseMe } from "../../context/Meprovider";
+import { UseMe } from "../../context/Provider";
+// import { UseMe } from "../../context/Meprovider";
 
 const StoreOverview = () => {
   const { allproducts, setAllProducts } = UseMe();

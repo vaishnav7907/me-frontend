@@ -8,7 +8,8 @@ import {
   FiUser,
 } from "react-icons/fi";
 import axios from "axios";
-import { UseMe } from "../../../context/Meprovider";
+import { UseMe } from "../../../context/Provider";
+// import { UseMe } from "../../../context/Meprovider";
 
 const AdminSignup = ({ setAdminSignUp, setAdminSignIn }) => {
   const [showPassword, setShowPassword] = useState(false);

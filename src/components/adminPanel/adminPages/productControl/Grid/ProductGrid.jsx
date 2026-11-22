@@ -4,7 +4,8 @@ import { FaEye } from "react-icons/fa";
 import { CiEdit } from "react-icons/ci";
 import { FiPackage, FiShoppingBag, FiTrendingUp } from "react-icons/fi";
 import axios from "axios";
-import { UseMe } from "../../../../context/Meprovider";
+import { UseMe } from "../../../../context/Provider";
+// import { UseMe } from "../../../../context/Meprovider";
 
 const ProductGrid = ({ products }) => {
   const {

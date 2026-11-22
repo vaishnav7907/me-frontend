@@ -9,7 +9,8 @@ import {
   FiSearch,
   FiCheck,
 } from "react-icons/fi";
-import { UseMe } from "../../../../context/Meprovider";
+import { UseMe } from "../../../../context/Provider";
+// import { UseMe } from "../../../../context/Meprovider";
 
 const createEmptyVariant = () => ({
   color: {

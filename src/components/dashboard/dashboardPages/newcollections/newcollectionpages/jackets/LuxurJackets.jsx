@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { IoArrowBack } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import { UseMe } from "../../../../../context/Meprovider";
+// import { UseMe } from "../../../../../context/Meprovider";
 import axios from "axios";
+import { UseMe } from "../../../../../context/Provider";
 
 const LuxurJackets = () => {
   const navigate = useNavigate();

@@ -10,9 +10,10 @@ import NewArrivalsGrid from "../ArrivalsGrid/NewArrivalsGrid";
 import CreateLatestOverDisplay from "../createLatestOverDisplay/CreateLatestOverDisplay";
 import axios from "axios";
 import UpdateLatestArrivals from "../updateLatestArrivals/UpdateLatestArrivals";
-import { UseMe } from "../../../../context/Meprovider";
+// import { UseMe } from "../../../../context/Meprovider";
 import DeleteLatestArrivalsModal from "../deleteLatestArrivalsModal/DeleteLatestArrivalsModal";
 import { useNavigate } from "react-router-dom";
+import { UseMe } from "../../../../context/Provider";
 const StoreNewArrivals = () => {
   const {
     updateLatestArrivalsModal,

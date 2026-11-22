@@ -3,7 +3,8 @@ import { motion } from "motion/react";
 import { IoArrowBack } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { UseMe } from "../../../../../context/Meprovider";
+import { UseMe } from "../../../../../context/Provider";
+// import { UseMe } from "../../../../../context/Meprovider";
 
 const PremiumShirts = () => {
   const navigate = useNavigate();

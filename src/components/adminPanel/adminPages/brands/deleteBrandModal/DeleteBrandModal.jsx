@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { FiX, FiAlertTriangle, FiTrash2 } from "react-icons/fi";
-import { UseMe } from "../../../../context/Meprovider";
+// import { UseMe } from "../../../../context/Meprovider";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { UseMe } from "../../../../context/Provider";
 const DeleteBrandModal = () => {
   const { setBrandDeleteModal, brandId, brandDeleteName, brandDeleteIcon } =
     UseMe();
