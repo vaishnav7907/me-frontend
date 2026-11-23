@@ -2,40 +2,16 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { IoArrowBack } from "react-icons/io5";
-import pant1 from "../../../../../assets/pants/pants1.jpg";
-import pant2 from "../../../../../assets/pants/pants3.webp";
-import shirt1 from "../../../../../assets/premiumshirts/premiumshirt1.jpg";
-import shirt2 from "../../../../../assets/premiumshirts/premiumshirt2.jpg";
-import jacket1 from "../../../../../assets/premjackets/jacket3.webp";
-import tshirt1 from "../../../../../assets/tshirts/tshirt1.webp";
+
 const OfferPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const offerData = location.state?.offer;
+
   console.log("offerData", offerData);
 
-  //   const products = offerData?.products.map((0fferProducts)=>({
-  // id: 1,
-  //       name: "Classic White Shirt",
-  //       image: shirt1,
-  //       category: "Shirts",
-  //       price: "$79",
-  //   }))
-
-  // const products =
-  //   offerData?.products?.map((offerProducts, index) => ({
-  //     id: offerProducts._id,
-  //     name: offerProducts.name,
-  //     image: offerProducts.variants?.[0]?.color?.mainImage?.url,
-  //     category: offerProducts.category,
-  //     price: offerProducts.price,
-  //     brand: offerProducts.brand?.name,
-    
-  //   })) || [];
-
-
-    const products=  Array.isArray(offerData?.products)? offerData.products : []
+  const products = Array.isArray(offerData?.products) ? offerData.products : [];
 
   const categories = [
     "All",
@@ -48,6 +24,7 @@ const OfferPage = () => {
   ];
 
   const [selectedCategory, setSelectedCategory] = useState("All");
+
   const filteredProducts =
     selectedCategory === "All"
       ? products
@@ -69,32 +46,37 @@ const OfferPage = () => {
       })
     : "";
 
-      const handleProductClick = (product) => {
+  const handleProductClick = (product) => {
     navigate("/productInfo", {
       state: { product },
     });
   };
+
   return (
-    <section className="bg-black text-white min-h-screen overflow-hidden ">
-      <h1 className="absolute top-24 left-0 text-[180px] lg:text-[260px] font-bold text-white/[0.03] uppercase pointer-events-none select-none">
+    <section className="bg-black text-white min-h-screen overflow-hidden relative w-full">
+      <h1 className="absolute top-20 sm:top-24 left-0 text-[70px] sm:text-[110px] md:text-[180px] lg:text-[260px] font-bold text-white/[0.03] uppercase pointer-events-none select-none whitespace-nowrap">
         Offers
       </h1>
 
       <button
-        className="group flex items-center gap-3 absolute top-10 left-7"
+        className="group flex items-center gap-2 sm:gap-3 absolute top-6 left-4 sm:top-10 sm:left-7 z-50"
         onClick={() => navigate(-1)}
       >
-        <span className="text-xl transition-transform duration-300 group-hover:-translate-x-2">
+        <span className="text-lg sm:text-xl transition-transform duration-300 group-hover:-translate-x-2">
           <IoArrowBack className="transition-transform duration-300 group-hover:-translate-x-1" />
         </span>
-        <span className="uppercase tracking-[0.35em] text-sm">Back</span>
+
+        <span className="uppercase tracking-[0.2em] sm:tracking-[0.35em] text-xs sm:text-sm">
+          Back
+        </span>
       </button>
-      <section className="max-w-7xl mx-auto px-6 py-28">
-        <p className="text-xs md:text-sm uppercase tracking-[0.4em] text-gray-400">
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 relative z-10">
+        <p className="text-[10px] sm:text-xs md:text-sm uppercase tracking-[0.25em] sm:tracking-[0.4em] text-gray-400">
           {offerStartDate} - {offerEndDate}
         </p>
 
-        <h1 className="mt-6 text-[55px] md:text-[100px] lg:text-[140px] font-black leading-none tracking-tighter">
+        <h1 className="mt-5 sm:mt-6 text-5xl sm:text-7xl md:text-[100px] lg:text-[140px] font-black leading-[0.95] tracking-tighter break-words">
           {offerData?.discountType === "buy_x_get_y"
             ? `Buy ${offerData.buyQuantity} Get ${offerData.getQuantity}`
             : offerData?.discountType === "percentage"
@@ -102,25 +84,26 @@ const OfferPage = () => {
               : `₹${Number(offerData?.discountValue).toLocaleString("en-IN")}`}
         </h1>
 
-        <h2 className="text-4xl md:text-6xl font-light mt-6 uppercase">
-          {offerData.title}
+        <h2 className="text-2xl sm:text-4xl md:text-6xl font-light mt-5 sm:mt-6 uppercase break-words">
+          {offerData?.title}
         </h2>
 
-        <p className="mt-10 max-w-xl text-gray-400 leading-8">
-          {offerData.description}
+        <p className="mt-5 sm:mt-8 max-w-xl text-gray-400 text-sm sm:text-base leading-7 sm:leading-8">
+          {offerData?.description}
         </p>
       </section>
-      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-xl border-y border-white/10 ">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex gap-8 overflow-x-auto py-5 no-scrollbar">
+
+      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-xl border-y border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+          <div className="flex gap-5 sm:gap-8 overflow-x-auto py-4 sm:py-5 no-scrollbar whitespace-nowrap">
             {categories.map((data) => (
               <button
                 key={data}
                 onClick={() => setSelectedCategory(data)}
-                className="relative pb-2"
+                className="relative pb-2 shrink-0"
               >
                 <p
-                  className={`uppercase tracking-[3px] text-sm transition ${
+                  className={`uppercase tracking-[2px] sm:tracking-[3px] text-xs sm:text-sm transition ${
                     selectedCategory === data
                       ? "text-white"
                       : "text-gray-500 hover:text-white"
@@ -138,7 +121,7 @@ const OfferPage = () => {
                       stiffness: 300,
                       damping: 30,
                     }}
-                  ></motion.div>
+                  />
                 )}
               </button>
             ))}
@@ -147,97 +130,117 @@ const OfferPage = () => {
       </div>
 
       {/* Products */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8 pb-24">
+      <div className="w-full ">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  mt-6 sm:mt-8 pb-20 sm:pb-24">
+          {filteredProducts.length === 0 ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-20 sm:py-28 text-center">
+              <h3 className="text-2xl sm:text-3xl md:text-5xl font-serif text-neutral-700">
+                Nothing to discover.
+              </h3>
 
-              {filteredProducts.length === 0 ? (
-                <div className="col-span-full flex flex-col items-center justify-center py-28 text-center">
-                  <h3 className="text-3xl md:text-5xl font-serif text-neutral-700">
-                    Nothing to discover.
-                  </h3>
+              <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-500 tracking-wide px-3">
+                No products are available in this category.
+              </p>
 
-                  <p className="mt-4 text-sm text-gray-500 tracking-wide">
-                    No products are available in this category.
-                  </p>
-                </div>
-              ) : (
-                filteredProducts.map((product, index) => {
+              {selectedCategory !== "All" && (
+                <button
+                  onClick={() => setSelectedCategory("All")}
+                  className="mt-6 border-b border-white pb-1 text-xs uppercase tracking-[0.25em]"
+                >
+                  View All Products
+                </button>
+              )}
+            </div>
+          ) : (
+            filteredProducts.map((product, index) => {
+              const image =
+                product.variants?.[0]?.color?.mainImage?.url ||
+                product.variants?.[0]?.color?.subImages?.[0]?.url ||
+                "";
 
-                  const image =
-                    product.variants?.[0]?.color?.mainImage?.url ||
-                    product.variants?.[0]?.color?.subImages?.[0]?.url ||
-                    "";
+              const brandIcon =
+                product.brand?.brandIcon?.url ||
+                product.brand?.brandIcon ||
+                product.brand?.logo?.url ||
+                product.brand?.logo ||
+                "";
 
-                  return (
-                    <motion.div
-                      key={product._id}
-                      initial={{ opacity: 0, y: 50 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.3 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 70,
-                        damping: 18,
-                        delay: index * 0.08,
-                      }}
-                      whileHover={{
-                        y: -10,
-                        transition: {
-                          duration: 0.35,
-                          ease: "easeOut",
-                        },
-                      }}
-                      onClick={() => handleProductClick(product)}
-                      className="group relative overflow-hidden cursor-pointer bg-[#111]"
-                    >
+              const brandName =
+                product.brand?.brandName || product.brand?.name || "ME";
 
-                      {/* Product Image */}
-                      <div className="overflow-hidden">
-                        <img
-                          src={image}
-                          alt={product.name}
-                          loading="lazy"
-                          className="w-full h-[430px] object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
-                        />
-                      </div>
+              return (
+                <motion.div
+                  key={product._id}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 70,
+                    damping: 18,
+                    delay: index * 0.08,
+                  }}
+                  whileHover={{
+                    y: -8,
+                    transition: {
+                      duration: 0.35,
+                      ease: "easeOut",
+                    },
+                  }}
+                  onClick={() => handleProductClick(product)}
+                  className="group relative overflow-hidden cursor-pointer bg-[#111]"
+                >
+                  {/* Product Image */}
+                  <div className="overflow-hidden">
+                    <img
+                      src={image}
+                      alt={product.name}
+                      loading="lazy"
+                      className="w-full h-[260px] sm:h-[350px] md:h-[420px] lg:h-[400px] xl:h-[430px] object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
+                    />
+                  </div>
 
-                      {/* Gradient Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent transition-all duration-700 group-hover:from-black group-hover:via-black/60" />
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent transition-all duration-700 group-hover:from-black group-hover:via-black/60" />
 
-                      {/* Offer Badge */}
-                      <span className="absolute top-6 left-6 bg-white text-black px-4 py-2 uppercase tracking-[0.3em] text-[10px]">
-                        Exclusive Offer
+                  {/* Brand Icon */}
+                  {brandIcon && (
+                    <div className="absolute top-3 left-3 sm:top-5 sm:left-5 z-10 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white rounded-full p-1.5 sm:p-2 flex items-center justify-center">
+                      <img
+                        src={brandIcon}
+                        alt={brandName}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  )}
+
+                  {/* Product Details */}
+                  <div className="absolute bottom-3 left-3 right-3 sm:bottom-5 sm:left-5 sm:right-5 md:bottom-7 md:left-7 md:right-7 transition-all duration-500 group-hover:-translate-y-1 sm:group-hover:-translate-y-2">
+                    <p className="uppercase tracking-[0.15em] sm:tracking-[0.35em] text-[8px] sm:text-[10px] text-neutral-400">
+                      {brandName} / {product.category}
+                    </p>
+
+                    <h3 className="font-serif text-base sm:text-xl md:text-2xl lg:text-[30px] mt-1.5 sm:mt-3 leading-tight text-white line-clamp-2">
+                      {product.name}
+                    </h3>
+
+                    <div className="mt-2 sm:mt-4 flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-sm sm:text-base md:text-lg text-white">
+                        ₹{Number(product.price).toLocaleString("en-IN")}
                       </span>
 
-                      {/* Product Details */}
-                      <div className="absolute bottom-7 left-7 right-7 transition-all duration-500 group-hover:-translate-y-2">
-
-                        <p className="uppercase tracking-[0.35em] text-[10px] text-neutral-400">
-                          {product.brand?.name || "ME"} /{" "}
-                          {product.category}
-                        </p>
-
-                        <h3 className="font-serif text-2xl md:text-[30px] mt-3 leading-tight text-white">
-                          {product.name}
-                        </h3>
-
-                        <div className="mt-6 flex items-center justify-between">
-                          <span className="text-lg text-white">
-                            ₹{Number(product.price).toLocaleString("en-IN")}
-                          </span>
-
-                          <span className="flex items-center gap-2 uppercase tracking-[0.25em] text-[11px] opacity-0 translate-y-3 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0 text-white">
-                            View
-                            <span className="text-lg">→</span>
-                          </span>
-                        </div>
-
-                      </div>
-                    </motion.div>
-                  );
-                })
-              )}
-
-            </div>
+                      <span className="flex items-center gap-1 sm:gap-2 uppercase tracking-[0.15em] sm:tracking-[0.25em] text-[9px] sm:text-[11px] opacity-100 sm:opacity-0 translate-y-0 sm:translate-y-3 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0 text-white">
+                        View
+                        <span className="text-base sm:text-lg">→</span>
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })
+          )}
+        </div>
+      </div>
     </section>
   );
 };

@@ -191,6 +191,11 @@ const PremiumShirts = () => {
                 }}
                 viewport={{ once: true }}
                 whileHover={{ y: -6 }}
+                onClick={() =>
+                navigate("/productInfo", {
+                  state: { product: data },
+                })
+              }
                 className="flex-none w-[75vw] sm:w-[320px] md:w-[350px] snap-start group cursor-pointer"
               >
                 <div className="relative overflow-hidden rounded-sm">

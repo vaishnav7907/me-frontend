@@ -175,10 +175,15 @@ const MenCollection = () => {
                 </div>
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent transition-all duration-700 group-hover:from-black group-hover:via-black/50" />
-
-                <span className="absolute top-2 left-2 sm:top-4 sm:left-4 md:top-6 md:left-6 bg-white text-black px-2 py-1 sm:px-3 sm:py-2 uppercase tracking-[0.2em] sm:tracking-[0.35em] text-[7px] sm:text-[9px] md:text-[10px]">
-                  New
-                </span>
+                {data.brand?.brandIcon?.url && (
+                  <div className="absolute top-3 left-3 sm:top-6 sm:left-6 z-10 w-9 h-9 sm:w-12 sm:h-12 bg-white rounded-full p-1.5 sm:p-2 flex items-center justify-center">
+                    <img
+                      src={data.brand.brandIcon.url}
+                      alt={data.brand.brandName}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                )}
 
                 <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-4 md:p-6 lg:p-7 transition-all duration-500 group-hover:-translate-y-2">
                   <p className="uppercase tracking-[0.15em] sm:tracking-[0.35em] text-[7px] sm:text-[10px] md:text-[11px] text-neutral-300">

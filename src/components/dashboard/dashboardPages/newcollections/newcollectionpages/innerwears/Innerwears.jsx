@@ -93,6 +93,11 @@ const Innerwears = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: index * 0.15 }}
             viewport={{ once: true }}
+            onClick={() =>
+                navigate("/productInfo", {
+                  state: { product: items },
+                })
+              }
           >
             <div className="h-4/5 overflow-hidden relative">
               <img
@@ -149,6 +154,11 @@ const Innerwears = () => {
                 whileHover={{
                   y: -10,
                 }}
+                onClick={() =>
+                navigate("/productInfo", {
+                  state: { product: data },
+                })
+              }
                 className="min-w-[320px] snap-center group cursor-pointer"
               >
                 <div className="relative overflow-hidden rounded-sm">
