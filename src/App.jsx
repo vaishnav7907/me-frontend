@@ -16,7 +16,7 @@ import Signup from "./components/authentication/signup/Signup";
 import Brands from "./components/dashboard/dashboardPages/brands/Brands";
 import BrandSubpage from "./components/dashboard/dashboardPages/brands/brandsSubpages/BrandSubpage";
 import Cart from "./components/dashboard/dashboardPages/cart/Cart";
-import CartOrder from "./components/dashboard/dashboardPages/cart/cartOrder/CartOrder";
+
 import MenCollection from "./components/dashboard/dashboardPages/collections/Collections";
 import MainPage from "./components/dashboard/dashboardPages/MainPage/MainPage";
 import LuxurJackets from "./components/dashboard/dashboardPages/newcollections/newcollectionpages/jackets/LuxurJackets";
@@ -92,7 +92,7 @@ function App() {
           <Route path="/orderSuccess" element={<OrderSuccess />} />
 
           <Route path="/Offers" element={<OfferPage />} />
-          <Route path="/CartOrder" element={<CartOrder />} />
+
           {/* end brand subpage */}
 
           {/* <Route element={}/> */}
@@ -115,7 +115,7 @@ function App() {
             }
           >
             <Route index element={<StoreOverview />} />
-            <Route path="storeWelcomeImage" element={<GetwelcomeImage/>}/>
+            <Route path="storeWelcomeImage" element={<GetwelcomeImage />} />
             <Route path="storeProducts" element={<StoreProducts />} />
             <Route path="storeNewArrivals" element={<StoreNewArrivals />} />
             <Route path="storeBrands" element={<StoreBrands />} />

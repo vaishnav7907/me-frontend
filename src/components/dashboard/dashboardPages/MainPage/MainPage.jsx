@@ -15,15 +15,16 @@ const MainPage = () => {
           <DashboardNavbar />
         </div>
 
-        <div className="w-full ">
+        <div className="w-full">
           <Outlet />
+
           <AnimatePresence>
             {sidebar && (
               <>
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  exit={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   className="fixed inset-0 bg-black/50 z-40"
                   onClick={() => setSidebar(false)}
                 />
